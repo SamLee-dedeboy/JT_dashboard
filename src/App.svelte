@@ -1,10 +1,10 @@
 <script lang="ts">
   import Router, { push } from "svelte-spa-router";
   import Home from "./lib/Home.svelte";
-  import MentalModel from "./lib/MentalModel.svelte";
-  import Sunburst from "./lib/Sunburst.svelte";
-  import Linking from "./lib/Linking.svelte";
-  import Flow from "./lib/Flow.svelte";
+  import MentalModel from "./lib/MentalModel/MentalModel.svelte";
+  import Sunburst from "./lib/Sunburst/Sunburst.svelte";
+  import Linking from "./lib/Linking/Linking.svelte";
+  import Flow from "./lib/Flow/Flow.svelte";
 
   const routes = {
     "/": Home,

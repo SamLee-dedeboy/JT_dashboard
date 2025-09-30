@@ -141,3 +141,4 @@ vite.config.ts.timestamp-*
 *.pyc
 server/flow_data/**/*.json
 server/mm_data/**/*.json
+server/linking_data/**/*.json
