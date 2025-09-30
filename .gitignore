@@ -137,3 +137,7 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+*.pyc
+server/flow_data/**/*.json
+server/mm_data/**/*.json
