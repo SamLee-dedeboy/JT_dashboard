@@ -23,7 +23,7 @@
   <div
     tabindex="0"
     role="button"
-    class="jt-section-title text-[2.5rem] text-[#253439] bg-[#7ed957] pl-4 flex items-center uppercase cursor-pointer"
+    class="jt-section-title text-[2.5rem] pl-4 flex items-center uppercase cursor-pointer"
     on:click={navigateHome}
     on:keyup={(e) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -41,5 +41,11 @@
   main {
     min-height: 100vh;
     display: flex;
+  }
+  .jt-section-title {
+    color: var(--bg-text-primary);
+    background-color: var(--bg-page);
+    font-family: var(--sc-title);
+    font-weight: 400;
   }
 </style>

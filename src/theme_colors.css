@@ -1,0 +1,84 @@
+/* deprecated -- do not use */
+:root {
+  color-scheme: dark;
+
+  /* --- Core Brand Colors --- */
+  --brand-primary: #43C5FF;   /* bright aqua accent */
+  --brand-secondary: #93CA12; /* vibrant lime green */
+
+  /* --- Backgrounds & Surfaces --- */
+  --bg-page: #1B262A;         /* deep blue-gray */
+  --bg-surface: #253439;      /* slightly lighter surface panels */
+  --border-subtle: #343C40;   /* low-contrast separators */
+
+  /* --- Text --- */
+  --text-primary: #FFFFFF;
+  --text-secondary: #E0E0E0;
+  --text-muted: #9AA0A4;
+
+  /* --- Interactive --- */
+  --link-color: var(--brand-primary);
+  --link-hover: #58C878;
+  --button-bg: var(--brand-primary);
+  --button-text: #FFFFFF;
+
+  /* --- Accents --- */
+  --accent-info: #43C5FF;
+  --accent-success: #58C878;
+  --accent-warning: #EFE397;
+  --accent-danger: #FF5A5A;
+
+  /* --- Neutrals --- */
+  --neutral-100: #FAFAFA;
+  --neutral-200: #E9E9E9;
+  --neutral-300: #CBCBCB;
+  --neutral-400: #808080;
+  --neutral-500: #4C4C4C;
+  --neutral-600: #343C40;
+  --neutral-700: #1F2C30;
+  --neutral-800: #1B262A;
+  --neutral-900: #000000;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: light;
+
+    /* --- Core Brand Colors --- */
+    --brand-primary: #0079C1;   /* strong medium aqua blue */
+    --brand-secondary: #6D960D; /* softened green accent */
+
+    /* --- Backgrounds & Surfaces --- */
+    --bg-page: #FAFAFA;
+    --bg-surface: #FFFFFF;
+    --border-subtle: #DDDDDD;
+
+    /* --- Text --- */
+    --text-primary: #1B262A;
+    --text-secondary: #343C40;
+    --text-muted: #666666;
+
+    /* --- Interactive --- */
+    --link-color: var(--brand-primary);
+    --link-hover: #005E95;
+    --button-bg: var(--brand-primary);
+    --button-text: #FFFFFF;
+
+    /* --- Accents --- */
+    --accent-info: #2D69C7;
+    --accent-success: #5AAA5A;
+    --accent-warning: #C9B200;
+    --accent-danger: #D94747;
+
+    /* --- Neutrals --- */
+    --neutral-100: #FFFFFF;
+    --neutral-200: #F0F0F0;
+    --neutral-300: #E0E0E0;
+    --neutral-400: #C1C1C1;
+    --neutral-500: #A0A0A0;
+    --neutral-600: #7D7D7D;
+    --neutral-700: #5A5A5A;
+    --neutral-800: #3B3B3B;
+    --neutral-900: #1B262A;
+  }
+}
+

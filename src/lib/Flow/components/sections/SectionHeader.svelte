@@ -307,7 +307,7 @@
   }
   .editable[placeholder]:empty:before {
     content: attr(placeholder);
-    color: #555;
+    color: var(--text-muted);
   }
 
   .editable[placeholder]:empty:focus:before {

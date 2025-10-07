@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -70,4 +69,46 @@ button:focus-visible {
   @apply flex h-full flex-col text-black;
   grid-row: 4/-1;
   z-index: 1;
+}
+
+
+:root {
+  /* --- Core Brand Colors --- */
+  --brand-primary: #93CA12;/* bright aqua accent (links, highlights) */
+  --brand-secondary: #43C5FF; /* green accent used in arrows and icons */
+
+  /* --- Backgrounds & Surfaces --- */
+  --bg-page: #1B262A;         /* deep blue-gray background */
+  --bg-surface: #253439;      /* slightly lighter surface panels */
+  --border-subtle: #343C40;   /* subtle separators */
+
+  /* --- Text --- */
+  --text-primary: #FFFFFF;    /* main text color */
+  --text-secondary: #E0E0E0;  /* secondary body text */
+  --text-muted: #808080;      /* muted text and placeholders */
+
+  /* --- Interactive & Utility --- */
+  --link-color: var(--brand-primary);
+  --link-hover: #58C878;      /* lighter green hover variant */
+  --button-bg: var(--brand-primary);
+  --button-text: #FFFFFF;
+
+  /* --- Accents & Highlights --- */
+  --accent-info: #43C5FF;     /* blue information tone */
+  --accent-success: #58C878;  /* green success tone */
+  --accent-warning: #EFE397;  /* yellow highlight tone */
+  --accent-danger: #FF5A5A;   /* red warning tone */
+
+  /* --- Neutrals --- */
+  --neutral-100: #FAFAFA;
+  --neutral-200: #E9E9E9;
+  --neutral-300: #CBCBCB;
+  --neutral-400: #808080;
+  --neutral-500: #4C4C4C;
+  --neutral-600: #343C40;
+  --neutral-700: #1F2C30;
+  --neutral-800: #1B262A;
+  --neutral-900: #010101;
+
+  --sc-title: 'Hammersmith One', sans-serif;
 }

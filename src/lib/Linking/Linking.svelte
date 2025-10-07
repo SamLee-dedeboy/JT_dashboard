@@ -14,10 +14,10 @@
 
 <div class="page-container flex grow">
   <!-- <CodeBubbles {codes} /> -->
-  <div class="flex-1">
+  <div class="flex-1 flex flex-col">
     <ScenarioOverview bind:selected_scenario />
   </div>
-  <div class="flex-1 flex flex-col">
+  <div class="bubble-container flex-1 flex flex-col">
     <ScenarioCodes {selected_scenario} />
   </div>
 </div>
@@ -37,5 +37,9 @@
   p {
     margin-bottom: 2rem;
     font-size: 1.1rem;
+  }
+  .bubble-container {
+    outline: 1px solid var(--brand-primary);
+    border-radius: 0.5rem;
   }
 </style>

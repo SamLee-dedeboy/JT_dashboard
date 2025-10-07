@@ -15,7 +15,7 @@
   }
 
   h1 {
-    color: #646cff;
+    color: var(--brand-primary);
     margin-bottom: 1rem;
   }
 

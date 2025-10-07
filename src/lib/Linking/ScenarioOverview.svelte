@@ -28,17 +28,17 @@
 </script>
 
 {#if !scenario_overview}
-  <div>Loading...</div>
+  <div class="loading">Loading...</div>
 {:else}
-  <div class="scenario-container flex flex-col grow gap-y-2">
+  <div class="scenario-container flex flex-col flex-1 gap-y-2">
     <div class="flex flex-col flex-1 gap-y-2">
       <div class="flex flex-col py-1 grow gap-y-2">
         <div class="selector flex flex-col gap-y-4 z-10">
-          <div class="text-gray-600 italic">Scenarios:</div>
+          <div class="scenario-label italic">Scenarios:</div>
           <div class="flex gap-x-4 gap-y-2 flex-wrap mx-1">
             {#each scenario_overview as scenario}
               <button
-                class="w-fit min-h-[4rem] text-sm italic outline outline-gray-200 outline-2 bg-gray-100 hover:bg-gray-300 hover:shadow-md text-gray-800 rounded px-2 py-0.5 font-sans uppercase transition-all"
+                class="scenario-button w-fit min-h-[4rem] text-sm italic outline outline-2 rounded px-2 py-0.5 font-sans uppercase transition-all"
                 class:active={selected_scenario?.name === scenario.name}
                 onclick={() =>
                   (selected_scenario = scenario_overview?.find(
@@ -50,40 +50,42 @@
             {/each}
           </div>
         </div>
-        <div class="overflow-y-auto bg-[#fffdf6] grow">
-          <div class="px-2 flex flex-col divide-y rounded text-slate-800">
+        <div class="content-area flex flex-col grow">
+          <div
+            class="content-container px-2 flex flex-col grow divide-y rounded"
+          >
             {#if selected_scenario}
               {#key selected_scenario.name}
-                <div in:slide class=" p-1 rounded">
-                  <span class="italic text-gray-500 text-sm">
+                <div in:slide class="p-1 rounded grow">add an image here</div>
+                <div in:slide class="p-1 rounded">
+                  <span class="field-label italic text-sm">
                     Description -
                   </span>
-                  <span>
+                  <span class="field-content">
                     {selected_scenario.narrative}
                   </span>
                 </div>
                 <div class="mt-2 px-1 rounded">
-                  <span class="italic text-gray-500 text-sm">
+                  <span class="field-label italic text-sm">
                     Primary Research Importance
                   </span>
-                  <div>
+                  <div class="field-content">
                     {selected_scenario.primary_research_importance}
                   </div>
                 </div>
                 <div class="mt-2 px-1 rounded">
-                  <span class="italic text-gray-500 text-sm"> Adaptation </span>
-                  <div>
+                  <span class="field-label italic text-sm"> Adaptation </span>
+                  <div class="field-content">
                     {selected_scenario.adaptation}
                   </div>
                 </div>
                 <div class="mt-2 px-1 rounded">
-                  <span class="italic text-gray-500 text-sm">
-                    Key Drivers
-                  </span>
-                  <div>
+                  <span class="field-label italic text-sm"> Key Drivers </span>
+                  <div class="field-content">
                     {selected_scenario.key_drivers}
                   </div>
                 </div>
+                <div class="min-h-[10rem]"></div>
               {/key}
             {/if}
           </div>
@@ -95,7 +97,49 @@
 
 <style lang="postcss">
   @reference "tailwindcss";
+
+  .loading {
+    color: var(--text-secondary);
+  }
+
+  .scenario-label {
+    color: var(--text-secondary);
+  }
+
+  .scenario-button {
+    /* background-color: var(--neutral-100); */
+    color: var(--text-primary);
+    outline-color: var(--neutral-500);
+  }
+
+  /* .scenario-button:hover {
+    background-color: var(--neutral-200);
+    box-shadow:
+      0 4px 6px -1px rgb(0 0 0 / 0.1),
+      0 2px 4px -2px rgb(0 0 0 / 0.1);
+  } */
+
   .active {
-    @apply bg-[#fffdf6] outline-orange-800 font-semibold text-orange-900;
+    background-color: var(--brand-primary);
+    outline-color: var(--brand-primary);
+    font-weight: 600;
+    color: var(--neutral-800);
+  }
+
+  .content-area {
+    /* background-color: var(--neutral-100); */
+  }
+
+  .content-container {
+    color: var(--text-primary);
+  }
+
+  .field-label {
+    color: var(--text-secondary);
+  }
+
+  .field-content {
+    /* color: var(--neutral-800); */
+    color: var(--text-primary);
   }
 </style>

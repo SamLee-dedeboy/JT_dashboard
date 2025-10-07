@@ -3,8 +3,8 @@
 </script>
 
 <div class="home-container">
-  <h1>JT Dashboard</h1>
-  <p>Welcome to the Just Transition Dashboard</p>
+  <!-- <h1>JT Dashboard</h1> -->
+  <p class="text-3xl">Welcome to the Just Transition Interview Dashboard</p>
 
   <div class="buttons-container">
     <button class="nav-button" on:click={() => push("/mental-model")}>
@@ -32,18 +32,18 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    font-family: var(--sc-title);
   }
 
   h1 {
-    color: #646cff;
+    color: var(--brand-primary);
     font-size: 3rem;
     margin-bottom: 1rem;
   }
 
   p {
-    font-size: 1.2rem;
     margin-bottom: 3rem;
-    color: rgba(255, 255, 255, 0.87);
+    color: var(--text-primary);
   }
 
   .buttons-container {
@@ -59,18 +59,29 @@
     font-size: 1.3rem;
     font-weight: 600;
     border-radius: 12px;
-    background: linear-gradient(135deg, #646cff 0%, #535bf2 100%);
-    color: white;
-    border: none;
+    /* background: linear-gradient(
+      135deg,
+      var(--brand-primary) 0%,
+      var(--accent-info) 100%
+    ); */
+    background: transparent;
+    color: var(--button-text);
+    /* color: var(--text-) */
+    /* border: 1px solid var(--brand-primary); */
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(100, 108, 255, 0.3);
+    /* box-shadow: 0 4px 15px rgba(67, 197, 255, 0.3); */
+    box-shadow: 0 2px 10px var(--brand-primary);
   }
 
   .nav-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(100, 108, 255, 0.4);
-    background: linear-gradient(135deg, #535bf2 0%, #646cff 100%);
+    box-shadow: 0 8px 25px rgba(67, 197, 255, 0.4);
+    background: linear-gradient(
+      135deg,
+      var(--accent-success) 0%,
+      var(--brand-primary) 100%
+    );
   }
 
   .nav-button:active {
@@ -79,7 +90,7 @@
 
   @media (prefers-color-scheme: light) {
     p {
-      color: #213547;
+      color: var(--text-primary);
     }
   }
 </style>
