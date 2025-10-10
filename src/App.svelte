@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Router, { push } from "svelte-spa-router";
+  import Router, { push, location } from "svelte-spa-router";
   import Home from "./lib/Home.svelte";
   import MentalModel from "./lib/MentalModel/MentalModel.svelte";
   import Sunburst from "./lib/Sunburst/Sunburst.svelte";
@@ -8,24 +8,28 @@
 
   const routes = {
     "/": Home,
+    "/flow": Flow,
+    "/linking": Linking,
     "/mental-model": MentalModel,
     "/sunburst": Sunburst,
-    "/linking": Linking,
-    "/flow": Flow,
   };
 
   const navigateHome = () => {
     push("/");
   };
+
+  // Reactive statement to check if we're not on the home page
+  let isNotHomePage = $derived($location !== "/");
 </script>
 
-<main class="flex flex-col">
+<main class="flex flex-col relative">
   <div
     tabindex="0"
     role="button"
     class="jt-section-title text-[2.5rem] pl-4 flex items-center uppercase cursor-pointer"
-    on:click={navigateHome}
-    on:keyup={(e) => {
+    class:jt-section-title--with-bg={isNotHomePage}
+    onclick={navigateHome}
+    onkeyup={(e) => {
       if (e.key === "Enter" || e.key === " ") {
         navigateHome();
       }
@@ -33,6 +37,16 @@
   >
     Just Transitions
   </div>
+  {#if !isNotHomePage}
+    <div
+      class="jt-section-subtitle absolute top-[2.5rem] left-[1rem] text-right"
+    >
+      <p class="jt-section-subtitle uppercase text-[2.5rem]">In The Delta</p>
+      <p class="jt-section-body text-[1.4rem]/2 font-light">
+        Drought, salinity, and sea-level rise
+      </p>
+    </div>
+  {/if}
   <Router {routes} />
 </main>
 
@@ -43,9 +57,19 @@
     display: flex;
   }
   .jt-section-title {
-    color: var(--bg-text-primary);
-    background-color: var(--bg-page);
+    color: var(--brand-primary);
     font-family: var(--sc-title);
     font-weight: 400;
+  }
+  .jt-section-title--with-bg {
+    background-color: var(--bg-page);
+  }
+  .jt-section-subtitle {
+    color: var(--brand-primary);
+    font-family: var(--sc-title);
+  }
+  .jt-section-body {
+    color: var(--brand-primary);
+    font-family: var(--body-content);
   }
 </style>

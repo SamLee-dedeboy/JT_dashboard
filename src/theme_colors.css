@@ -1,3 +1,20 @@
+/* 
+ * ⚠️  DEPRECATED FILE - DO NOT USE ⚠️ 
+ * 
+ * This file is deprecated and should not be used for new development.
+ * All CSS variables have been consolidated and updated in:
+ * - /src/app.css (main application styles)
+ * - /dragMM/index.css (mental model component)
+ * 
+ * Migration Path:
+ * - Replace old variables with new JT brand variables
+ * - Use --jt-primary instead of --brand-primary
+ * - Use --surface-* instead of --bg-* 
+ * - Use --text-* hierarchy for typography colors
+ * 
+ * This file will be removed in a future version.
+ */
+
 /* deprecated -- do not use */
 :root {
   color-scheme: dark;

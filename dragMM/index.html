@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Model Drag & Drop Interface</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            height: 100vh;
+            display: flex;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+        }
+        
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            font-family: var(--body-content);
+        }
+        
+        .header {
+            font-family: var(--sc-title);
+        }
+        
+        .sidebar {
+            width: 30%;
+            background-color: var(--bg-surface);
+            border-right: 2px solid var(--border-subtle);
+            overflow-y: auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: var(--neutral-700);
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--neutral-500);
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--neutral-400);
+        }
+        
+        .sidebar h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--brand-primary);
+            padding-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .canvas-area {
+            width: 70%;
+            background-color: var(--bg-page);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .canvas-header {
+            padding: 20px;
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            /* text-transform: uppercase; */
+            font-style: italic;
+        }
+        
+        .canvas-header h2 {
+            color: var(--text-primary);
+            /* color: var(--brand-secondary); */
+            text-align: center;
+        }
+        
+        .canvas {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(180deg, 
+                #51a2bd 0%, 
+                color-mix(in srgb, #51a2bd 30%, var(--bg-page)) 50%, 
+                color-mix(in srgb, #ffffff 30%, var(--bg-page)) 50%, 
+                #ffffff 100%);
+            overflow: hidden;
+        }
+
+        .canvas::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0);
+            background-size: 20px 20px;
+            z-index: 0;
+        }
+
+        .drop-zone {
+            position: absolute;
+            left: 20px;
+            right: 20px;
+            border: 2px dashed transparent;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .drop-zone.top {
+            top: 20px;
+            bottom: 50%;
+            margin-bottom: 10px;
+        }
+
+        .drop-zone.bottom {
+            top: 50%;
+            bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--brand-primary);
+            background-color: rgba(147, 202, 18, 0.1);
+            box-shadow: 0 0 20px rgba(147, 202, 18, 0.3);
+        }
+
+        /* Zone-specific drag-over styles */
+        .drop-zone.top.drag-over {
+            border-color: var(--dropzone-top-border);
+            background-color: color-mix(in srgb, var(--dropzone-top-border) 10%, transparent);
+            box-shadow: 0 0 20px color-mix(in srgb, var(--dropzone-top-border) 30%, transparent);
+        }
+
+        .drop-zone.bottom.drag-over {
+            border-color: var(--dropzone-bottom-border);
+            background-color: color-mix(in srgb, var(--dropzone-bottom-border) 10%, transparent);
+            box-shadow: 0 0 20px color-mix(in srgb, var(--dropzone-bottom-border) 30%, transparent);
+        }
+
+        /* Enhanced visual feedback for zone switching */
+        .drop-zone.zone-switch-valid {
+            border-color: var(--brand-secondary);
+            background-color: color-mix(in srgb, var(--brand-secondary) 15%, transparent);
+            box-shadow: 0 0 25px color-mix(in srgb, var(--brand-secondary) 40%, transparent);
+            animation: zoneSwitchPulse 1s ease-in-out infinite alternate;
+        }
+
+        /* Zone-specific zone-switch-valid styles to ensure proper colors */
+        .drop-zone.top.zone-switch-valid {
+            border-color: var(--dropzone-top-border);
+            background-color: color-mix(in srgb, var(--dropzone-top-border) 15%, transparent);
+            box-shadow: 0 0 25px color-mix(in srgb, var(--dropzone-top-border) 40%, transparent);
+        }
+
+        .drop-zone.bottom.zone-switch-valid {
+            border-color: var(--dropzone-bottom-border);
+            background-color: color-mix(in srgb, var(--dropzone-bottom-border) 15%, transparent);
+            box-shadow: 0 0 25px color-mix(in srgb, var(--dropzone-bottom-border) 40%, transparent);
+        }
+
+        @keyframes zoneSwitchPulse {
+            0% { 
+                border-width: 2px;
+                box-shadow: 0 0 25px color-mix(in srgb, var(--brand-secondary) 40%, transparent);
+            }
+            100% { 
+                border-width: 3px;
+                box-shadow: 0 0 35px color-mix(in srgb, var(--brand-secondary) 60%, transparent);
+            }
+        }
+
+        .drop-zone-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-primary);
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            margin-bottom: 10px;
+            opacity: 0.8;
+            font-family: var(--sc-title);
+            font-style: italic;
+        }
+
+        .drop-zone-hint {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: center;
+        }
+
+        .drop-zone.drag-over .drop-zone-hint {
+            opacity: 1;
+        }
+
+        .drop-zone.zone-switch-valid .drop-zone-hint {
+            opacity: 1;
+            /* color: var(--brand-secondary); */
+            /* font-weight: bold; */
+        }
+
+        .drop-zone-hint.zone-switch {
+            /* color: var(--brand-secondary); */
+            /* font-weight: bold; */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        .canvas-divider {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-subtle);
+            z-index: 1;
+        }
+        
+        .canvas-labels {
+            display: none;
+        }
+        
+        .canvas-label {
+            position: absolute;
+            font-weight: bold;
+            color: var(--text-primary);
+            font-size: 18px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+        
+        .canvas-label.top {
+            top: 25%;
+            transform: translateY(-50%);
+        }
+        
+        .canvas-label.bottom {
+            bottom: 25%;
+            transform: translateY(50%);
+        }
+        
+        .salinity-node {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, #6bb946 60%, #cccccc 95%);
+            /* border: 4px solid rgba(255, 255, 255, 0.8); */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--text-primary);
+            font-size: 18px;
+            box-shadow: 
+                0 6px 20px rgba(0,0,0,0.4),
+                0 0 0 8px rgba(255, 255, 255, 0.1),
+                0 0 0 16px rgba(255, 255, 255, 0.05);
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
+            z-index: 10;
+            font-family: var(--sc-title);
+        }
+
+        .code-node {
+            position: absolute;
+            min-width: 120px;
+            max-width: 200px;
+            padding: 12px 16px;
+            background: var(--bg-surface);
+            border: 2px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            cursor: move;
+            z-index: 5;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .code-node:hover {
+            border-color: var(--border-accent);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+            transform: translateY(-2px);
+        }
+
+        .code-node.general {
+            border-color: var(--border-subtle);
+            background: linear-gradient(135deg, var(--bg-surface), var(--neutral-600));
+            font-style: italic;
+        }
+
+        /* Zone-based border colors for code nodes */
+        .code-node[data-zone="impact"] {
+            border-color: var(--dropzone-top-border);
+        }
+
+        .code-node[data-zone="impacted"] {
+            border-color: var(--dropzone-bottom-border);
+        }
+
+        .code-node.dragging-canvas {
+            opacity: 0.9;
+            z-index: 1000;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            pointer-events: none;
+            transition: none;
+        }
+
+        .code-node .remove-btn {
+            display: none; /* Hidden since we're using trash zone now */
+        }
+
+        .connection-line {
+            position: absolute;
+            background: var(--brand-secondary);
+            height: 2px;
+            z-index: 1;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            transform-origin: left center;
+        }
+
+        .connection-line:hover {
+            opacity: 1;
+            height: 3px;
+        }
+
+        .canvas-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .canvas-btn {
+            padding: 8px 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .canvas-btn:hover {
+            background: var(--neutral-600);
+            border-color: var(--brand-primary);
+        }
+
+        .canvas-btn.danger {
+            background: var(--accent-danger);
+            border-color: var(--accent-danger);
+        }
+
+        .canvas-btn.danger:hover {
+            background: color-mix(in srgb, var(--accent-danger) 80%, black);
+        }
+
+        .stats-panel {
+            position: absolute;
+            top: 5rem;
+            right: 20px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            z-index: 20;
+        }
+
+        .stats-panel .stat {
+            margin: 2px 0;
+        }
+
+        .trash-zone {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 100px;
+            height: 100px;
+            background: var(--accent-danger);
+            border: 3px dashed rgba(239, 68, 68, 0.5);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .trash-zone.drag-over {
+            background: linear-gradient(45deg, 
+                color-mix(in srgb, var(--accent-danger) 90%, white),
+                color-mix(in srgb, var(--accent-danger) 70%, yellow)
+            );
+            border-color: var(--accent-danger);
+            border-style: solid;
+            border-width: 4px;
+            width: 140px;
+            height: 140px;
+            transform: translateY(-50%);
+            box-shadow: 
+                0 0 30px rgba(239, 68, 68, 0.9),
+                0 0 60px rgba(239, 68, 68, 0.6),
+                inset 0 0 20px rgba(255, 255, 255, 0.3);
+            opacity: 1;
+            animation: trashPulse 0.6s ease-in-out infinite alternate,
+                       trashGlow 1.2s ease-in-out infinite;
+        }
+
+        @keyframes trashPulse {
+            0% { 
+                width: 120px;
+                height: 120px;
+            }
+            100% { 
+                width: 130px;
+                height: 130px;
+            }
+        }
+
+        @keyframes trashGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 30px rgba(239, 68, 68, 0.9),
+                    0 0 60px rgba(239, 68, 68, 0.6),
+                    inset 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    0 0 40px rgba(239, 68, 68, 1),
+                    0 0 80px rgba(239, 68, 68, 0.8),
+                    inset 0 0 30px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        .trash-zone.active {
+            opacity: 1;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: translateY(-50%) scale(1); 
+                box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            }
+            50% { 
+                transform: translateY(-50%) scale(1.05); 
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .trash-icon {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .trash-zone.drag-over .trash-icon {
+            font-size: 28px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: trashIconBounce 0.4s ease-in-out infinite alternate;
+        }
+
+        @keyframes trashIconBounce {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-3px); }
+        }
+
+        .trash-label {
+            font-size: 10px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .trash-zone.drag-over .trash-label {
+            font-size: 11px;
+            color: #fff;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        .export-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-surface);
+            border: 2px solid var(--brand-primary);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .export-panel h3 {
+            color: var(--brand-primary);
+            margin-bottom: 15px;
+        }
+
+        .export-panel textarea {
+            width: 100%;
+            height: 200px;
+            background: var(--neutral-700);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            color: var(--text-primary);
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        /* Codebook Tree Styles */
+        #codebook-tree {
+            padding-bottom: 20px;
+        }
+
+        .parent-code {
+            margin-bottom: 15px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            background-color: var(--neutral-700);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .parent-code:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-color: var(--border-accent);
+        }
+
+        .parent-header {
+            padding: 12px 15px;
+            cursor: pointer;
+            background-color: var(--neutral-600);
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .parent-header:hover {
+            background-color: var(--neutral-500);
+            transform: translateY(-1px);
+        }
+
+        .parent-header:active {
+            transform: translateY(0);
+        }
+
+        .toggle-icon {
+            width: 16px;
+            height: 16px;
+            /* color: var(--brand-secondary); */
+            color: var(--brand-primary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            transform: rotate(-180deg);
+        }
+        
+        .toggle-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+
+        .parent-name {
+            font-weight: bold;
+            /* color: var(--brand-secondary); */
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .parent-definition {
+            padding: 10px 15px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            border-bottom: 1px solid var(--border-subtle);
+            background-color: rgba(0,0,0,0.1);
+            font-style: italic;
+            display: none; /* Hidden by default when collapsed */
+            transition: all 0.3s ease;
+        }
+
+        .parent-code.expanded .parent-definition {
+            display: block; /* Show when parent is expanded */
+        }
+
+        /* Collapsed state - children hidden by default */
+        .children-container {
+            padding: 10px;
+            background-color: var(--neutral-800);
+            border-radius: 0 0 8px 8px;
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 10px;
+        }
+        
+        .children-container.expanded {
+            max-height: 500px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .children-container.expanded::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .children-container.expanded::-webkit-scrollbar-track {
+            background: var(--neutral-700);
+            border-radius: 3px;
+        }
+
+        .children-container.expanded::-webkit-scrollbar-thumb {
+            background: var(--neutral-500);
+            border-radius: 3px;
+        }
+
+        .toggle-icon.collapsed {
+            transform: unset;
+        }
+
+        .child-code {
+            padding: 10px 12px;
+            margin: 5px 0;
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-height: 40px;
+        }
+
+        .child-code:hover {
+            background-color: var(--neutral-600);
+            border-color: var(--border-accent);
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .child-code:active {
+            cursor: grabbing;
+            transform: translateX(8px) scale(0.98);
+        }
+
+        .child-code.dragging {
+            opacity: 0.7;
+            transform: rotate(5deg) scale(1.05);
+            z-index: 1000;
+            border-color: var(--brand-secondary);
+            background-color: var(--brand-primary);
+        }
+
+        .child-name {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .drag-indicator {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 11px;
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+
+        /* .child-code:hover .drag-indicator {
+            opacity: 1;
+        } */
+
+        .child-code.dropped-impact {
+            border-left: 4px solid var(--brand-primary);
+            background: linear-gradient(90deg, color-mix(in srgb, var(--dropzone-top-border) 10%, transparent), var(--bg-surface));
+        }
+
+        .child-code.dropped-impacted {
+            border-left: 4px solid var(--brand-primary);
+            background: linear-gradient(270deg, color-mix(in srgb, var(--dropzone-bottom-border) 10%, transparent), var(--bg-surface));
+        }
+
+        .child-code.dropped-both {
+            border-left: 4px solid var(--brand-primary);
+            /* border-left: 4px solid var(--dropzone-top-border);
+            border-right: 4px solid var(--dropzone-bottom-border); */
+            /* background: linear-gradient(90deg, 
+                color-mix(in srgb, var(--dropzone-top-border) 10%, transparent) 0%, 
+                var(--bg-surface) 50%, 
+                color-mix(in srgb, var(--dropzone-bottom-border) 10%, transparent) 100%); */
+        }
+
+        .zone-indicator {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .child-code:hover .zone-indicator,
+        .child-code.dropped-impact .zone-indicator,
+        .child-code.dropped-impacted .zone-indicator,
+        .child-code.dropped-both .zone-indicator {
+            opacity: 1;
+        }
+
+        .zone-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            font-size: 8px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .zone-badge.impact {
+            background: var(--dropzone-top-border);
+        }
+
+        .zone-badge.impacted {
+            background: var(--dropzone-bottom-border);
+        }
+
+        .general-code:hover {
+            background-color: var(--neutral-500) !important;
+            border-color: var(--border-accent) !important;
+        }
+
+        /* Count badge */
+        .count-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--brand-primary);
+            color: var(--bg-surface);
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar for Codebook -->
+        <div class="sidebar header">
+            <h2>Themes</h2>
+            
+            <div id="codebook-tree">
+                <!-- Codebook tree will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Right Canvas Area -->
+        <div class="canvas-area">
+            <div class="canvas-header header">
+                <h2>What factors are at play for Delta salinity?</h2>
+            </div>
+            <div class="canvas" 
+                 ondrop="handleCanvasAreaDrop(event)" 
+                 ondragover="handleCanvasAreaDragOver(event)">
+                <!-- Canvas Controls -->
+                <div class="canvas-controls">
+                    <button class="canvas-btn" onclick="toggleConnections()" id="connections-btn">Hide Lines</button>
+                    <button class="canvas-btn" onclick="exportModel()">Submit</button>
+                    <button class="canvas-btn danger" onclick="clearCanvas()">Clear All</button>
+                </div>
+
+                <!-- Stats Panel -->
+                <div class="stats-panel" id="stats-panel">
+                    <div class="stat">Driving factors: <span id="impact-count">0</span></div>
+                    <div class="stat">Impacted factors: <span id="impacted-count">0</span></div>
+                    <div class="stat">Total factors: <span id="total-count">0</span></div>
+                </div>
+
+                <!-- Trash Zone -->
+                <div class="trash-zone" 
+                     ondrop="handleTrashDrop(event)" 
+                     ondragover="handleTrashDragOver(event)"
+                     ondragleave="handleTrashDragLeave(event)">
+                    <div class="trash-icon">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </div>
+                    <div class="trash-label">DROP TO<br>DELETE</div>
+                </div>
+                
+                <!-- Canvas divider line -->
+                <div class="canvas-divider"></div>
+                
+                <!-- Canvas labels -->
+                <!-- <div class="canvas-labels">
+                    <div class="canvas-label top">Impact Salinity</div>
+                    <div class="canvas-label bottom">Impacted by Salinity</div>
+                </div> -->
+                
+                <!-- Drop Zones -->
+                <div class="drop-zone top" 
+                     ondrop="handleCanvasDrop(event, 'impact')" 
+                     ondragover="handleCanvasDragOver(event)"
+                     ondragleave="handleCanvasDragLeave(event)">
+                    <div class="drop-zone-label">Factors that Drive Salinity</div>
+                    <div class="drop-zone-hint">Drop themes here that cause or influence salinity changes</div>
+                </div>
+                
+                <div class="drop-zone bottom" 
+                     ondrop="handleCanvasDrop(event, 'impacted')" 
+                     ondragover="handleCanvasDragOver(event)"
+                     ondragleave="handleCanvasDragLeave(event)">
+                    <div class="drop-zone-label">Factors Impacted by Salinity</div>
+                    <div class="drop-zone-hint">Drop themes here that are affected by salinity changes</div>
+                </div>
+                
+                <!-- Central Salinity Node -->
+                <div class="salinity-node" title="Central concept: Salinity">
+                    SALINITY
+                </div>
+                
+                <!-- Container for dropped code nodes -->
+                <div id="code-nodes-container"></div>
+                
+                <!-- Container for connection lines -->
+                <div id="connections-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Panel -->
+    <div class="overlay" id="overlay" onclick="closeExport()"></div>
+    <div class="export-panel" id="export-panel">
+        <h3>Submit Mental Model</h3>
+        <textarea id="export-data" readonly placeholder="Mental model data will appear here..."></textarea>
+        
+        <!-- Demographic Data Collection -->
+        <div class="demographic-section" style="margin-top: 20px; border-top: 2px solid var(--border-subtle); padding-top: 20px;">
+            <h4 style="color: var(--brand-primary); margin-bottom: 15px;">Demographic Information</h4>
+            
+            <div class="demographic-field" style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">Age:</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="age" value="18-35" style="margin: 0;">
+                        <span>18-35</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="age" value="36-64" style="margin: 0;">
+                        <span>36-64</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="age" value="65+" style="margin: 0;">
+                        <span>65+</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="demographic-field" style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">Engagement in the Delta:</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="engagement" value="0-10 years" style="margin: 0;">
+                        <span>0-10 years</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="engagement" value="11-30 years" style="margin: 0;">
+                        <span>11-30 years</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="engagement" value="31+ years" style="margin: 0;">
+                        <span>31+ years</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="demographic-field" style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">Residence:</label>
+                <p style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">Do you live in one of these counties: San Joaquin, Sacramento, Yolo, Solano, or Contra Costa?</p>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="residence" value="yes" style="margin: 0;">
+                        <span>Yes</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="residence" value="no" style="margin: 0;">
+                        <span>No</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text-primary);">
+                        <input type="radio" name="residence" value="used-to-live-there" style="margin: 0;">
+                        <span>I used to live there</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
+            <button class="canvas-btn" onclick="submitWithDemographics()">Submit with Demographics</button>
+            <button class="canvas-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button class="canvas-btn" onclick="closeExport()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let codebookData = [];
+        let hierarchicalData = {};
+        let currentDraggedCodeNode = null;
+
+        // Function to fetch and parse codebook data
+        async function loadCodebookData() {
+            try {
+                const response = await fetch('codebook.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                codebookData = await response.json();
+                console.log('Loaded codebook data:', codebookData.length, 'items');
+                
+                // Organize data into hierarchical structure
+                organizeHierarchicalData();
+                
+                // Render the codebook tree
+                renderCodebookTree();
+                
+            } catch (error) {
+                console.error('Error loading codebook data:', error);
+                document.getElementById('codebook-tree').innerHTML = 
+                    '<p style="color: var(--accent-danger);">Error loading codebook data</p>';
+            }
+        }
+
+        // Function to organize data into parent-child relationships
+        function organizeHierarchicalData() {
+            hierarchicalData = {};
+            
+            // First pass: identify all parent codes
+            const parentCodes = new Set();
+            codebookData.forEach(item => {
+                if (item.parent_code && item.parent_code !== 'N/A') {
+                    parentCodes.add(item.parent_code);
+                }
+            });
+
+            // Second pass: organize into hierarchy
+            codebookData.forEach(item => {
+                if (item.parent_code === 'N/A') {
+                    // This is a top-level parent
+                    if (!hierarchicalData[item.code_name]) {
+                        hierarchicalData[item.code_name] = {
+                            definition: item.definition,
+                            children: []
+                        };
+                    }
+                } else if (item.parent_code && parentCodes.has(item.parent_code)) {
+                    // This is a child code
+                    if (!hierarchicalData[item.parent_code]) {
+                        hierarchicalData[item.parent_code] = {
+                            definition: '',
+                            children: []
+                        };
+                    }
+                    hierarchicalData[item.parent_code].children.push({
+                        name: item.code_name,
+                        definition: item.definition
+                    });
+                }
+            });
+
+            console.log('Organized hierarchical data:', hierarchicalData);
+        }
+
+        // Function to render the codebook tree in the sidebar
+        function renderCodebookTree() {
+            const treeContainer = document.getElementById('codebook-tree');
+            treeContainer.innerHTML = '';
+
+            // Sort parent codes alphabetically
+            const sortedParents = Object.keys(hierarchicalData).sort();
+
+            sortedParents.forEach(parentName => {
+                const parentData = hierarchicalData[parentName];
+                
+                // Create parent container
+                const parentDiv = document.createElement('div');
+                parentDiv.className = 'parent-code';
+                parentDiv.innerHTML = `
+                    <div class="parent-header" onclick="toggleParent('${parentName}')">
+                        <span class="toggle-icon collapsed" id="toggle-${parentName}">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-down-from-line-icon lucide-arrow-down-from-line"><path d="M19 3H5"/><path d="M12 21V7"/><path d="m6 15 6 6 6-6"/></svg>
+                        </span>
+                        <span class="parent-name">${parentName}</span>
+                        <span class="count-badge">${parentData.children.length + 1}</span>
+                    </div>
+                    <div class="parent-definition">${parentData.definition}</div>
+                    <div class="children-container collapsed" id="children-${parentName}">
+                        <div class="child-code general-code" 
+                             draggable="true" 
+                             data-code-name="${parentName} (general)" 
+                             data-parent="${parentName}"
+                             title="${parentData.definition}"
+                             ondragstart="handleSidebarDragStart(event)"
+                             ondragend="handleSidebarDragEnd(event)">
+                            <span class="child-name">${parentName} (general)</span>
+                            <span class="zone-indicator">
+                                <span class="zone-badge impact" title="Impact Zone">I</span>
+                                <span class="zone-badge impacted" title="Impacted Zone">R</span>
+                            </span>
+                            <span class="drag-indicator">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical-icon lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                            </span>
+                        </div>
+                        ${parentData.children.map(child => `
+                            <div class="child-code" 
+                                 draggable="true" 
+                                 data-code-name="${child.name}" 
+                                 data-parent="${parentName}"
+                                 title="${child.definition}"
+                                 ondragstart="handleSidebarDragStart(event)"
+                                 ondragend="handleSidebarDragEnd(event)">
+                                <span class="child-name">${child.name}</span>
+                                <span class="zone-indicator">
+                                    <span class="zone-badge impact" title="Impact Zone">I</span>
+                                    <span class="zone-badge impacted" title="Impacted Zone">R</span>
+                                </span>
+                                <span class="drag-indicator">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-grip-vertical-icon lucide-grip-vertical"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                treeContainer.appendChild(parentDiv);
+            });
+        }
+
+        // Function to toggle parent code visibility with smooth animation
+        function toggleParent(parentName) {
+            const parentDiv = document.querySelector(`[onclick*="toggleParent('${parentName}')"]`).closest('.parent-code');
+            const childrenContainer = document.getElementById(`children-${parentName}`);
+            const toggleIcon = document.getElementById(`toggle-${parentName}`);
+            
+            if (childrenContainer.classList.contains('collapsed')) {
+                // Expand
+                parentDiv.classList.add('expanded');
+                childrenContainer.classList.remove('collapsed');
+                childrenContainer.classList.add('expanded');
+                toggleIcon.classList.remove('collapsed');
+            } else {
+                // Collapse
+                parentDiv.classList.remove('expanded');
+                childrenContainer.classList.remove('expanded');
+                childrenContainer.classList.add('collapsed');
+                toggleIcon.classList.add('collapsed');
+            }
+        }
+
+        // Drag and drop event handlers for sidebar codes
+        function handleSidebarDragStart(event) {
+            event.target.classList.add('dragging');
+            event.dataTransfer.setData('text/plain', JSON.stringify({
+                codeName: event.target.dataset.codeName,
+                parent: event.target.dataset.parent,
+                source: 'sidebar' // Add source identifier
+            }));
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleSidebarDragEnd(event) {
+            event.target.classList.remove('dragging');
+        }
+
+        // Canvas drag and drop handlers
+        let droppedCodes = { impact: [], impacted: [] };
+        let nodeIdCounter = 0;
+        let connectionsVisible = true;
+
+        function handleCanvasDragOver(event) {
+            // Handle drop zone effects for both sidebar codes and canvas nodes
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            
+            const dropZone = event.currentTarget;
+            const hintElement = dropZone.querySelector('.drop-zone-hint');
+            const isTopZone = dropZone.classList.contains('top');
+            const isBottomZone = dropZone.classList.contains('bottom');
+            
+            // Try to determine if this is a zone-switching drag
+            if (currentDraggedCodeNode) {
+                const currentZone = currentDraggedCodeNode.dataset.zone;
+                const codeName = currentDraggedCodeNode.dataset.codeName;
+                
+                // Check if this is a valid zone switch
+                const isValidSwitch = (currentZone === 'impact' && isBottomZone) || 
+                                    (currentZone === 'impacted' && isTopZone);
+                
+                if (isValidSwitch) {
+                    dropZone.classList.add('zone-switch-valid');
+                    hintElement.textContent = `Switch "${codeName}" to this zone`;
+                    hintElement.classList.add('zone-switch');
+                } else if (currentZone === (isTopZone ? 'impact' : 'impacted')) {
+                    // Same zone - just repositioning
+                    dropZone.classList.add('drag-over');
+                    hintElement.textContent = `Reposition "${codeName}" within this zone`;
+                } else {
+                    // Invalid zone switch
+                    dropZone.classList.add('drag-over');
+                    hintElement.textContent = `Cannot move ${currentZone} factors here`;
+                    hintElement.style.color = 'var(--accent-danger)';
+                }
+            } else {
+                // Default behavior for sidebar codes
+                dropZone.classList.add('drag-over');
+                // Keep original hint text for sidebar codes
+                if (isTopZone) {
+                    hintElement.textContent = 'Drop themes here that cause or influence salinity changes';
+                } else {
+                    hintElement.textContent = 'Drop themes here that are affected by salinity changes';
+                }
+            }
+        }
+
+        function handleCanvasDragLeave(event) {
+            // Only remove if we're actually leaving the drop zone
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+                const dropZone = event.currentTarget;
+                const hintElement = dropZone.querySelector('.drop-zone-hint');
+                const isTopZone = dropZone.classList.contains('top');
+                
+                dropZone.classList.remove('drag-over', 'zone-switch-valid');
+                hintElement.classList.remove('zone-switch');
+                hintElement.style.color = '';
+                
+                // Reset to original hint text
+                if (isTopZone) {
+                    hintElement.textContent = 'Drop themes here that cause or influence salinity changes';
+                } else {
+                    hintElement.textContent = 'Drop themes here that are affected by salinity changes';
+                }
+            }
+        }
+
+        function handleCanvasDrop(event, zone) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over', 'zone-switch-valid');
+            
+            const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+            
+            // Handle sidebar codes (new codes being added)
+            if (data.source === "sidebar") {
+                const { codeName, parent } = data;
+                
+                // Check if code is already in this zone
+                if (droppedCodes[zone].some(code => code.name === codeName)) {
+                    alert(`"${codeName}" is already in this zone.`);
+                    return;
+                }
+                
+                // Create a new code node
+                createCodeNode(codeName, parent, zone, event.clientX, event.clientY);
+                
+                // Add to dropped codes array
+                droppedCodes[zone].push({ name: codeName, parent: parent });
+                
+                // Update sidebar visual indicators
+                updateSidebarIndicators();
+                
+                // Update stats and connections
+                updateStats();
+                if (connectionsVisible) {
+                    updateConnections();
+                }
+                
+                console.log(`Dropped "${codeName}" in ${zone} zone`);
+            }
+            // Handle canvas nodes (zone switching)
+            else if (data.source === 'canvas-node') {
+                const { nodeId, codeName, zone: currentZone } = data;
+                
+                // Validate zone switching rules: top can only go to bottom, bottom can only go to top
+                if ((currentZone === 'impact' && zone === 'impacted') || 
+                    (currentZone === 'impacted' && zone === 'impact')) {
+                    
+                    // Check if code is already in the target zone
+                    if (droppedCodes[zone].some(code => code.name === codeName)) {
+                        alert(`"${codeName}" is already in this zone.`);
+                        return;
+                    }
+                    
+                    // Move the node to the new zone
+                    switchCodeNodeZone(nodeId, codeName, currentZone, zone, event.clientX, event.clientY);
+                    
+                    console.log(`Switched "${codeName}" from ${currentZone} to ${zone} zone`);
+                } else if (currentZone === zone) {
+                    // Same zone drop - just reposition
+                    console.log(`Repositioned "${codeName}" within ${zone} zone`);
+                } else {
+                    // Invalid zone switch
+                    alert(`Invalid zone switch: ${currentZone} nodes can only be moved to ${currentZone === 'impact' ? 'impacted' : 'impact'} zone.`);
+                }
+            }
+        }
+
+        function createCodeNode(codeName, parent, zone, clientX, clientY) {
+            console.log("createCodeNode:", codeName, parent, zone, clientX, clientY);
+            const canvas = document.querySelector('.canvas');
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            // Calculate position relative to canvas
+            let x = clientX - canvasRect.left;
+            let y = clientY - canvasRect.top;
+            
+            // Ensure the node stays within bounds with more generous spacing
+            x = Math.max(20, Math.min(x - 60, canvasRect.width - 200));
+            y = Math.max(30, Math.min(y - 20, canvasRect.height - 60));
+            
+            // Adjust y position based on zone
+            if (zone === 'impact') {
+                y = Math.max(30, Math.min(y, canvasRect.height * 0.45));
+            } else {
+                y = Math.max(canvasRect.height * 0.55, Math.min(y, canvasRect.height - 60));
+            }
+            
+            const nodeId = `node-${++nodeIdCounter}`;
+            const isGeneral = codeName.includes('(general)');
+            
+            const codeNode = document.createElement('div');
+            codeNode.className = `code-node ${isGeneral ? 'general' : ''}`;
+            codeNode.id = nodeId;
+            codeNode.style.left = x + 'px';
+            codeNode.style.top = y + 'px';
+            codeNode.innerHTML = codeName;
+            
+            // Store zone information for deletion
+            codeNode.dataset.zone = zone;
+            codeNode.dataset.codeName = codeName;
+            
+            // Make nodes draggable within canvas and to trash
+            codeNode.draggable = true;
+            codeNode.addEventListener('dragstart', function(e) {
+                handleCodeNodeDragStart(e, codeNode, nodeId, codeName, zone);
+            });
+            
+            codeNode.addEventListener('dragend', function(e) {
+                handleCodeNodeDragEnd(e, codeNode, nodeId);
+            });
+            
+            // Function to make element follow cursor during drag
+            document.getElementById('code-nodes-container').appendChild(codeNode);
+        }
+        function followCursorDuringDrag(e) {
+            if (currentDraggedCodeNode) {
+                e.preventDefault(); // Prevent default to allow our custom behavior
+                
+                const canvas = document.querySelector('.canvas');
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                // Calculate position relative to canvas, centered on cursor
+                let x = e.clientX - canvasRect.left - (currentDraggedCodeNode.offsetWidth / 2);
+                let y = e.clientY - canvasRect.top - (currentDraggedCodeNode.offsetHeight / 2);
+                
+                // Constrain to canvas bounds
+                x = Math.max(20, Math.min(x, canvasRect.width - currentDraggedCodeNode.offsetWidth - 20));
+                y = Math.max(20, Math.min(y, canvasRect.height - currentDraggedCodeNode.offsetHeight - 20));
+                
+                currentDraggedCodeNode.style.left = x + 'px';
+                currentDraggedCodeNode.style.top = y + 'px';
+                
+                // Update connections in real-time during drag
+                if (connectionsVisible) {
+                    requestAnimationFrame(() => updateConnections());
+                }
+            }
+        }
+
+        function handleCodeNodeDragStart(e, codeNode, nodeId, codeName, zone) {
+            console.log('Drag started for node:', nodeId, codeName, zone);
+            
+            // Set the global reference to the currently dragged node
+            currentDraggedCodeNode = codeNode;
+            
+            // Get current zone from the node's dataset in case it was switched
+            const currentZone = codeNode.dataset.zone;
+            
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                nodeId: nodeId,
+                codeName: codeName,
+                zone: currentZone,
+                action: 'move-or-delete',
+                source: 'canvas-node'
+            }));
+            
+            // Hide the default drag image by creating an empty one
+            const emptyImg = new Image();
+            emptyImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+            e.dataTransfer.setDragImage(emptyImg, 0, 0);
+            
+            // Start following cursor with the actual element
+            codeNode.classList.add('dragging-canvas');
+            
+            // Store original position
+            codeNode.dataset.originalLeft = codeNode.style.left;
+            codeNode.dataset.originalTop = codeNode.style.top;
+            
+            // Add global mousemove listener to follow cursor
+            document.addEventListener('dragover', followCursorDuringDrag);
+            
+            // Activate trash zone visual feedback
+            const trashZone = document.querySelector('.trash-zone');
+            console.log('Activating trash zone', trashZone);
+            if (trashZone) {
+                trashZone.classList.add('active');
+            }
+        }
+
+        function handleCodeNodeDragEnd(e, codeNode, nodeId) {
+            console.log('Drag ended for node:', nodeId);
+            
+            // Clear the global reference to the dragged node
+            currentDraggedCodeNode = null;
+            
+            // Stop following cursor
+            document.removeEventListener('dragover', followCursorDuringDrag);
+            
+            // Reset visual state
+            codeNode.classList.remove('dragging-canvas');
+            
+            // Update connections after drag ends
+            if (connectionsVisible) {
+                updateConnections();
+            }
+            
+            // Deactivate trash zone visual feedback
+            const trashZone = document.querySelector('.trash-zone');
+            if (trashZone) {
+                trashZone.classList.remove('active', 'drag-over');
+            }
+        }
+
+        function removeCodeNode(nodeId, zone, codeName) {
+            const node = document.getElementById(nodeId);
+            if (node) {
+                node.remove();
+                // Remove from dropped codes array
+                droppedCodes[zone] = droppedCodes[zone].filter(code => code.name !== codeName);
+                
+                // Update sidebar visual indicators
+                updateSidebarIndicators();
+                
+                // Update stats and connections
+                updateStats();
+                if (connectionsVisible) {
+                    updateConnections();
+                }
+                
+                console.log(`Removed "${codeName}" from ${zone} zone`);
+            }
+        }
+
+        function switchCodeNodeZone(nodeId, codeName, fromZone, toZone, clientX, clientY) {
+            const node = document.getElementById(nodeId);
+            if (!node) return;
+
+            // Find the code data from the original zone
+            const codeData = droppedCodes[fromZone].find(code => code.name === codeName);
+            if (!codeData) return;
+
+            // Remove from original zone
+            droppedCodes[fromZone] = droppedCodes[fromZone].filter(code => code.name !== codeName);
+            
+            // Add to new zone
+            droppedCodes[toZone].push(codeData);
+            
+            // Update node's zone data attribute
+            node.dataset.zone = toZone;
+            
+            // Calculate new position within the appropriate zone
+            const canvas = document.querySelector('.canvas');
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            let x = clientX - canvasRect.left;
+            let y = clientY - canvasRect.top;
+            
+            // Ensure the node stays within bounds
+            x = Math.max(20, Math.min(x - 60, canvasRect.width - 200));
+            y = Math.max(30, Math.min(y - 20, canvasRect.height - 60));
+            
+            // Adjust y position based on new zone
+            if (toZone === 'impact') {
+                y = Math.max(30, Math.min(y, canvasRect.height * 0.45));
+            } else {
+                y = Math.max(canvasRect.height * 0.55, Math.min(y, canvasRect.height - 60));
+            }
+            
+            // Update node position
+            node.style.left = x + 'px';
+            node.style.top = y + 'px';
+            
+            // Update sidebar visual indicators
+            updateSidebarIndicators();
+            
+            // Update stats and connections
+            updateStats();
+            if (connectionsVisible) {
+                updateConnections();
+            }
+            
+            console.log(`Switched "${codeName}" from ${fromZone} to ${toZone} zone`);
+        }
+
+        // Trash zone handlers
+        function handleTrashDragOver(event) {
+            console.log('handleTrashDragOver called on:', event.target, event.currentTarget);
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            event.currentTarget.classList.add('drag-over');
+            console.log('Dragging over trash zone - drag-over class added');
+        }
+
+        function handleTrashDragLeave(event) {
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+                event.currentTarget.classList.remove('drag-over');
+                console.log('Left trash zone');
+            }
+        }
+
+        function handleTrashDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            console.log('Drop detected on trash zone');
+            
+            try {
+                const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+                console.log('Trash drop data:', data);
+                
+                // Only handle deletion of canvas nodes, not sidebar codes
+                if (data.source === 'canvas-node' && data.action === 'move-or-delete' && data.nodeId) {
+                    console.log(`Attempting to delete node: ${data.nodeId}, ${data.codeName}, ${data.zone}`);
+                    removeCodeNode(data.nodeId, data.zone, data.codeName);
+                    console.log(`Successfully deleted "${data.codeName}" via trash zone`);
+                } else {
+                    console.log('Invalid data for trash deletion:', data);
+                }
+            } catch (error) {
+                console.error('Error handling trash drop:', error);
+            }
+        }
+
+        // Canvas area drop handlers (for canvas node repositioning)
+        function handleCanvasAreaDragOver(event) {
+            // Only allow drops for canvas nodes being repositioned
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleCanvasAreaDrop(event) {
+            // Only handle canvas node drops (not sidebar codes)
+            try {
+                const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+                
+                if (data.source === 'canvas-node' && data.action === 'move-or-delete') {
+                    event.preventDefault();
+                    console.log('Canvas node dropped on canvas area - keeping current position');
+                    // Node position was already updated during drag, just ensure it's finalized
+                    const node = document.getElementById(data.nodeId);
+                    if (node && currentDraggedCodeNode === node) {
+                        // Position is already set by followCursorDuringDrag, just ensure it's stable
+                        console.log(`Node ${data.codeName} dropped at position: ${node.style.left}, ${node.style.top}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error handling canvas area drop:', error);
+            }
+        }
+
+        function updateSidebarIndicators() {
+            // Get all child code elements in the sidebar
+            const childCodes = document.querySelectorAll('.child-code');
+            
+            childCodes.forEach(element => {
+                const codeName = element.dataset.codeName;
+                
+                // Check if this code is in any zones
+                const inImpact = droppedCodes.impact.some(code => code.name === codeName);
+                const inImpacted = droppedCodes.impacted.some(code => code.name === codeName);
+                
+                // Remove all zone classes first
+                element.classList.remove('dropped-impact', 'dropped-impacted', 'dropped-both');
+                
+                // Add appropriate class based on zones
+                if (inImpact && inImpacted) {
+                    element.classList.add('dropped-both');
+                } else if (inImpact) {
+                    element.classList.add('dropped-impact');
+                } else if (inImpacted) {
+                    element.classList.add('dropped-impacted');
+                }
+                
+                // Update zone indicator badges
+                const zoneBadges = element.querySelectorAll('.zone-badge');
+                zoneBadges.forEach(badge => {
+                    if (badge.classList.contains('impact')) {
+                        badge.style.opacity = inImpact ? '1' : '0.3';
+                    } else if (badge.classList.contains('impacted')) {
+                        badge.style.opacity = inImpacted ? '1' : '0.3';
+                    }
+                });
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('impact-count').textContent = droppedCodes.impact.length;
+            document.getElementById('impacted-count').textContent = droppedCodes.impacted.length;
+            document.getElementById('total-count').textContent = 
+                droppedCodes.impact.length + droppedCodes.impacted.length;
+        }
+
+        function toggleConnections() {
+            connectionsVisible = !connectionsVisible;
+            const btn = document.getElementById('connections-btn');
+            
+            if (connectionsVisible) {
+                btn.textContent = 'Hide Lines';
+                updateConnections();
+            } else {
+                btn.textContent = 'Show Lines';
+                document.getElementById('connections-container').innerHTML = '';
+            }
+        }
+
+        function updateConnections() {
+            const container = document.getElementById('connections-container');
+            container.innerHTML = '';
+            
+            const salinityNode = document.querySelector('.salinity-node');
+            const salinityRect = salinityNode.getBoundingClientRect();
+            const canvasRect = document.querySelector('.canvas').getBoundingClientRect();
+            
+            const salinityCenter = {
+                x: salinityRect.left + salinityRect.width / 2 - canvasRect.left,
+                y: salinityRect.top + salinityRect.height / 2 - canvasRect.top
+            };
+            
+            // Draw connections to all code nodes
+            document.querySelectorAll('.code-node').forEach(node => {
+                const nodeRect = node.getBoundingClientRect();
+                const nodeCenter = {
+                    x: nodeRect.left + nodeRect.width / 2 - canvasRect.left,
+                    y: nodeRect.top + nodeRect.height / 2 - canvasRect.top
+                };
+                
+                createConnectionLine(salinityCenter, nodeCenter, container);
+            });
+        }
+
+        function createConnectionLine(start, end, container) {
+            const line = document.createElement('div');
+            line.className = 'connection-line';
+            
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            
+            line.style.width = length + 'px';
+            line.style.left = start.x + 'px';
+            line.style.top = start.y + 'px';
+            line.style.transform = `rotate(${angle}deg)`;
+            
+            container.appendChild(line);
+        }
+
+        function clearCanvas() {
+            if (confirm('Are you sure you want to clear all codes from the canvas?')) {
+                document.getElementById('code-nodes-container').innerHTML = '';
+                document.getElementById('connections-container').innerHTML = '';
+                droppedCodes = { impact: [], impacted: [] };
+                nodeIdCounter = 0;
+                
+                // Update sidebar indicators
+                updateSidebarIndicators();
+                updateStats();
+                console.log('Canvas cleared');
+            }
+        }
+
+        function exportModel() {
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                mentalModel: {
+                    centralConcept: 'Salinity',
+                    impactFactors: droppedCodes.impact.map(code => ({
+                        name: code.name,
+                        parent: code.parent,
+                        type: code.name.includes('(general)') ? 'general' : 'specific'
+                    })),
+                    impactedFactors: droppedCodes.impacted.map(code => ({
+                        name: code.name,
+                        parent: code.parent,
+                        type: code.name.includes('(general)') ? 'general' : 'specific'
+                    })),
+                    statistics: {
+                        totalCodes: droppedCodes.impact.length + droppedCodes.impacted.length,
+                        impactFactorsCount: droppedCodes.impact.length,
+                        impactedFactorsCount: droppedCodes.impacted.length
+                    }
+                }
+            };
+            
+            document.getElementById('export-data').value = JSON.stringify(exportData, null, 2);
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('export-panel').style.display = 'block';
+        }
+
+        function closeExport() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('export-panel').style.display = 'none';
+        }
+
+        function submitWithDemographics() {
+            // Get demographic data from radio buttons
+            const age = document.querySelector('input[name="age"]:checked')?.value || '';
+            const engagement = document.querySelector('input[name="engagement"]:checked')?.value || '';
+            const residence = document.querySelector('input[name="residence"]:checked')?.value || '';
+            
+            // Validate demographic data
+            if (!age || !engagement || !residence) {
+                alert('Please fill in all demographic information fields before submitting.');
+                return;
+            }
+            
+            // Create submission data including demographics
+            const submissionData = {
+                timestamp: new Date().toISOString(),
+                mentalModel: {
+                    centralConcept: 'Salinity',
+                    impactFactors: droppedCodes.impact.map(code => ({
+                        name: code.name,
+                        parent: code.parent,
+                        type: code.name.includes('(general)') ? 'general' : 'specific'
+                    })),
+                    impactedFactors: droppedCodes.impacted.map(code => ({
+                        name: code.name,
+                        parent: code.parent,
+                        type: code.name.includes('(general)') ? 'general' : 'specific'
+                    })),
+                    statistics: {
+                        totalCodes: droppedCodes.impact.length + droppedCodes.impacted.length,
+                        impactFactorsCount: droppedCodes.impact.length,
+                        impactedFactorsCount: droppedCodes.impacted.length
+                    }
+                },
+                demographics: {
+                    age: age,
+                    deltaEngagement: engagement,
+                    residence: residence
+                }
+            };
+            
+            // Create filename with timestamp for uniqueness
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `mental_model_submission_${timestamp}.json`;
+            
+            // Create and download the JSON file
+            const jsonString = JSON.stringify(submissionData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            // Create a temporary download link and trigger download
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = filename;
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            
+            // Clean up the URL object
+            URL.revokeObjectURL(url);
+            
+            // Show success message
+            alert('Thank you! Your mental model and demographic data have been downloaded as a JSON file.');
+            
+            // Copy complete data to textarea for reference
+            document.getElementById('export-data').value = JSON.stringify(submissionData, null, 2);
+            
+            // Close the panel
+            closeExport();
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('export-data');
+            textarea.select();
+            document.execCommand('copy');
+            
+            // Provide visual feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => {
+                btn.textContent = originalText;
+            }, 2000);
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing application...');
+            loadCodebookData();
+            updateStats(); // Initialize stats display
+            updateSidebarIndicators(); // Initialize sidebar indicators
+            // Initialize connections as visible
+            updateConnections();
+            // Add a global mousemove listener to the document to track cursor
+        });
+
+    </script>
+</body>
+</html>

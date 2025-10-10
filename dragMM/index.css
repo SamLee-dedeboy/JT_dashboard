@@ -1,4 +1,3 @@
-@import "tailwindcss";
 @font-face {
   font-family: 'Proxima Nova';
   src: url('/src/assets/proximanova/proximanova_regular.ttf') format('truetype');
@@ -178,4 +177,8 @@ button:focus-visible {
   /* --- Legacy Typography Variables --- */
   --sc-title: var(--font-family-display);
   --body-content: var(--font-family-body);
+
+  /* --- Dropzone Colors --- */
+  --dropzone-top-border: #51a2bd;    /* Coral red for top dropzone */
+  --dropzone-bottom-border: #ffffff; /* Teal for bottom dropzone */
 }

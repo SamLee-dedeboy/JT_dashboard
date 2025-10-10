@@ -1,0 +1,622 @@
+[
+  {
+    "parent_code": "N/A",
+    "code_name": "Climate change",
+    "definition": "Alterations in the Earth's climate patterns due to anthropogenic activities. This includes both direct references to climate change and indirect references to its consequences, such as sea level rise and extreme weather shifts"
+  },
+  {
+    "parent_code": "Climate change",
+    "code_name": "extreme wet years",
+    "definition": "years characterized by extreme precipitation"
+  },
+  {
+    "parent_code": "Climate change",
+    "code_name": "extreme dry years",
+    "definition": "Drought years"
+  },
+  {
+    "parent_code": "Climate change",
+    "code_name": "sea-level rise",
+    "definition": "increase in ocean levels"
+  },
+  {
+    "parent_code": "Climate change",
+    "code_name": "heat waves",
+    "definition": "prolonged hot periods"
+  },
+  {
+    "parent_code": "Climate change",
+    "code_name": "wildfires",
+    "definition": "Wildfires"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Policy & Regulatory Environment",
+    "definition": "Laws, regulations, and government policies that shape water management, land use, environmental protections, and community rights in the Delta. Includes local, state, and federal policies, as well as regulatory agency actions and legal disputes. This also includes implicit regulatory contexts, such as permitting requirements, environmental review processes (e.g., Environmental Impact Reports), agency decisions."
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "Bay-Delta Plan & D-1641",
+    "definition": "The Bay-Delta Plan delineates water quality standards, set into motion by the State Water Resources Control Board's Decision 1641"
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "TUCP",
+    "definition": "The process and implications of Temporary Urgency Change Petitions (TUCPs), which allow for temporary modifications to water rights and flow requirements in response to drought, emergencies, or other urgent conditions."
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "current water rights",
+    "definition": "water rights/rights holders as they stand now"
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "rights changes",
+    "definition": "changes to water rights and rights holders"
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "politics",
+    "definition": "the political agenda of those in power"
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "Federal view of water",
+    "definition": "perspective of water as property"
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "Tribal representation",
+    "definition": "Tribal involvement in salinity management decision making"
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "economic value of water",
+    "definition": "the monetary cost associated with water consumption"
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "decision-making process",
+    "definition": "the structures, stakeholders, and processes involved in making management decisions in the Delta."
+  },
+  {
+    "parent_code": "Policy & Regulatory Environment",
+    "code_name": "policy changes",
+    "definition": "changes to current legislative landscape"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Structure (physical geography)",
+    "definition": "Refers to the fixed physical layout of the Delta—such as the shape, depth, elevation, or configuration of levees, channels, islands, and floodplains—that influences salinity or water dynamics."
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "bathymetry",
+    "definition": "geometry of Delta channels"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "subsidence",
+    "definition": "loss of peat soils and decrease in island elevation, often below sea-level"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "levees",
+    "definition": "structures along the edges of land that prevent flooding"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "barriers",
+    "definition": "permanent or emergency installed structures that separate areas of the Delta water"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "operable gates",
+    "definition": "structures that can be opened or closed to control the flow and direction of water within the Delta"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "tidal marsh restoration",
+    "definition": "rebuilding and rehabilitation of tidal marshes"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "restoration",
+    "definition": "general mention of restoration without specification"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "living water wall",
+    "definition": "a series of indigenous plants strategically placed in a wall-like series to attenuate salinity"
+  },
+  {
+    "parent_code": "Structure (physical geography)",
+    "code_name": "green infrastructure & nature-based solutions",
+    "definition": "interventions that restore ecological processes and functions"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Urbanization",
+    "definition": "effects of development"
+  },
+  {
+    "parent_code": "Urbanization",
+    "code_name": "consumerism",
+    "definition": "individuals who consume Delta water"
+  },
+  {
+    "parent_code": "Urbanization",
+    "code_name": "zoning",
+    "definition": "what kind of development is allowed to happen, and where"
+  },
+  {
+    "parent_code": "Urbanization",
+    "code_name": "population increase",
+    "definition": "growing number of people living in CA"
+  },
+  {
+    "parent_code": "Urbanization",
+    "code_name": "housing",
+    "definition": "construction of new housing"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Flow",
+    "definition": "The volume, timing, and distribution of water moving through the Delta, influenced by natural conditions, water management decisions, and regulatory requirements. Measured in the unit 'cfs'"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "reservoir operations/storage",
+    "definition": "timing and amount of releases from water storage, as well as the amount of water being stored"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "in-Delta diversions",
+    "definition": "water diverted for consumption within the Delta limits"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "exports",
+    "definition": "sending water outside of the Delta limits"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "seasonal precipitation",
+    "definition": "how much precipitation is experienced in a given year"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "snow pack",
+    "definition": "how much water is stored via snow in the winter, to melt and flow into the Delta in warmer months"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "State & Federal Water Projects",
+    "definition": "State & Federal Water Projects"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "tunnel",
+    "definition": "conveyance of water for export"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "environmental yield",
+    "definition": "availability of water for runoff based on dryness of soil and plants"
+  },
+  {
+    "parent_code": "Flow",
+    "code_name": "upstream management",
+    "definition": "management of lands upstream of the Delta that will affect flow rate into the Delta"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Resource Use & Management",
+    "definition": "Conscious efforts and decisions that affect water availability, distribution, and use in the Delta. This includes both broad strategies (e.g., long-term planning or allocation policies) and localized or operational actions hat influence how water is accessed, moved, or conserved. Relevant even when the discussion is specific to one region or project, as long as it reflects intentional human control over water as a resource."
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "wetlands",
+    "definition": "general mention of wetlands, which are areas where water saturates the land either permanently or seasonally, supporting unique ecosystems of aquatic plants, animals, and microorganisms"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "conversion to wetlands",
+    "definition": "intentionally changing land from a different use into a wetland"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "tidal wetland recovery",
+    "definition": "rehabilitation of previous tidal wetlands"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "reclamation districts",
+    "definition": "local entities that determine practices for resource use"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "managed groundwater storage",
+    "definition": "intentional recharge of aquifers for underground water storage"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "farming practices",
+    "definition": "specific agricultural methods and actions"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "groundwater use",
+    "definition": "how much groundwater is consumed"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "agricultural land retirement",
+    "definition": "permanent fallowing of agricultural lands"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "agricultural water application",
+    "definition": "how much water is consumed for agricultural purposes"
+  },
+  {
+    "parent_code": "Resource Use & Management",
+    "code_name": "water demand",
+    "definition": "overall quantity of water demanded (all uses)"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Salinity Sources",
+    "definition": "where salt in the Delta originates from"
+  },
+  {
+    "parent_code": "Salinity Sources",
+    "code_name": "salt recycling",
+    "definition": "salts recycled in water use/rivers in Central Valley"
+  },
+  {
+    "parent_code": "Salinity Sources",
+    "code_name": "tidal influence",
+    "definition": "tides pushing saltwater further into the Delta"
+  },
+  {
+    "parent_code": "Salinity Sources",
+    "code_name": "Pacific Ocean",
+    "definition": "ocean as a source of salinity"
+  },
+  {
+    "parent_code": "Salinity Sources",
+    "code_name": "salt accumulation",
+    "definition": "salt accumulation in soil gets mobilized into waterways"
+  },
+  {
+    "parent_code": "Salinity Sources",
+    "code_name": "uncapped mines",
+    "definition": "uncapped mines in Bay Area producing pollutants"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Information Sources",
+    "definition": "Individuals, organizations, systems, or data sources that provide information, insights, or data relevant to water management decisions in the Delta. This includes both the presence and use of information (e.g., from agencies, models, or monitoring networks) and the absence, failure, or lack of transparency of such sources (e.g., broken gauging systems, inaccessible data, or withheld reports). Relevant when the availability, quality, or use of information—whether formal or informal—affects understanding or decision-making related to Delta conditions."
+  },
+  {
+    "parent_code": "Information Sources",
+    "code_name": "sound science",
+    "definition": "true, valid, and reliable scientific pursuits"
+  },
+  {
+    "parent_code": "Information Sources",
+    "code_name": "traditional ecological knowledge / Indigenous knowledge",
+    "definition": "knowledge from Indigenous practices"
+  },
+  {
+    "parent_code": "Information Sources",
+    "code_name": "cultural significance of water",
+    "definition": "what water means to different cultures"
+  },
+  {
+    "parent_code": "Information Sources",
+    "code_name": "modeling",
+    "definition": "The outputs and results of computer-based models used to simulate water flow, salinity levels, environmental conditions, or ecological outcomes in the Delta."
+  },
+  {
+    "parent_code": "Information Sources",
+    "code_name": "real-time consumptive use",
+    "definition": "understanding how much water is being consumed at any given time"
+  },
+  {
+    "parent_code": "Information Sources",
+    "code_name": "monitoring",
+    "definition": "increasing number of water quality monitoring stations throughout the Delta"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Misc",
+    "definition": "consisting of content that is not covered in any of the other child codes or parent codes in this codebook"
+  },
+  {
+    "parent_code": "Misc",
+    "code_name": "invasive species",
+    "definition": "effects of non-native species in the Delta"
+  },
+  {
+    "parent_code": "Misc",
+    "code_name": "earthquake",
+    "definition": "effects of earthquakes on Delta infrastructure"
+  },
+  {
+    "parent_code": "Misc",
+    "code_name": "desalination",
+    "definition": "exploring desalination options as another source of water to meet demands"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Human Dimensions",
+    "definition": "Human dimensions of natural resources refers to the social attitudes, processes and behaviors related to how we maintain, protect, enhance and use our natural resources. This includes public perceptions, stakeholder conflict, equity concerns, political dynamics, and institutional decisions that influence resource management."
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Natural Climate",
+    "definition": "The long-term, stable patterns of weather conditions in a particular region, typically over a span of years or centuries, as determined by factors like temperature, wind, and precipitation. This includes the baseline, natural conditions of the atmosphere and environment in a given area. Relevant when discussing the inherent, pre-existing state of a region's climate, without factoring in the shifts caused by human activity."
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Eco Impacts",
+    "definition": ""
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Ecosystem-wide changes",
+    "definition": "Changes experienced throughout the entire ecosystem"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Bird habitat impacts",
+    "definition": "Changes to bird habitats and flyways"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Fish habitat impacts",
+    "definition": "Changes to fish habitats"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "HAB prevention",
+    "definition": "Measures to prevent HABs"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Native species disruption",
+    "definition": "Impact on native species by invasive species"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Invasive-prevent",
+    "definition": "Measures to prevent invasive species"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Native fish and native fish health",
+    "definition": "Native fish and Health of the native fish population"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Native birds",
+    "definition": "Native birds"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Primary productivity",
+    "definition": "The rate at which plants and algae in an ecosystem convert solar energy into chemical energy through photosynthesis, forming the basis of the food web."
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Water Temperature",
+    "definition": "Temperature fluctuations of Delta water"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Agriculture",
+    "definition": "The practices, industries, and interests related to farming, crop production, and livestock management, particularly in relation to water use, land management, and environmental impacts. This includes both the direct agricultural activities (e.g., irrigation, crop selection, and farming techniques) and the broader concerns impacting farming, such as water quality, salinity, water availability, and land degradation. Relevant when agricultural practices or concerns are tied to environmental conditions or resource management issues."
+  },
+  {
+    "parent_code": "Agriculture",
+    "code_name": "Ag economy",
+    "definition": "The economic system driven by agricultural activities"
+  },
+  {
+    "parent_code": "Agriculture",
+    "code_name": "Crop export",
+    "definition": "Amount of crops exported"
+  },
+  {
+    "parent_code": "Agriculture",
+    "code_name": "Farm viability",
+    "definition": "The capacity of farmland to remain productive and suitable for agriculture in the face of environmental challenges, such as increased salinity, water scarcity, and climate change."
+  },
+  {
+    "parent_code": "Agriculture",
+    "code_name": "Production",
+    "definition": "Agricultural yield"
+  },
+  {
+    "parent_code": "Agriculture",
+    "code_name": "Crop Quality",
+    "definition": "Quality of yield"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Human Impacts",
+    "definition": ""
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Cultural resources",
+    "definition": "Places, artifacts, ideas, etc. that are valued by a specific culture"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Inequitable distribution of impacts",
+    "definition": "Undue burdens on underserved or underrepresented communities"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Drinking water",
+    "definition": "Quality, amount, and accessibility of drinking water"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Economy",
+    "definition": "The overall stability and sustainability of economic activities"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Fishing and Fisheries",
+    "definition": "Fishing activities in the Delta, including commercial fisheries for human consumption, recreational fishing for sport or leisure, and subsistence fishing for personal or family sustenance."
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Health",
+    "definition": "Human and community health as influenced by water quality, access to clean water"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Interest overrides",
+    "definition": "Situations where competing interests or priorities override one another, rather than aligning or reaching a consensus. This typically happens when different stakeholders (e.g., agricultural, environmental, governmental, or community groups) advocate for conflicting outcomes, and one set of interests prevails over others in decision-making processes. Relevant when the reference discusses power dynamics, decision-making struggles, or where one interest group's priorities directly affect or negate another's, even if not explicitly described as competing interests."
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Aesthetics enjoyment",
+    "definition": "Enjoyment of places in the Delta for viewing purposes"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Boating",
+    "definition": "Boating"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Bird watching",
+    "definition": "Bird watching"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Photography",
+    "definition": "Photography"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Recreational hiking",
+    "definition": "Recreational hiking"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Recreational hunting",
+    "definition": "Recreational hunting"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Swimming",
+    "definition": "Swimming"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Wine tasting",
+    "definition": "Wine tasting"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "EJ",
+    "definition": "Issues related to the fair distribution of environmental benefits and burdens, particularly focusing on marginalized communities that may disproportionately experience negative environmental impacts."
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Equity",
+    "definition": "Equity in decision-making and distribution of benefits and burdens in the Delta"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Flooding",
+    "definition": "Flooding events and the systems in place to manage, control, and mitigate them"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Groundwater quality",
+    "definition": "Groundwater quality refers specifically to the condition of water in underground aquifers, including salinity, nutrients, and contaminants. Apply this code only when the interviewee mentions groundwater, wells, aquifers, or subsurface water explicitly."
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Tribal-western collaboration",
+    "definition": "Collaboration of knowledge from Traditional Ecological Knowledge and western sciences"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Tribal beneficial uses",
+    "definition": "Activities practiced by Tribal communities, including ceremonies and access to cultural resources"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Tribal perspectives",
+    "definition": "Inclusion of the viewpoints of Tribes"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Way of life",
+    "definition": "The distinctive patterns of living, values, and practices shared by a community or region. this includes local customs, livelihoods (such as agriculture, fishing, or water management), cultural traditions, and how communities interact with their environment"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Emergency declarations",
+    "definition": "Emergency declarations have the potential to be very impactful on the Delta"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Social-technical intersection",
+    "definition": "Need for more collaboration between social and technical sciences"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Science communication",
+    "definition": "The process of conveying scientific information and research findings to the general public in a clear, accessible, and engaging way"
+  },
+  {
+    "parent_code": "N/A",
+    "code_name": "Systems Operations",
+    "definition": ""
+  },
+  {
+    "parent_code": "Systems Operations",
+    "code_name": "Salinity duration in-system",
+    "definition": "How long salinity is maintained in the system before being flushed"
+  },
+  {
+    "parent_code": "Systems Operations",
+    "code_name": "Reduce ET",
+    "definition": "Reduce evapotranspiration"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "Native Species",
+    "definition": "TBD"
+  },
+  {
+    "parent_code": "Eco Impacts",
+    "code_name": "HABs",
+    "definition": "TBD"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Human Health",
+    "definition": "TBD"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Disadvantaged Communities",
+    "definition": "TBD"
+  },
+  {
+    "parent_code": "Human Impacts",
+    "code_name": "Recreation",
+    "definition": "TBD"
+  }
+]

@@ -3,6 +3,9 @@ import os
 import json
 import glob
 from collections import defaultdict
+from pydantic import BaseModel
+from datetime import datetime
+from typing import List, Dict, Any
 
 router = APIRouter()
 
@@ -114,3 +117,51 @@ def get_mm_results():
             # all_MMs[c] += 1
             all_MMs[c].append(participant_id)
     return all_MMs
+
+
+# Pydantic models for request/response validation
+class Factor(BaseModel):
+    name: str
+    parent: str
+    type: str
+
+
+class Demographics(BaseModel):
+    age: str
+    deltaEngagement: str
+    residence: str
+
+
+class MentalModelSubmission(BaseModel):
+    timestamp: str
+    mentalModel: Dict[str, Any]
+    demographics: Demographics
+
+
+@router.post("/submit/")
+def submit_mental_model(submission: MentalModelSubmission):
+    """
+    Submit a mental model with demographic data
+    """
+    try:
+        # Create submissions directory if it doesn't exist
+        submissions_dir = server_path("submissions")
+        os.makedirs(submissions_dir, exist_ok=True)
+
+        # Generate a unique filename based on timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"submission_{timestamp}.json"
+        filepath = os.path.join(submissions_dir, filename)
+
+        # Save the submission data
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(submission.dict(), f, indent=2, ensure_ascii=False)
+
+        return {
+            "status": "success",
+            "message": "Mental model and demographic data submitted successfully",
+            "submission_id": timestamp,
+        }
+
+    except Exception as e:
+        return {"status": "error", "message": f"Failed to submit data: {str(e)}"}
