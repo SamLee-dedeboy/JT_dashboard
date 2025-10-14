@@ -34,8 +34,6 @@
         show_column_header={true}
         blocks={block_aggregator.decision_making_blocks.block_dict[column.id]}
         total_participants={block_aggregator.max_participants}
-        on:moveLeft={() => handleMoveColumnLeft(index)}
-        on:moveRight={() => handleMoveColumnRight(index)}
       ></Column>
       <!-- total_participants={column.id === "fairness"
           ? block_aggregator.decision_making_blocks.participants

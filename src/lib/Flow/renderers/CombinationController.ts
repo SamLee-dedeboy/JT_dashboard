@@ -3,24 +3,32 @@ import {
   combinationState,
 } from "../flow_store.svelte";
 import type { tBlock } from "../types";
+// const colors = [
+//   "#AEE1D7",
+//   "#f8b897",
+//   "#f4cfdd",
+//   "#F9EA9A",
+//   "#CCC7B9",
+//   "#EAF9D9",
+//   "#C0D6DF",
+//   "#E2D4BA",
+//   "#A5FFD6",
+//   "#FED9B7",
+//   "#F07167",
+//   "#F6C0D0",
+//   "#D0A5C0",
+//   "#F1DEDC",
+//   "#E1DABD",
+//   "#ABC798",
+// ];
 const colors = [
-  "#AEE1D7",
-  "#f8b897",
-  "#f4cfdd",
-  "#F9EA9A",
-  "#CCC7B9",
-  "#EAF9D9",
-  "#C0D6DF",
-  "#E2D4BA",
-  "#A5FFD6",
-  "#FED9B7",
-  "#F07167",
-  "#F6C0D0",
-  "#D0A5C0",
-  "#F1DEDC",
-  "#E1DABD",
-  "#ABC798",
-];
+  "#7eeaee",
+  "#cb531b",
+  "#dee006",
+  "#e263ff",
+  "#efa400",
+  "#ff4c79",
+]
 export const combination_controller = {
   generateCombinations(target_blocks: tBlock[]) {
     let block_id_to_title_dict = target_blocks.reduce((acc, block) => {

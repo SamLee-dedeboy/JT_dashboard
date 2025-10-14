@@ -8,7 +8,7 @@
 
   // Use $props() instead of export let
   let {
-    column,
+    column = $bindable(),
     blocks,
     show_column_header = false,
     total_participants,

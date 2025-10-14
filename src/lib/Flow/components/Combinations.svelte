@@ -44,6 +44,7 @@
 
   // Derived reactive values - accessing the state values correctly
   let options = $derived(leading_blocks.map((b) => b.title));
+  let sorted_options = $derived(options.sort((a, b) => b.length - a.length));
 
   let clicked_options = $derived(
     options.filter((o) => clicked_normal_blocks.map((b) => b.title).includes(o))
@@ -142,42 +143,60 @@
     </div>
   </div>
   <div class="flex grow flex-col">
-    <div
+    <!-- <div
       class="relative z-[40] mb-[-0.5rem] mt-[-2.5rem] flex max-w-full select-none gap-x-[1.3rem] overflow-x-visible pl-12"
+    > -->
+    <div
+      class="relative z-[40] flex flex-col max-w-full select-none overflow-x-visible"
     >
-      {#each options as option, index}
+      {#each sorted_options as option, index}
         {@const option_filled = sorted_combinations
           .map((c) => combination_content[c].map((b) => b.title))
           .flat()
           .includes(option)}
         {@const option_clicked = clicked_options.includes(option)}
         {@const abbr_length = 17}
-        <div
+        <!-- <div
           class="shortened-title vertical-title"
           style={`color: ${
-            option_clicked ? "black" : "darkgray"
+            option_clicked ? "darkgray" : "white"
           }; text-decoration-line: ${option_filled ? "none" : "line-through"}`}
         >
           {option.slice(0, abbr_length) +
             (option.length > abbr_length ? "..." : "")}
-        </div>
+        </div> -->
         <div
-          class="full-title pointer-events-none absolute top-8 z-[999] hidden w-max bg-white px-2 text-base outline-1 outline-gray-200"
+          class="flex w-max relative"
+          style={`color: ${
+            option_clicked ? "darkgray" : "white"
+          }; text-decoration-line: ${option_filled ? "none" : "line-through"};
+          padding-left: ${index * 3.1}rem
+          `}
+        >
+          {option}
+          <!-- Vertical dotted line for each option -->
+          <div
+            class="connecting-line"
+            style={`left: ${index * 3.0 + 0.7}rem; height: calc(9rem - ${index * 1.5}rem)`}
+          ></div>
+        </div>
+        <!-- <div
+          class="full-title pointer-events-none absolute top-8 z-[999] hidden w-max px-2 text-base outline-1 outline-gray-200"
           style={`left: ${(index + 1) * 1.3}rem`}
         >
           {option}
-        </div>
+        </div> -->
       {/each}
     </div>
     <div
-      class="combinations-list flex h-1 grow snap-y flex-col gap-y-2 overflow-auto px-0.5 pr-[0.6rem] text-sm"
+      class="combinations-list flex h-1 grow snap-y flex-col gap-y-2 overflow-auto px-0.5 pr-[0.6rem] mt-6 text-sm"
       style={`scrollbar-gutter: stable`}
     >
       {#each sorted_combinations as combination, index}
         {@const combination_titles = combination_content[combination].map(
           (b) => b.title
         )}
-        {@const circle_filled = options.map((o) =>
+        {@const circle_filled = sorted_options.map((o) =>
           combination_titles.includes(o)
         )}
         {@const filled_circle_indices = circle_filled
@@ -186,7 +205,7 @@
         <div
           role="button"
           tabindex={index}
-          class="combination-container relative flex snap-center justify-between py-1 opacity-[15%] outline-2 outline-black transition-opacity hover:shadow-md hover:brightness-90"
+          class="combination-container relative flex snap-center justify-between py-1 opacity-[15%] outline-0 outline-black transition-opacity hover:shadow-md hover:brightness-90"
           class:rendered={rendered_combinations.includes(combination)}
           class:highlighted={highlighted_combinations.includes(combination)}
           style={`background-color: ${combination_colors[combination]};`}
@@ -197,7 +216,7 @@
           }}
           on:keyup={() => {}}
         >
-          {#each options as option, index}
+          {#each sorted_options as option, index}
             <svg class="h-[1.3rem] w-[1.3rem]" viewBox="0 0 100 110"
               ><circle
                 cx="50"
@@ -220,7 +239,7 @@
 <style lang="postcss">
   @reference "tailwindcss";
   .comparison-mode {
-    @apply bg-green-100;
+    /* @apply bg-green-100; */
   }
   .shortened-title:hover + .full-title {
     @apply block;
@@ -239,5 +258,13 @@
   }
   .highlighted {
     @apply outline;
+  }
+  .connecting-line {
+    position: absolute;
+    top: 100%;
+    width: 2px;
+    border-left: 2px dotted rgba(255, 255, 255, 0.5);
+    z-index: 30;
+    pointer-events: none;
   }
 </style>

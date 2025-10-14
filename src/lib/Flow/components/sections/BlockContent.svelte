@@ -327,12 +327,17 @@
     </div>
   {/if}
   {#each content as participant_response, index}
-    <div
+    <!-- <div
       class="flex gap-x-3"
       class:changed={changed[index]}
       style={`z-index: ${content.length - index}; background-color: ${
         $participant_colors[participant_response[0]]
       }`}
+    > -->
+    <div
+      class="flex gap-x-3"
+      class:changed={changed[index]}
+      style={`z-index: ${content.length - index}; background-color: white`}
     >
       <div>
         {Constants.initial_to_id_dict[participant_response[0]] ||

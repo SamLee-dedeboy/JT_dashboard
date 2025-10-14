@@ -111,7 +111,6 @@
   max-w-[8rem]
   justify-center
   rounded 
-  font-mono
   text-[0.9rem]
   outline-1 outline-gray-200
   ${grow ? "grow" : "flex-none"}
@@ -159,11 +158,7 @@
   <div
     id={block.id}
     class={`block-element relative flex w-full flex-col items-center justify-center rounded p-1 text-center`}
-    style={`background-color: ${
-      fill
-        ? setOpacity(participant_colors[block.participants[0]], 0.7)
-        : "white"
-    }; `}
+    style={`background-color: white`}
     data-json={JSON.stringify({
       column: block.column_id,
       combinations: block_combinations,
@@ -178,7 +173,10 @@
     >
       {block.title}
       {#if block.column_id !== Constants.fairness_column_id}
-        <div class="absolute right-[100%] top-1/2 text-gray-500">
+        <div
+          class="absolute right-[105%] top-1/2"
+          style="color: var(--text-primary);"
+        >
           ({block.participants.length})
         </div>
       {/if}
@@ -217,10 +215,12 @@
     @apply flex h-4 w-4 items-center justify-center p-0.5 hover:bg-gray-300;
   }
   .showing-content {
-    @apply bg-gray-200;
+    /* @apply bg-gray-200; */
   }
   .clicked {
-    @apply rounded shadow-[0px_0px_2px_2px_gray] outline outline-gray-400 brightness-[95%];
+    @apply rounded shadow-[0px_0px_2px_2px_gray];
+    outline: 4px solid var(--jt-secondary);
+    color: var(--jt-secondary) !important;
   }
   .leading {
     @apply max-w-[12rem];

@@ -55,14 +55,13 @@
   main {
     min-height: 100vh;
     display: flex;
+    background-color: var(--surface-elevated);
   }
   .jt-section-title {
     color: var(--brand-primary);
     font-family: var(--sc-title);
     font-weight: 400;
-  }
-  .jt-section-title--with-bg {
-    background-color: var(--bg-page);
+    background-color: var(--surface-elevated);
   }
   .jt-section-subtitle {
     color: var(--brand-primary);

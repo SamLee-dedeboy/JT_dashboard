@@ -173,9 +173,15 @@ button:focus-visible {
   /* --- Typography Scale --- */
   --font-family-display: 'Hammersmith One', system-ui, sans-serif;
   --font-family-body: 'Proxima Nova', system-ui, sans-serif;
-  --font-family-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', monospace;
+  /* --font-family-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', monospace; */
 
   /* --- Legacy Typography Variables --- */
   --sc-title: var(--font-family-display);
   --body-content: var(--font-family-body);
+  --categorical-one: #7eeaee;
+  --categorical-two: #cb531b;
+  --categorical-three: #dee006;
+  --categorical-four: #e263ff;
+  --categorical-five: #efa400;
+  --categorical-six: #ff4c79;
 }

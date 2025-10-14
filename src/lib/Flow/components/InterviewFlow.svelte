@@ -652,6 +652,12 @@
 
 <style lang="postcss">
   @reference "tailwindcss";
+  .upper-page {
+    background-color: var(--surface-elevated);
+  }
+  .control-panel span {
+    color: var(--text-primary);
+  }
   .sankey-svg {
     @apply absolute bottom-0 left-0 right-0 top-0;
     & .center {
@@ -660,7 +666,7 @@
       /* stroke: black; */
       /* stroke-dasharray: 4; */
       z-index: 2;
-      fill: black;
+      fill: var(--text-primary);
     }
     & .sankey {
       filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.2));
@@ -669,7 +675,7 @@
     & .dismiss-path {
       opacity: 0.01;
       pointer-events: none;
-      fill: #efefef;
+      fill: var(--neutral-100);
     }
     & .semi-highlight-path {
       opacity: 0.1;
@@ -686,6 +692,7 @@
   }
 
   .flow-container {
+    font-family: var(--font-family-body);
     /* & .section-container {
       @apply shadow-[0px_10px_10px_-5px_rgba(0,0,0,0.3)];
     } */
@@ -699,7 +706,8 @@
       @apply pointer-events-none !shadow-none;
     }
     & .leading_section .section-header {
-      @apply !bg-slate-500 !text-white;
+      background-color: var(--surface-interactive) !important;
+      color: var(--text-primary) !important;
     }
     /* & .leading_section .icon:hover {
       @apply !bg-amber-400;
@@ -721,7 +729,8 @@
     @apply font-semibold;
   }
   :global(.intro-bg-gray) {
-    @apply rounded bg-gray-200 px-0.5;
+    @apply rounded px-0.5;
+    background-color: var(--neutral-200);
   }
   :global(.intro-svg) {
     @apply inline h-[1.3rem] w-[1.3rem];
@@ -736,8 +745,8 @@
     height: unset !important;
     padding: 0.3rem 0.2rem !important;
     border-radius: 3% !important;
-    outline: 1px solid gray !important;
-    background: rgb(244, 244, 244) !important;
+    outline: 1px solid var(--border-subtle) !important;
+    background: var(--neutral-100) !important;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
       "Liberation Mono", "Courier New", monospace !important;
   }
