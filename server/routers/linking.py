@@ -1,8 +1,11 @@
 import os
+import re
 import json
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any
+
+# from .AutoGenUtils import query
 
 dirname = os.path.dirname(__file__)
 relative_path = lambda filename: os.path.join(dirname, "..", filename)
@@ -11,6 +14,10 @@ router = APIRouter()
 
 class ScenarioRequest(BaseModel):
     scenario: str
+
+
+class CodeSummarizeRequest(BaseModel):
+    code: str
 
 
 class CodeOccurrence(BaseModel):
@@ -66,10 +73,59 @@ def get_scenario_codes_manual(request: ScenarioRequest):
         }
         for code in codes
     ]
+    # with open("debug_node_dict.json", "w", encoding="utf-8") as f:
+    #     json.dump(list(new_node_dict.values()), f, indent=4, ensure_ascii=False)
     return ScenarioCodesResponse(
         occurrences=code_w_freq,
         participants=list(new_node_dict.values()),
     )
+
+
+@router.post("/codes/summarize/")
+async def codes_summarize(request: CodeSummarizeRequest):
+    code = request.code
+    code_summaries = json.load(open(relative_path("linking_data/code_summaries.json")))
+    code_summaries_dict = {item["name"]: item["summary"] for item in code_summaries}
+    if code not in code_summaries_dict:
+        raise HTTPException(status_code=404, detail=f"Code '{code}' not found in data")
+    return code_summaries_dict[code]
+
+
+#     references = code["references"]
+#     references_text = ""
+#     for ref in references:
+#         participant_text = ref["participant"]
+#         match = re.search(r"Files\\\\([A-Z]+) Transcript", participant_text)
+#         if match:
+#             participant = match.group(1)  # Output: AF or ABC
+#         else:
+#             participant = "unknown"
+#         references_text += """
+#         <reference>
+#             <reference_text> {reference} </reference_text>
+#             <from_participant> {participant} </from_participant>
+#         </reference
+#         """.format(
+#             reference=ref["reference"], participant=participant
+#         )
+
+#     print(references_text)
+#     messages = [
+#         {
+#             "source": "user",
+#             "content": """
+#             Summarize the references for me in a concise way. Use only one short sentence for each bullet point.
+#             Give me no more than 5 bullet points.
+#             References: {references_text}
+#             """.format(
+#                 references_text=references_text
+#             ),
+#         }
+#     ]
+#     response, messages = await query.chat(
+#         messages, "gpt-4o-mini", open("api_key").read().strip(), temperature=1
+#     )
+#     return {"response": response}
 
 
 def remove_duplicates(codes):

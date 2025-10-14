@@ -4,6 +4,7 @@
   import CodeBubbles from "./CodeBubbles.svelte";
   // import EquitySpace from "./EquitySpace.svelte";
   import type { tScenarioData } from "./types";
+  import { bubble_color } from "./constants";
   let { selected_scenario = undefined } = $props();
 
   function fetchScenarioCodes(scenario: tScenarioData) {
@@ -30,31 +31,57 @@
         return error;
       });
   }
+  const categories = ["Drivers", "Strategies", "Value", "Governance"];
 </script>
 
 {#key selected_scenario}
   <div
-    class="header-container font-bold italic justify-center items-center flex flex-col"
+    class="header-container italic justify-center items-center flex flex-col relative"
   >
-    <span class="title-banner w-full text-center text-[2.5rem]">
+    <span class="title-banner w-full text-center text-[2.5rem] uppercase">
       Public Opinion
     </span>
-    <div
-      class="info-text px-1 font-mono text-[1rem] font-normal w-full flex flex-col"
-    >
-      <span class="inline-flex flex-wrap items-center">
-        <img src="info.svg" class="w-5 h-5 inline mr-2" alt="info" />
+    <div class="info-text px-1 text-[1rem] font-normal w-full flex flex-col">
+      <span class="inline-flex">
+        <!-- <img src="info.svg" class="info-icon w-5 h-5 inline mr-2" alt="info" /> -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="info-icon w-5 h-5 inline mr-2"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path
+            d="M12 8h.01"
+          /></svg
+        >
         This chart shows the distribution of participants' responses in our interview.
       </span>
-      <span class="">
+      <!-- <span class="text-left ml-7">
         Each bubble is a category. Bigger bubbles indicate
         <span class="font-semibold whitespace-normal">
-          &nbsp;more participants mentioned this category.
+          more participants mentioned this category.
         </span>
+      </span> -->
+      <span class="text-left ml-7">
+        Click any bubble to interact with it.
       </span>
-      <span>
-        Click any bubble and use the buttons on the left to interact with it.
-      </span>
+    </div>
+    <div
+      class="absolute right-2 top-1 flex flex-col justify-center gap-y-2 text-white"
+    >
+      {#each categories as category}
+        <div class="flex items-center gap-x-2 text-sm">
+          <svg class="w-6 h-6" viewBox="0 0 10 10">
+            <circle cx="5" cy="5" r="5" fill={bubble_color(category)} />
+          </svg>
+          <span>{category}</span>
+        </div>
+      {/each}
     </div>
   </div>
   {#if selected_scenario}
@@ -81,13 +108,16 @@
 
   .title-banner {
     /* background-color: var(--neutral-100); */
-    color: var(--text-primary);
+    color: var(--jt-secondary);
   }
 
   .info-text {
     color: var(--text-primary);
   }
 
+  .info-icon svg {
+    stroke: white;
+  }
   .select-hint {
     color: var(--text-primary);
     /* box-shadow: 0px 0px 10px var(--accent-danger); */

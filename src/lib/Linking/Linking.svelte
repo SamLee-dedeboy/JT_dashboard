@@ -12,7 +12,7 @@
   onMount(() => {});
 </script>
 
-<div class="page-container flex grow">
+<div class="page-container flex grow overflow-hidden">
   <!-- <CodeBubbles {codes} /> -->
   <div class="flex-1 flex flex-col">
     <ScenarioOverview bind:selected_scenario />
@@ -39,7 +39,7 @@
     font-size: 1.1rem;
   }
   .bubble-container {
-    outline: 1px solid var(--brand-primary);
+    outline: 1px solid var(--jt-secondary);
     border-radius: 0.5rem;
   }
 </style>

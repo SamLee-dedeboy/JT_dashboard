@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { server_address } from "./constants";
-  import { slide } from "svelte/transition";
+  import { slide, scale } from "svelte/transition";
   import type { tScenarioData } from "./types";
   let {
     selected_scenario = $bindable(),
@@ -34,11 +34,11 @@
     <div class="flex flex-col flex-1 gap-y-2">
       <div class="flex flex-col py-1 grow gap-y-2">
         <div class="selector flex flex-col gap-y-4 z-10">
-          <div class="scenario-label italic">Scenarios:</div>
+          <div class="scenario-label italic text-left pl-1">Scenarios:</div>
           <div class="flex gap-x-4 gap-y-2 flex-wrap mx-1">
             {#each scenario_overview as scenario}
               <button
-                class="scenario-button w-fit min-h-[4rem] text-sm italic outline outline-2 rounded px-2 py-0.5 font-sans uppercase transition-all"
+                class="scenario-button w-fit min-h-[4rem] text-sm italic outline outline-2 rounded px-2 py-0.5 uppercase transition-all"
                 class:active={selected_scenario?.name === scenario.name}
                 onclick={() =>
                   (selected_scenario = scenario_overview?.find(
@@ -52,40 +52,49 @@
         </div>
         <div class="content-area flex flex-col grow">
           <div
-            class="content-container px-2 flex flex-col grow divide-y rounded"
+            class="content-container px-2 flex flex-col items-center justify-center grow rounded relative"
           >
             {#if selected_scenario}
               {#key selected_scenario.name}
-                <div in:slide class="p-1 rounded grow">add an image here</div>
-                <div in:slide class="p-1 rounded">
-                  <span class="field-label italic text-sm">
-                    Description -
-                  </span>
-                  <span class="field-content">
-                    {selected_scenario.narrative}
-                  </span>
+                <div class="p-1 absolute left-0 right-0 top-0 bottom-0">
+                  <img
+                    src={`scenario_imagery/${selected_scenario.name}.jpg`}
+                    alt="Scenario Image"
+                    class="w-full h-full object-contain"
+                  />
                 </div>
-                <div class="mt-2 px-1 rounded">
-                  <span class="field-label italic text-sm">
-                    Primary Research Importance
-                  </span>
-                  <div class="field-content">
-                    {selected_scenario.primary_research_importance}
+                <div
+                  class="scenario-content flex p-2 flex-col max-w-[45rem] self-center relative mt-4 shadow-[0_1px_6px_rgb(81,162,189,0.5)]"
+                  in:slide
+                >
+                  <div class="p-1 text-left">
+                    <!-- <span class="field-label"> Description - </span> -->
+                    <span class="field-content">
+                      {selected_scenario.narrative}
+                    </span>
                   </div>
-                </div>
-                <div class="mt-2 px-1 rounded">
-                  <span class="field-label italic text-sm"> Adaptation </span>
-                  <div class="field-content">
-                    {selected_scenario.adaptation}
+                  <div class="mt-2 px-1 text-left">
+                    <span class="field-label">
+                      Why is this scenario important?
+                    </span>
+                    <div class="field-content">
+                      - {selected_scenario.primary_research_importance}
+                    </div>
                   </div>
-                </div>
-                <div class="mt-2 px-1 rounded">
-                  <span class="field-label italic text-sm"> Key Drivers </span>
-                  <div class="field-content">
-                    {selected_scenario.key_drivers}
+                  <div class="mt-2 px-1 text-left">
+                    <span class="field-label"> Adaptation </span>
+                    <div class="field-content">
+                      - {selected_scenario.adaptation}
+                    </div>
                   </div>
+                  <div class="mt-2 px-1 text-left">
+                    <span class="field-label"> Key Drivers </span>
+                    <div class="field-content">
+                      - {selected_scenario.key_drivers}
+                    </div>
+                  </div>
+                  <!-- <div class="min-h-[2rem]"></div> -->
                 </div>
-                <div class="min-h-[10rem]"></div>
               {/key}
             {/if}
           </div>
@@ -105,9 +114,16 @@
   .scenario-label {
     color: var(--text-secondary);
   }
+  .scenario-content {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-elevated) 90%,
+      transparent
+    );
+  }
 
   .scenario-button {
-    /* background-color: var(--neutral-100); */
+    background-color: var(--surface-interactive);
     color: var(--text-primary);
     outline-color: var(--neutral-500);
   }
@@ -120,10 +136,12 @@
   } */
 
   .active {
-    background-color: var(--brand-primary);
-    outline-color: var(--brand-primary);
-    font-weight: 600;
-    color: var(--neutral-800);
+    /* background-color: var(--brand-secondary); */
+    outline-color: var(--brand-secondary);
+    transform: translateY(-8px), scale(1.05);
+
+    /* font-weight: 600; */
+    /* color: var(--neutral-800); */
   }
 
   .content-area {
@@ -135,7 +153,10 @@
   }
 
   .field-label {
-    color: var(--text-secondary);
+    color: var(--brand-secondary);
+    background: var(--surface-elevated);
+    padding: 0.25rem 0.25rem;
+    border-radius: 4px;
   }
 
   .field-content {

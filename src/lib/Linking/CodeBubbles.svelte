@@ -32,7 +32,6 @@
   let tooltip: any = $state();
   let bubbles: tBubble[] = [];
   let init_done = false;
-  const categories = ["Drivers", "Strategies", "Value", "Governance"];
 
   // effect when codes change
   $effect(() => {
@@ -68,11 +67,14 @@
 
   function handleClick(bubble) {
     selected_bubble = bubble;
-    bubble_renderer.highlightSelectBubble(bubble);
+    // bubble_renderer.highlightSelectBubble(bubble);
 
-    tooltip.style.display = "block";
-    tooltip.style.left = `${bubble.x + bubble.r + 5}px`;
-    tooltip.style.top = `${bubble.y - bubble.r}px`;
+    // tooltip.style.display = "block";
+    tooltip.style.opacity = "100";
+    // tooltip.style.left = `${bubble.x + bubble.r + 5}px`;
+    // tooltip.style.top = `${bubble.y - bubble.r}px`;
+    tooltip.style.left = `10px`;
+    tooltip.style.top = "50px";
     console.log("Bubble clicked", bubble, tooltip);
   }
 
@@ -80,7 +82,8 @@
     if (bubble.data.scenario_children.length === 0) {
       return;
     }
-    tooltip.style.display = "none";
+    tooltip.style.opacity = "0";
+    // tooltip.style.display = "none";
     const _code_dict = codes.reduce((acc, code) => {
       acc[code.name] = code;
       return acc;
@@ -99,29 +102,53 @@
     bubbles = bubbles.filter((b) => b.id !== bubble.id);
     updateBubbles(bubbles);
   }
+
+  function handleCloseTooltip() {
+    tooltip.style.opacity = "0";
+    // tooltip.style.display = "none";
+    selected_bubble = undefined;
+    // bubble_renderer.highlightSelectBubble(undefined);
+    // bubble_renderer.clearClickedBubble();
+  }
 </script>
 
-<div class="flex grow relative">
-  <div
+<div class="flex flex-col h-0 grow relative">
+  <!-- <div
     bind:this={tooltip}
-    class="tooltip absolute hidden bg-gray-100 outline-2 outline-gray-400 outline rounded p-2 z-10 w-[25rem] text-sm font-mono"
+    class="tooltip absolute hidden bg-gray-100 outline-2 outline-gray-400 rounded p-2 z-10 w-[45rem] text-sm"
   >
     {#if selected_bubble}
-      <BubbleTooltip bubble={selected_bubble} {handleExpand}></BubbleTooltip>
+      <BubbleTooltip
+        bubble={selected_bubble}
+        {handleExpand}
+        handleClose={handleCloseTooltip}
+      ></BubbleTooltip>
+    {/if}
+  </div> -->
+  <svg id={svgId} class="overflow-hidden mt-2"></svg>
+  <div
+    bind:this={tooltip}
+    class="tooltip transition-all overflow-hidden flex flex-col opacity-0 min-h-[18rem] outline-2 outline-gray-400 rounded mx-2 mt-6 p-2 z-10 text-sm"
+  >
+    {#if selected_bubble}
+      <BubbleTooltip
+        bubble={selected_bubble}
+        {handleExpand}
+        handleClose={handleCloseTooltip}
+      ></BubbleTooltip>
     {/if}
   </div>
-  <svg id={svgId} class="w-full h-full"></svg>
   <div
     class="legend absolute right-2 top-1 flex flex-col justify-center gap-y-2"
   >
-    {#each categories as category}
-      <div class="flex items-center gap-x-2 text-sm font-mono">
+    <!-- {#each categories as category}
+      <div class="flex items-center gap-x-2 text-sm">
         <svg class="w-6 h-6" viewBox="0 0 10 10">
           <circle cx="5" cy="5" r="5" fill={bubble_color(category)} />
         </svg>
         <span>{category}</span>
       </div>
-    {/each}
+    {/each} -->
     <!-- <button
       class="outline-orange-300 bg-orange-100 hover:bg-orange-300 px-2 ml-1"
       onclick={() => {
@@ -152,10 +179,20 @@
 
 <style lang="postcss">
   @reference "tailwindcss";
-  button {
-    @apply max-w-[6rem] text-slate-700 font-mono outline outline-2 rounded px-2 py-1 flex flex-wrap gap-x-1 items-center justify-center hover:scale-110 transition-all duration-100;
-  }
+  /* button {
+    @apply max-w-[6rem] text-slate-700 outline outline-2 rounded px-2 py-1 flex flex-wrap gap-x-1 items-center justify-center hover:scale-110 transition-all duration-100;
+  } */
 
+  /* .canvas {
+
+  } */
+  .tooltip {
+    transition:
+      opacity 0.3s ease,
+      max-height 0.5s ease-in-out;
+    background-color: var(--surface-page);
+    color: var(--text-primary);
+  }
   :global(.bubble.hovered) {
     stroke: black;
     stroke-width: 2px;

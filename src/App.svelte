@@ -22,7 +22,7 @@
   let isNotHomePage = $derived($location !== "/");
 </script>
 
-<main class="flex flex-col relative">
+<main class="flex flex-col relative w-screen h-screen">
   <div
     tabindex="0"
     role="button"
