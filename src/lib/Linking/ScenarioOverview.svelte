@@ -35,10 +35,10 @@
       <div class="flex flex-col py-1 grow gap-y-2">
         <div class="selector flex flex-col gap-y-4 z-10">
           <div class="scenario-label italic text-left pl-1">Scenarios:</div>
-          <div class="flex gap-x-4 gap-y-2 flex-wrap mx-1">
+          <div class="flex gap-x-4 gap-y-4 flex-wrap mx-1">
             {#each scenario_overview as scenario}
               <button
-                class="scenario-button w-fit min-h-[4rem] text-sm italic outline outline-2 rounded px-2 py-0.5 uppercase transition-all"
+                class="scenario-button w-fit min-h-[4rem] text-lg italic outline outline-2 rounded px-4 py-2 uppercase transition-all"
                 class:active={selected_scenario?.name === scenario.name}
                 onclick={() =>
                   (selected_scenario = scenario_overview?.find(
