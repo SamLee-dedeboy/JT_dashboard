@@ -963,8 +963,8 @@
         </div>
         
         <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end;">
-            <button class="canvas-btn" onclick="submitWithDemographics()">Submit with Demographics</button>
-            <button class="canvas-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+            <button class="canvas-btn" onclick="submitWithDemographics()">Submit</button>
+            <!-- <button class="canvas-btn" onclick="copyToClipboard()">Copy to Clipboard</button> -->
             <button class="canvas-btn" onclick="closeExport()">Close</button>
         </div>
     </div>
@@ -1657,7 +1657,7 @@
             const exportData = {
                 timestamp: new Date().toISOString(),
                 mentalModel: {
-                    centralConcept: 'Salinity',
+                    // centralConcept: 'Salinity',
                     impactFactors: droppedCodes.impact.map(code => ({
                         name: code.name,
                         parent: code.parent,
