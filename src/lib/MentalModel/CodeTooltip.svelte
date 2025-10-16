@@ -23,10 +23,10 @@
       acc[parent_code] = acc[parent_code] || [];
       acc[parent_code].push(code.name);
       return acc;
-    }, {}),
+    }, {})
   );
   let parent_codes = $derived(
-    codebook.filter((code) => code.parent === "N/A").map((code) => code.name),
+    codebook.filter((code) => code.parent === "N/A").map((code) => code.name)
   );
   let parent_to_child_participants = $derived(
     parent_codes.reduce((acc, parent) => {
@@ -38,21 +38,21 @@
         })
         .filter((item) => (Object.values(item) as any)[0].length > 0);
       return acc;
-    }, {}),
+    }, {})
   );
 
   let tooltip_data = $derived(
-    selected_code ? parent_to_child_participants[selected_code] : undefined,
+    selected_code ? parent_to_child_participants[selected_code] : undefined
   );
   let total_participants = $derived(
     tooltip_data
       ? tooltip_data.reduce((acc, item) => {
           (Object.values(item) as any)[0].forEach((participant) =>
-            acc.add(participant),
+            acc.add(participant)
           );
           return acc;
         }, new Set()).size
-      : 0,
+      : 0
   );
   onMount(() => {
     console.log("Parent to Child Participants:", parent_to_child_participants);
@@ -65,31 +65,30 @@
     <div
       class="tooltip-content text-lg px-3 py-1 jt-body-2 outline outline-4 outline-slate-200 rounded shadow-md bg-[#253439] text-white"
     >
-      <div>
-        <span
-          class="text-[#253439] italic font-semibold px-1 py-1 rounded bg-[#7ed957]"
-        >
-          {selected_code}
-        </span>
-        is defined as:
+      <div class="text-left mt-2">
+        <!-- is defined as: -->
         <p
-          class="mt-1 text-[1rem] border-l-[6px] border-[#7ed957] bg-[#323b3e] pl-2 py-0.5 rounded"
+          class="mt-0 text-[1.2rem] border-r-[4px] bg-[#323b3e] p-3 py-1 rounded"
+          style={`border-color: var(--jt-secondary);`}
         >
+          <span class="text-white italic rounded">
+            {selected_code} -
+          </span>
           {codebook.find((code) => code.name === selected_code)?.definition ||
             "No definition available"}
         </p>
       </div>
-      <p>
-        <span class=" font-semibold underline">
+      <p class="text-left mt-2">
+        <span class="font-semibold underline">
           {total_participants}
         </span>
         participants mentioned this in the interview.
       </p>
       {#if tooltip_data.length > 1}
-        <p class="">
+        <p class="text-left">
           Among these {total_participants} participants,
         </p>
-        <ul class="">
+        <ul class="text-left">
           <li class="ml-2">
             -
             <span class="underline">

@@ -1,11 +1,91 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import AllMMs from "./AllMMs.svelte";
   import PastExhibitionMMs from "./PastExhibitionMMs.svelte";
+  import { server_address } from "./constants";
   import { push } from "svelte-spa-router";
 
-  function goBack() {
-    push("/");
+  // function goBack() {
+  //   push("/");
+  // }
+
+  let codebook: any = $state([]);
+  let code_tsne: Record<string, number> = $state({});
+  let interview_server_data: any = $state(undefined);
+  let exhibition_server_data: any = $state(undefined);
+  function fetchCodebook() {
+    fetch(`${server_address}/codebook/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Codebook:", data);
+        codebook = data;
+        fetchInterviewMMs();
+        fetchExhibitionMMs();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
+
+  function fetchCodeTsne() {
+    fetch(`${server_address}/codebook/parent_tsne/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("TSNE Data:", data);
+        code_tsne = data;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  function fetchInterviewMMs() {
+    fetch(`${server_address}/mental_model/interview/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        interview_server_data = data;
+        console.log("server data", interview_server_data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  function fetchExhibitionMMs() {
+    fetch(`${server_address}/mental_model/exhibition/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        exhibition_server_data = data;
+        console.log("server data", exhibition_server_data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+  onMount(() => {
+    fetchCodebook();
+    fetchCodeTsne();
+  });
 </script>
 
 <div class="page-container flex-1 flex flex-col">
@@ -32,20 +112,31 @@
   </div>
 
   <div class="flex justify-between gap-8 grow">
-    <div class="flex flex-col w-[45%]">
+    <div class="flex flex-col flex-1">
       <div class="jt-section-title text-center text-[1.5rem] text-white">
         Interview Mental Models
       </div>
-      <AllMMs></AllMMs>
+      <AllMMs
+        server_data={interview_server_data}
+        {code_tsne}
+        {codebook}
+        svgId="interview_mm_svg"
+      ></AllMMs>
     </div>
-    <div class="flex flex-col grow">
+    <div class="flex flex-col grow flex-1">
       <div class="jt-section-title text-center text-[1.5rem] text-white">
         Exhibition Mental Models
       </div>
       <div
         class="flex flex-wrap grow justify-between gap-4 h-1 overflow-y-auto pr-3"
       >
-        <PastExhibitionMMs></PastExhibitionMMs>
+        <!-- <PastExhibitionMMs></PastExhibitionMMs> -->
+        <AllMMs
+          server_data={exhibition_server_data}
+          {code_tsne}
+          {codebook}
+          svgId="exhibition_mm_svg"
+        ></AllMMs>
       </div>
     </div>
   </div>
@@ -70,5 +161,11 @@
   p {
     margin-bottom: 2rem;
     font-size: 1.1rem;
+  }
+  :global(.is_top) {
+    fill: var(--jt-secondary);
+  }
+  :global(.is_bottom) {
+    fill: var(--neutral-500);
   }
 </style>

@@ -29,9 +29,9 @@ def get_codebook_parent_tsne():
     return parent_code_tsne
 
 
-@router.get("/mental_model/interview/")
-def get_interview_MM():
-    interview_MMs = []
+@router.get("/mental_model/exhibition_individual/")
+def get_exhibition_individual():
+    exhibition_MMs = []
     codes = json.load(
         open(server_path("mm_data/all_codes.json"), "r", encoding="utf-8")
     )
@@ -70,14 +70,41 @@ def get_interview_MM():
                 }
                 for mm in participant_MM
             ]
-        interview_MMs.append(participant_MM)
+        exhibition_MMs.append(participant_MM)
         participants.append(participant_MM_file.split("/")[-1].split(".")[0])
 
-    return {"participants": participants, "mental_models": interview_MMs}
+    return {"participants": participants, "mental_models": exhibition_MMs}
 
 
-@router.get("/mental_model/results/")
-def get_mm_results():
+# Aggregated mental model results from all exhibitions
+@router.get("/mental_model/exhibition/")
+def get_exhibition_MM():
+    all_MMs = defaultdict(list)
+    code_book = json.load(open(server_path("mm_data/all_codes.json")))
+    all_codes = [code["name"] for code in code_book]
+    parent_code_dict = {}  # from code to parent code
+    for code in code_book:
+        code_name = code["name"]
+        parent_code = code["parent"]
+        if parent_code != "N/A":
+            parent_code_dict[code_name] = parent_code
+        else:
+            parent_code_dict[code_name] = code_name
+    for participant_MM_file in glob.glob(server_path("mm_data/exhibition/*.json")):
+        participant_id = participant_MM_file.split("/")[-1].split(".")[0]
+        participant_MM = json.load(open(participant_MM_file))
+        participant_MM = list(
+            filter(lambda x: x["code_name"] in all_codes, participant_MM)
+        )
+        code_names = set([c["code_name"] for c in participant_MM])
+        for c in code_names:
+            all_MMs[c].append(participant_id)
+    return all_MMs
+
+
+# Aggregated mental model results from all interviews
+@router.get("/mental_model/interview/")
+def get_interview_Mm():
     all_MMs = defaultdict(list)
     code_book = json.load(open(server_path("mm_data/all_codes.json")))
     all_codes = [code["name"] for code in code_book]

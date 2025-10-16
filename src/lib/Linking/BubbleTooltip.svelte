@@ -90,7 +90,7 @@
     {#await fetchSummarization()}
       <p>...</p>
     {:then summarization}
-      <p class="text-[1rem] text-left whitespace-pre-wrap pl-2 overflow-y-auto">
+      <p class="text-[1rem] text-left whitespace-pre-wrap pl-2">
         <!-- {summarization.length > 0 ? summarization : "No summary available."} -->
         {summarization}
       </p>

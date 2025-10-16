@@ -45,7 +45,7 @@ export class MentalModelRenderer {
           .attr("fill", "#a2bffd")
           .attr("pointer-events", "none")
           .attr("font-family", "monospace")
-          .text("Factors Impacting Salinity")
+          .text("Factors that Drive Salinity")
         regions.append("text").attr("class", "bottom_region_label")
           .classed("jt-body-3", true)
           .attr("x", this.width/2)
@@ -273,7 +273,8 @@ export class MentalModelRenderer {
             .attr("x2", this.width/2)
             .attr("y2", this.height*center)
             .attr("stroke-width", 1.5)
-            .attr("stroke", "#26414b")
+            // .attr("stroke", "#26414b")
+            .attr("stroke", "#c3c3c3")
             .attr("stroke-opacity", 0.5)
         // update force
         const forceNode = d3.forceManyBody();
