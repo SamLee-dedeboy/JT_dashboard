@@ -12,7 +12,16 @@
   onMount(() => {});
 </script>
 
-<div class="page-container flex grow overflow-hidden">
+<div class="page-container flex grow relative">
+  <div class="tutorial absolute top-[-1.5rem] max-w-[35rem] left-1/5">
+    <div class="text-left mt-2 px-3 pb-1">
+      <p class="">
+        This page lets you explore public opinions associated with each
+        scenario.
+      </p>
+      <p>Click a scenario to get started.</p>
+    </div>
+  </div>
   <!-- <CodeBubbles {codes} /> -->
   <div class="flex-1 flex flex-col">
     <ScenarioOverview bind:selected_scenario />
@@ -28,16 +37,20 @@
     padding: 2rem;
     text-align: center;
   }
+  .tutorial {
+    background-color: var(--bg-page);
+    outline: 1px solid var(--brand-secondary);
+  }
 
   h1 {
     color: #646cff;
     margin-bottom: 1rem;
   }
 
-  p {
+  /* p {
     margin-bottom: 2rem;
     font-size: 1.1rem;
-  }
+  } */
   .bubble-container {
     outline: 1px solid var(--jt-secondary);
     border-radius: 0.5rem;

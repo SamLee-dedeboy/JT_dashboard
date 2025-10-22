@@ -98,6 +98,8 @@ def get_exhibition_MM():
         )
         code_names = set([c["code_name"] for c in participant_MM])
         for c in code_names:
+            if c == "Local surface water supply":
+                continue
             all_MMs[c].append(participant_id)
     return all_MMs
 
@@ -142,6 +144,8 @@ def get_interview_Mm():
         code_names = set([c["code_name"] for c in participant_MM])
         for c in code_names:
             # all_MMs[c] += 1
+            if c == "Local surface water supply":
+                continue
             all_MMs[c].append(participant_id)
     return all_MMs
 

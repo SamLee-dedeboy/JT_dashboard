@@ -179,6 +179,6 @@ button:focus-visible {
   --body-content: var(--font-family-body);
 
   /* --- Dropzone Colors --- */
-  --dropzone-top-border: #51a2bd;    /* Coral red for top dropzone */
-  --dropzone-bottom-border: #ffffff; /* Teal for bottom dropzone */
+  --dropzone-top-border: #51a2bd;    
+  --dropzone-bottom-border: #b39037; /* Teal for bottom dropzone */
 }

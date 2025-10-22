@@ -184,4 +184,7 @@ button:focus-visible {
   --categorical-four: #e263ff;
   --categorical-five: #efa400;
   --categorical-six: #ff4c79;
+
+  --bg-drivers: #51a2bd;    
+  --bg-impacted: #b39037; /* Teal for bottom dropzone */
 }

@@ -42,7 +42,7 @@ export class MentalModelRenderer {
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "hanging")
           .attr("font-size", 20)
-          .attr("fill", "#a2bffd")
+          .attr("fill", "var(--bg-drivers)")
           .attr("pointer-events", "none")
           .attr("font-family", "monospace")
           .text("Factors that Drive Salinity")
@@ -53,7 +53,7 @@ export class MentalModelRenderer {
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "bottom")
           .attr("font-size", 20)
-          .attr("fill", "#0088AD")
+            .attr("fill", "var(--bg-impacted)")
           .attr("pointer-events", "none")
           // .attr("font-family", "")
           .text("Factors Impacted by Salinity")
@@ -61,7 +61,8 @@ export class MentalModelRenderer {
           .attr("class", "bubble")
           .classed("is_center", true)
           // .attr("fill", "oklch(95.6% 0.045 203.388)")
-          .attr("fill", "#74b1d2")
+          // .attr("fill", "#74b1d2")
+          .attr("fill", "var(--brand-primary)")
           .attr("filter", "drop-shadow(0px 0px 1.5px rgba(255, 255, 255, 1))")
           .attr("stroke", "#26414b")
           // .attr("stroke", "#5d8397")
@@ -95,14 +96,14 @@ export class MentalModelRenderer {
           .attr("orient", "auto")
           .append("path")
           .attr("d", "M 0 0 L 10 5 L 0 10 Z")
-          .attr("fill", "#a2bffd");
+          .attr("fill", "var(--bg-drivers)");
         
         svg.append("line")
           .attr("x1", 0)
           .attr("y1", 5)
           .attr("x2", this.width)
           .attr("y2", 5)
-          .attr("stroke", "#a2bffd")
+          .attr("stroke", "var(--bg-drivers)")
           .attr("stroke-width", 2)
           .attr("marker-end", "url(#arrowhead)");
           // Add label "Natural" at the start of the line
@@ -112,7 +113,7 @@ export class MentalModelRenderer {
             .attr("y", 25) // Position below the line
             .attr("text-anchor", "start")
             .attr("font-size", 18)
-            .attr("fill", "#a2bffd")
+            .attr("fill", "var(--bg-drivers)")
             .text("Natural");
           
           // Add label "Human" at the end of the line
@@ -122,7 +123,7 @@ export class MentalModelRenderer {
             .attr("y", 25) // Position below the line
             .attr("text-anchor", "end")
             .attr("font-size", 18)
-            .attr("fill", "#a2bffd")
+            .attr("fill", "var(--bg-drivers)")
             .text("Human");
 
 
@@ -138,13 +139,13 @@ export class MentalModelRenderer {
           .attr("orient", "auto")
           .append("path")
           .attr("d", "M 0 0 L 10 5 L 0 10 Z")
-          .attr("fill", "#0088AD");
+            .attr("fill", "var(--bg-impacted)")
             svg.append("line")
             .attr("x1", 0)
             .attr("y1", this.height - 5)
             .attr("x2", this.width)
             .attr("y2", this.height - 5)
-            .attr("stroke", "#0088AD")
+              .attr("stroke", "var(--bg-impacted)")
             .attr("stroke-width", 2)
             .attr("marker-end", "url(#arrowhead-bot)");
             // Add label "Natural" at the start of the line
@@ -154,7 +155,7 @@ export class MentalModelRenderer {
               .attr("y", this.height - 15) // Position below the line
               .attr("text-anchor", "start")
               .attr("font-size", 18)
-              .attr("fill", "#0088AD")
+              .attr("fill", "var(--bg-impacted)")
               .text("Natural");
             
             // Add label "Human" at the end of the line
@@ -164,7 +165,7 @@ export class MentalModelRenderer {
               .attr("y", this.height - 15) // Position below the line
               .attr("text-anchor", "end")
               .attr("font-size", 18)
-              .attr("fill", "#0088AD")
+              .attr("fill", "var(--bg-impacted)")
               .text("Human");
     }
 

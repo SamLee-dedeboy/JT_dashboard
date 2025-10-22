@@ -139,7 +139,7 @@
 <div class="combinations-container flex w-full grow flex-col gap-y-1">
   <div class="flex">
     <div class="px-1 underline">
-      {leading_section_title}
+      Future Salinity Management {leading_section_title}
     </div>
   </div>
   <div class="flex grow flex-col">
@@ -168,7 +168,7 @@
         <div
           class="flex w-max relative"
           style={`color: ${
-            option_clicked ? "darkgray" : "white"
+            option_clicked ? "white" : "darkgray"
           }; text-decoration-line: ${option_filled ? "none" : "line-through"};
           padding-left: ${index * 3.1}rem
           `}
@@ -205,7 +205,7 @@
         <div
           role="button"
           tabindex={index}
-          class="combination-container relative flex snap-center justify-between py-1 opacity-[15%] outline-0 outline-black transition-opacity hover:shadow-md hover:brightness-90"
+          class="combination-container relative flex snap-center justify-between px-1.5 py-1 opacity-[15%] outline-0 outline-black transition-opacity hover:shadow-md hover:brightness-90"
           class:rendered={rendered_combinations.includes(combination)}
           class:highlighted={highlighted_combinations.includes(combination)}
           style={`background-color: ${combination_colors[combination]};`}
@@ -222,7 +222,8 @@
                 cx="50"
                 cy="55"
                 r="50"
-                fill={circle_filled[index] ? "gray" : "white"}
+                fill={circle_filled[index] ? "#222222" : "white"}
+                opacity={circle_filled[index] ? 1 : 0.5}
                 stroke-width="5"
               ></circle>
             </svg>

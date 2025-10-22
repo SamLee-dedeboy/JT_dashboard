@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunburst Gallery</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            /* max-width: 1400px; */
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .sunburst-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            flex: 1;
+            min-width: 350px;
+            max-width: 450px;
+        }
+        
+        .sunburst-title {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .arc-text {
+            font-size: 10px;
+            font-weight: bold;
+            fill: white;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            margin-bottom: 0;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .legend {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .legend-title {
+            color: #333;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        
+        .legend-text {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .sunburst-container {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sunburst Gallery</h1>
+        <div class="controls">
+            <div class="toggle-container">
+                <span class="toggle-label">Show Top 5 Only:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="top5Toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="gallery" id="gallery"></div>
+        <div class="tooltip" id="tooltip"></div>
+        
+        <div class="legend" id="legend">
+            <div class="legend-title">Color Legend</div>
+            <div class="legend-items" id="legendItems"></div>
+        </div>
+    </div>
+
+    <script>
+        // Define the data files and their display titles
+        const dataFiles = [
+            { file: "sunburst/sunburst_age_18_35.json", title: "Ages 18-35" },
+            { file: "sunburst/sunburst_age_36_64.json", title: "Ages 36-64" },
+            { file: "sunburst/sunburst_age_65_plus.json", title: "Ages 65+" },
+            { file: "sunburst/sunburst_years_0_10_experience.json", title: "Years 0-10 Engagement" },
+            { file: "sunburst/sunburst_years_11_30_experience.json", title: "Years 11-30 Engagement" },
+            { file: "sunburst/sunburst_years_31_plus_experience.json", title: "Years 31+ Engagement" },
+            { file: "sunburst/sunburst_Resident.json", title: "Resident" },
+            { file: "sunburst/sunburst_Non Resident.json", title: "Non Resident" },
+            { file: "sunburst/sunburst_team.json", title: "team" },
+            { file: "sunburst/sunburst_interviewees.json", title: "interviewees" },
+            { file: "sunburst/sunburst_all.json", title: "All MMs" }
+        ];
+
+        // Global variables
+        // const colorPalette = d3.schemeSet3;
+        const colorPalette = [
+            "#637CEF", "#E3008C", "#2AA0A4", "#9373C0", "#13A10E", "#3A96DD", "#CA5010", "#57811B", "#B146C2", "#AE8C00"
+        ]
+        let originalDatasets = [];
+        let isTop5Mode = false;
+        let globalColorMap = new Map(); // Moved here to be reset when needed
+
+        // Function to reset and rebuild color map
+        function resetColorMap() {
+            globalColorMap.clear();
+        }
+
+        // Function to get consistent color for a category name with hierarchical shading
+        function getConsistentColor(name, depth = 0, parentColor = null) {
+            const key = `${name}_${depth}`;
+            
+            if (!globalColorMap.has(key)) {
+                if (depth === 1 || !parentColor) {
+                    // Root level children get base colors from palette
+                    const colorIndex = Array.from(globalColorMap.keys())
+                        .filter(k => k.endsWith('_1'))
+                        .length % colorPalette.length;
+                    globalColorMap.set(key, colorPalette[colorIndex]);
+                } else {
+                    console.log(colorPalette, parentColor, d3.color(parentColor));
+                    // Children get shaded versions of parent color
+                    const baseColor = d3.color(parentColor);
+                    
+                    // Create variations by adjusting brightness and saturation
+                    const variations = [
+                        baseColor.brighter(0.8),
+                        // baseColor.darker(0.3),
+                        // baseColor.brighter(0.6),
+                        // baseColor.darker(0.6),
+                        // d3.hsl(baseColor).copy({s: Math.min(1, d3.hsl(baseColor).s + 0.2)}),
+                        // d3.hsl(baseColor).copy({s: Math.max(0, d3.hsl(baseColor).s - 0.2)}),
+                        // d3.hsl(baseColor).copy({l: Math.min(1, d3.hsl(baseColor).l + 0.15)}),
+                        // d3.hsl(baseColor).copy({l: Math.max(0, d3.hsl(baseColor).l - 0.15)})
+                    ];
+                    
+                    // Get index for this child based on how many siblings we've processed
+                    const siblingIndex = Array.from(globalColorMap.keys())
+                        .filter(k => k.includes(`_${depth}`) && globalColorMap.get(k).toString().includes(baseColor.formatHex().substring(1, 3)))
+                        .length;
+                    
+                    const selectedVariation = variations[siblingIndex % variations.length];
+                    globalColorMap.set(key, selectedVariation.toString());
+                }
+            }
+            return globalColorMap.get(key);
+        }
+
+        // Function to filter data to top 5 children
+        function filterToTop5(data) {
+            if (!data.children || data.children.length <= 5) {
+                return data;
+            }
+            
+            console.log("Filtering to top 5 for:", data.children);
+            // Sort children by value and take top 5
+            const sortedChildren = [...data.children]
+                .sort((a, b) => (d3.sum(b.children, d => d.value) || 0) - (d3.sum(a.children, d => d.value) || 0))
+                .slice(0, 5);
+            
+            return {
+                ...data,
+                children: sortedChildren
+            };
+        }
+
+        // Function to clear gallery
+        function clearGallery() {
+            d3.select("#gallery").selectAll("*").remove();
+        }
+
+        // Function to create and populate the legend
+        function createLegend() {
+            const legendItems = d3.select("#legendItems");
+            legendItems.selectAll("*").remove(); // Clear existing items
+            
+            // Get all parent categories (depth 1) and their colors
+            const parentCategories = new Map();
+            
+            // Collect parent categories from all datasets
+            const datasetsToUse = isTop5Mode 
+                ? originalDatasets.map(filterToTop5)
+                : originalDatasets;
+                
+            datasetsToUse.forEach(data => {
+                if (data.children) {
+                    data.children.forEach(child => {
+                        if (!parentCategories.has(child.name)) {
+                            const color = getConsistentColor(child.name, 1);
+                            parentCategories.set(child.name, color);
+                        }
+                    });
+                }
+            });
+            
+            // Sort categories alphabetically for consistent display
+            const sortedCategories = Array.from(parentCategories.entries())
+                .sort((a, b) => a[0].localeCompare(b[0]));
+            
+            // Create legend items
+            const legendItemElements = legendItems
+                .selectAll(".legend-item")
+                .data(sortedCategories)
+                .enter()
+                .append("div")
+                .attr("class", "legend-item");
+            
+            legendItemElements
+                .append("div")
+                .attr("class", "legend-color")
+                .style("background-color", d => d[1]);
+                
+            legendItemElements
+                .append("span")
+                .attr("class", "legend-text")
+                .text(d => d[0]);
+                
+            // Add fade-in animation
+            legendItemElements
+                .style("opacity", 0)
+                .transition()
+                .duration(800)
+                .delay((d, i) => i * 50)
+                .style("opacity", 1);
+        }
+
+        // Function to render all sunbursts
+        function renderSunbursts() {
+            clearGallery();
+            
+            // Reset color map when mode changes to get fresh colors
+            resetColorMap();
+            
+            const datasetsToUse = isTop5Mode 
+                ? originalDatasets.map(filterToTop5)
+                : originalDatasets;
+            
+            // Rebuild color map with current data
+            datasetsToUse.forEach(data => {
+                collectCategoryNames(data);
+            });
+            
+            datasetsToUse.forEach((data, index) => {
+                createSunburst(data, dataFiles[index].title, index);
+            });
+            
+            // Create legend after sunbursts are rendered
+            createLegend();
+        }
+
+        // Toggle event listener
+        document.getElementById('top5Toggle').addEventListener('change', function() {
+            isTop5Mode = this.checked;
+            renderSunbursts();
+        });
+
+        // Load all data files and create sunbursts
+        Promise.all(dataFiles.map(d => d3.json(d.file)))
+            .then(function(datasets) {
+                originalDatasets = datasets;
+                
+                // Initial render (color map will be built in renderSunbursts)
+                renderSunbursts();
+            })
+            .catch(function(error) {
+                console.error("Error loading data:", error);
+            });
+
+        // Recursively collect all category names from the data
+        function collectCategoryNames(node, depth = 0, parentColor = null) {
+            if (node.name) {
+                const color = getConsistentColor(node.name, depth, parentColor);
+                if (node.children) {
+                    node.children.forEach(child => collectCategoryNames(child, depth + 1, color));
+                }
+            }
+        }
+
+        function createSunburst(data, title, index) {
+            // Set dimensions and radius
+            const width = 400;
+            const height = 400;
+            const radius = Math.min(width, height) / 2 - 10;
+
+            // Track visibility state for children of each parent
+            const hiddenChildren = new Set();
+            
+            // Initialize hidden state: hide all children except top 5 parents
+            function initializeHiddenState() {
+                if (data.children) {
+                    // Calculate total value for each parent (sum of children values)
+                    const parentsWithTotals = data.children.map(parent => ({
+                        name: parent.name,
+                        totalValue: parent.children ? d3.sum(parent.children, d => d.value || 0) : 0
+                    }));
+                    
+                    // Sort by total value and get top 5
+                    const top5Parents = parentsWithTotals
+                        .sort((a, b) => b.totalValue - a.totalValue)
+                        .slice(0, 5)
+                        .map(p => p.name);
+                    
+                    console.log(`${title} - Top 5 parents:`, top5Parents);
+                    
+                    // Hide children of all parents except top 5
+                    data.children.forEach(parent => {
+                        if (!top5Parents.includes(parent.name) && parent.children) {
+                            parent.children.forEach(child => {
+                                const childKey = `${parent.name}_${child.name}`;
+                                hiddenChildren.add(childKey);
+                            });
+                        }
+                    });
+                }
+            }
+            
+            // Initialize the hidden state
+            initializeHiddenState();
+
+            // Create a color function that considers hierarchy
+            function getHierarchicalColor(d) {
+                let parentColor = null;
+                if (d.parent && d.parent.data.name) {
+                    parentColor = getConsistentColor(d.parent.data.name, d.depth - 1);
+                }
+                return getConsistentColor(d.data.name, d.depth, parentColor);
+            }
+
+            // Function to calculate contrasting text color
+            function getContrastColor(backgroundColor) {
+                // Convert hex to RGB
+                const rgb = d3.rgb(backgroundColor);
+                
+                // Calculate relative luminance using WCAG formula
+                const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+                
+                // Return white for dark backgrounds, black for light backgrounds
+                return luminance > 0.5 ? '#000000' : '#ffffff';
+            }
+
+            // Create the arc generator
+            const arc = d3.arc()
+                .startAngle(d => d.x0)
+                .endAngle(d => d.x1)
+                .innerRadius(d => d.y0)
+                .outerRadius(d => d.y1);
+
+            // Create arc generator for outer count arcs
+            const outerArc = d3.arc()
+                .startAngle(d => d.x0)
+                .endAngle(d => d.x1)
+                .innerRadius(d => d.y1 + 66)  // Start just outside the main arc
+                .outerRadius(d => d.y1 + 70); // 15px thick outer ring
+
+            // Create partition layout
+            const partition = d3.partition()
+                .size([2 * Math.PI, radius]);
+
+            // Create hierarchy from data
+            const root = d3.hierarchy(data)
+                .sum(d => d.value || 0)
+                .sort((a, b) => b.value - a.value);
+
+            // Apply partition layout
+            console.log(title, root)
+            partition(root);
+
+            // Create container for this sunburst
+            const container = d3.select("#gallery")
+                .append("div")
+                .attr("class", "sunburst-container");
+
+            // Add title
+            container.append("div")
+                .attr("class", "sunburst-title")
+                .text(title);
+
+            // Create SVG
+            const svg = container
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+                .attr("overflow", "visible");
+
+            const g = svg.append("g")
+                .attr("transform", `translate(${width / 2},${height / 2})`);
+
+            // Get tooltip element
+            const tooltip = d3.select("#tooltip");
+
+            // Function to update visibility of arcs and labels based on hidden state
+            function updateVisibility() {
+                // Update arcs
+                arcs.style("display", function(d) {
+                    if (d.depth <= 1) return "block"; // Always show root and parent arcs
+                    
+                    // Check if this child should be hidden
+                    const parentName = d.parent.data.name;
+                    const childKey = `${parentName}_${d.data.name}`;
+                    return hiddenChildren.has(childKey) ? "none" : "block";
+                });
+                
+                // Update labels
+                labels.style("display", function(d) {
+                    if (d.depth <= 1) return "block"; // Always show root and parent labels
+                    
+                    // Check if this child should be hidden
+                    const parentName = d.parent.data.name;
+                    const childKey = `${parentName}_${d.data.name}`;
+                    return hiddenChildren.has(childKey) ? "none" : "block";
+                });
+                
+                // Update outer arcs and count labels
+                outerArcs.style("display", function(d) {
+                    if (d.depth !== 1 || !d.children) return "none"; // Only show for parent nodes with children
+                    
+                    // Check if any children are visible
+                    const hasVisibleChildren = d.children.some(child => {
+                        const childKey = `${d.data.name}_${child.data.name}`;
+                        return !hiddenChildren.has(childKey);
+                    });
+                    
+                    return hasVisibleChildren ? "block" : "none";
+                });
+                
+                countLabels.style("display", function(d) {
+                    if (d.depth !== 1 || !d.children) return "none"; // Only show for parent nodes with children
+                    
+                    // Check if any children are visible
+                    const hasVisibleChildren = d.children.some(child => {
+                        const childKey = `${d.data.name}_${child.data.name}`;
+                        return !hiddenChildren.has(childKey);
+                    });
+                    
+                    return hasVisibleChildren ? "block" : "none";
+                }).text(function(d) {
+                    // Update count text based on currently visible children
+                    const visibleChildren = d.children.filter(child => {
+                        const childKey = `${d.data.name}_${child.data.name}`;
+                        return !hiddenChildren.has(childKey);
+                    }).length;
+                    return visibleChildren;
+                });
+            }
+
+            // Create arcs
+            const arcs = g.selectAll("path")
+                .data(root.descendants().filter(d => d.depth > 0))
+                .enter()
+                .append("path")
+                .attr("d", arc)
+                .attr("fill", d => getHierarchicalColor(d))
+                .attr("stroke", "white")
+                .attr("stroke-width", 1.5)
+                .style("cursor", d => {
+                    // Show pointer cursor for clickable parent arcs
+                    return (d.depth === 1 && d.children && d.children.length > 0) ? "pointer" : "default";
+                })
+                .on("mouseover", function(event, d) {
+                    // Highlight arc
+                    d3.select(this)
+                        .style("opacity", 0.8)
+                        .style("stroke-width", 3);
+
+                    // Show tooltip
+                    const value = d.value || 0;
+                    const percentage = d.parent ? (value / d.parent.value * 100).toFixed(1) : 100;
+                    
+                    tooltip
+                        .style("opacity", 1)
+                        .html(`
+                            <strong>${title}</strong><br/>
+                            <strong>${d.data.name}</strong><br/>
+                            Value: ${value}<br/>
+                            Percentage: ${percentage}%<br/>
+                        `)
+                        .style("left", (event.pageX + 10) + "px")
+                        .style("top", (event.pageY - 10) + "px");
+                })
+                .on("mouseout", function(event, d) {
+                    // Remove highlight
+                    d3.select(this)
+                        .style("opacity", 1)
+                        .style("stroke-width", 1.5);
+
+                    // Hide tooltip
+                    tooltip.style("opacity", 0);
+                })
+                .on("click", function(event, d) {
+                    // Only allow toggling for parent nodes (depth 1) that have children
+                    if (d.depth === 1 && d.children && d.children.length > 0) {
+                        console.log(`${title} - Toggling children for:`, d.data.name);
+                        
+                        // Toggle visibility of all children of this parent
+                        d.children.forEach(child => {
+                            const childKey = `${d.data.name}_${child.data.name}`;
+                            if (hiddenChildren.has(childKey)) {
+                                hiddenChildren.delete(childKey);
+                            } else {
+                                hiddenChildren.add(childKey);
+                            }
+                        });
+                        
+                        // Update the visualization
+                        updateVisibility();
+                    } else {
+                        console.log(`${title} - Clicked:`, d.data.name, "Value:", d.value);
+                    }
+                });
+
+            // Create outer arcs for child count display (only for parent nodes with children)
+            const outerArcs = g.selectAll(".outer-arc")
+                .data(root.descendants().filter(d => d.depth === 1 && d.children && d.children.length > 0))
+                .enter()
+                .append("path")
+                .attr("class", "outer-arc")
+                .attr("d", outerArc)
+                .attr("fill", d => {
+                    const baseColor = getHierarchicalColor(d);
+                    return d3.color(baseColor).darker(0.3).toString();
+                })
+                .attr("stroke", "white")
+                .attr("stroke-width", 1)
+                .style("opacity", 0.7);
+
+            // Create count labels for the outer arcs
+            const countLabels = g.selectAll(".count-label")
+                .data(root.descendants().filter(d => d.depth === 1 && d.children && d.children.length > 0))
+                .enter()
+                .append("text")
+                .attr("class", "count-label")
+                .attr("transform", function(d) {
+                    const angle = (d.x0 + d.x1) / 2;
+                    const radius = d.y1 + 78; // Middle of the outer ring
+                    const x = Math.sin(angle) * radius;
+                    const y = -Math.cos(angle) * radius;
+                    
+                    // Calculate rotation angle in degrees
+                    let rotationAngle = angle * 180 / Math.PI - 90;
+                    
+                    // Keep rotation between -90 and 90 degrees
+                    if (rotationAngle > 90) {
+                        rotationAngle -= 180;
+                    } else if (rotationAngle < -90) {
+                        rotationAngle += 180;
+                    }
+                    rotationAngle = 0;
+                    
+                    return `translate(${x},${y}) rotate(${rotationAngle})`;
+                })
+                .attr("text-anchor", "middle")
+                .attr("dy", "0.35em")
+                .style("font-size", "10px")
+                .style("font-weight", "bold")
+                .style("fill", "black")
+                .style("pointer-events", "none")
+                .text(d => {
+                    // Count visible children
+                    const visibleChildren = d.children.filter(child => {
+                        const childKey = `${d.data.name}_${child.data.name}`;
+                        return !hiddenChildren.has(childKey);
+                    }).length;
+                    return visibleChildren;
+                });
+
+            // Add labels for larger arcs (declare variable for use in updateVisibility)
+            let labels;
+            labels = g.selectAll("text.arc-text")
+                .data(root.descendants().filter(d => {
+                    // Only show labels for arcs that are large enough and not too deep
+                    return d.depth > 0 && d.depth <= 2 && (d.x1 - d.x0) > 0.15;
+                }))
+                .enter()
+                .append("text")
+                .attr("class", "arc-text")
+                .attr("transform", function(d) {
+                    const angle = (d.x0 + d.x1) / 2;
+                    const radius = (d.y0 + d.y1) / 2;
+                    const x = Math.sin(angle) * radius;
+                    const y = -Math.cos(angle) * radius;
+                    
+                    // Calculate rotation angle in degrees
+                    let rotationAngle = angle * 180 / Math.PI - 90;
+                    
+                    // Keep rotation between -90 and 90 degrees
+                    if (rotationAngle > 90) {
+                        rotationAngle -= 180;
+                    } else if (rotationAngle < -90) {
+                        rotationAngle += 180;
+                    }
+                    
+                    return `translate(${x},${y}) rotate(${rotationAngle})`;
+                })
+                .attr("dy", "0.35em")
+                .style("font-size", d => `${Math.min(10, (d.y1 - d.y0) / 4)}px`)
+                .style("fill", d => getContrastColor(getHierarchicalColor(d)))
+                .text(d => {
+                    // Only show text if arc is wide enough
+                    if (d.x1 - d.x0 > 0.2) {
+                        return d.data.name.length > 16 ? d.data.name.substring(0, 16) + "..." : d.data.name;
+                    }
+                    return "";
+                })
+                .call(wrap, 50);
+
+            // Add center text
+            // g.append("text")
+            //     .attr("text-anchor", "middle")
+            //     .attr("dy", "0.35em")
+            //     .style("font-size", "14px")
+            //     .style("font-weight", "bold")
+            //     .style("fill", "#333")
+            //     .text(data.name);
+
+            // Add animation with staggered delay for each sunburst
+            const baseDelay = index * 500;
+            
+            arcs
+                .style("opacity", 0)
+                .transition()
+                .duration(1000)
+                .delay((d, i) => baseDelay + i * 30)
+                .style("opacity", 1);
+
+            outerArcs
+                .style("opacity", 0)
+                .transition()
+                .duration(1000)
+                .delay((d, i) => baseDelay + i * 30)
+                .style("opacity", 0.7);
+
+            labels
+                .style("opacity", 0)
+                .transition()
+                .duration(1000)
+                .delay((d, i) => baseDelay + i * 30 + 300)
+                .style("opacity", 1);
+
+            countLabels
+                .style("opacity", 0)
+                .transition()
+                .duration(1000)
+                .delay((d, i) => baseDelay + i * 30 + 300)
+                .style("opacity", 1);
+                
+            // Apply initial hidden state after elements are created
+            setTimeout(() => {
+                updateVisibility();
+            }, 100);
+        }
+     function wrap(text, width) {
+        text.each(function (d, i) {
+            let text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            // words = text.text().split("").reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            x = text.attr("x"),
+            y = text.attr("y"),
+            dy = 0, //parseFloat(text.attr("dy")),
+            hasTransform = text.attr("transform") !== null;
+
+            var tspan;
+            if (hasTransform) {
+            // For transformed text, use relative positioning to avoid offset issues
+            tspan = text
+                .text(null)
+                .append("tspan")
+                .attr("dy", dy + "em")
+                .attr("text-anchor", "bottom")
+                .attr("dominant-baseline", "central");
+            } else {
+            // For non-transformed text, use absolute positioning as before
+            tspan = text
+                .text(null)
+                .append("tspan")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("dy", dy + "em")
+                .attr("text-anchor", "bottom")
+                .attr("dominant-baseline", "central");
+            }
+
+            while ((word = words.pop())) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width && line.length > 1) {
+                    line.pop(); 
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    if (hasTransform) {
+                    // For transformed text, use only dy for line spacing
+                        tspan = text
+                            .append("tspan")
+                            .attr("x", 0)
+                            .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                            .attr("dominant-baseline", "central")
+                            .text(word);
+                    } else {
+                        // For non-transformed text, use absolute positioning
+                        tspan = text
+                            .append("tspan")
+                            .attr("x", x)
+                            .attr("y", y)
+                            .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                            .attr("dominant-baseline", "central")
+                            .text(word);
+                    }
+                }
+            }
+
+            if (!hasTransform) {
+            // Only adjust y positioning for non-transformed text
+            const line_num = text.selectAll("tspan").nodes().length;
+            const em_to_px = 16;
+            text
+                .selectAll("tspan")
+                .attr("y", +y - (em_to_px / 2) * lineHeight * (line_num - 1));
+            } else {
+            // For transformed text, center the text block vertically
+            const line_num = text.selectAll("tspan").nodes().length;
+            if (line_num > 1) {
+                // Offset the first line to center the text block
+                const centerOffset = (-(line_num - 1) * lineHeight) / 2;
+                text.select("tspan").attr("dy", centerOffset + "em");
+            }
+            }
+        });
+    }
+    </script>
+</body>
+</html>

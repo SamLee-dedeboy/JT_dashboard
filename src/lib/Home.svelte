@@ -12,12 +12,20 @@
     <!-- Timeline Item 1 - Left side: description -- content -->
     <div class="timeline-item left">
       <div class="timeline-side">
-        <div class="timeline-description">
-          <p>Initial phase of public opinion collection</p>
+        <div class="flex flex-col gap-2">
+          <div class="timeline-description relative">
+            <p>Initial phase of public opinion collection</p>
+            <p class="timeline-description absolute top-[4rem] text-left">
+              Interviews with Delta residents, community organization members,
+              Indigenous community members, farmers, practitioners, and
+              scientists investigated perceptions of drivers of change in the
+              Delta, values, preferred management strategies, and governance.
+            </p>
+          </div>
         </div>
         <div class="timeline-content">
           <button class="nav-button" on:click={() => push("/flow")}>
-            Flow
+            Listening
           </button>
         </div>
       </div>
@@ -34,11 +42,18 @@
       <div class="timeline-side">
         <div class="timeline-content">
           <button class="nav-button" on:click={() => push("/linking")}>
-            Linking
+            Designing
           </button>
         </div>
-        <div class="timeline-description">
-          <p>Connecting public opinion to scenarios</p>
+        <div class="flex flex-col gap-2">
+          <div class="timeline-description relative">
+            <p>Linking public opinion to scenarios design</p>
+            <p class="timeline-description absolute top-[4rem] text-left">
+              Results from interviews were translated into six distinct
+              scenarios to compare management strategies in alternative,
+              plausible futures.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -46,12 +61,18 @@
     <!-- Timeline Item 3 - Left side: description -- content -->
     <div class="timeline-item left">
       <div class="timeline-side">
-        <div class="timeline-description">
-          <p>Identifying mental models in public opinion</p>
+        <div class="flex flex-col gap-2">
+          <div class="timeline-description relative">
+            <p>Identifying mental models in public opinion</p>
+            <p class="timeline-description absolute top-[4rem] text-left">
+              Analyzing the drivers of change in salinity and what salinity
+              impacts interviewees identified in the initial interviews.
+            </p>
+          </div>
         </div>
         <div class="timeline-content">
           <button class="nav-button" on:click={() => push("/mental-model")}>
-            Mental Model
+            Conceptualizing
           </button>
         </div>
       </div>
@@ -68,11 +89,17 @@
       <div class="timeline-side">
         <div class="timeline-content">
           <button class="nav-button" on:click={() => push("/sunburst")}>
-            Sunburst
+            Comparing
           </button>
         </div>
-        <div class="timeline-description">
-          <p>Comparing mental models across groups</p>
+        <div class="flex flex-col gap-2">
+          <div class="timeline-description relative">
+            <p>Comparing mental models across groups</p>
+            <p class="timeline-description absolute top-[4rem] text-left">
+              Looking at similarities and differences in mental models of
+              different demographic groups.
+            </p>
+          </div>
         </div>
       </div>
     </div>

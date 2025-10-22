@@ -82,7 +82,7 @@
         <span class="font-semibold underline">
           {total_participants}
         </span>
-        participants mentioned this in the interview.
+        participants mentioned this.
       </p>
       {#if tooltip_data.length > 1}
         <p class="text-left">

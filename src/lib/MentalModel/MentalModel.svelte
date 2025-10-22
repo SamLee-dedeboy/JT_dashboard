@@ -4,6 +4,7 @@
   import PastExhibitionMMs from "./PastExhibitionMMs.svelte";
   import { server_address } from "./constants";
   import { push } from "svelte-spa-router";
+  import { slide } from "svelte/transition";
 
   // function goBack() {
   //   push("/");
@@ -82,13 +83,64 @@
         console.error("Error:", error);
       });
   }
+  let tutorialExpanded = $state(false);
+
+  function toggleTutorial() {
+    tutorialExpanded = !tutorialExpanded;
+  }
+
   onMount(() => {
     fetchCodebook();
     fetchCodeTsne();
   });
 </script>
 
-<div class="page-container flex-1 flex flex-col">
+<div class="page-container flex-1 flex flex-col relative">
+  <div class="tutorial absolute top-[-1.5rem] max-w-[40rem] left-1/3 z-10">
+    <div class="text-left mt-2 px-3 pb-1">
+      <div class="flex items-start justify-between">
+        <p class="flex-1">
+          This page lets you compare mental models from a 2023 public interviews
+          and a 2025 exhibition participants.
+        </p>
+        <button
+          onclick={toggleTutorial}
+          class="ml-3 p-1 text-gray-400 hover:text-white transition-colors duration-200"
+          aria-label={tutorialExpanded
+            ? "Collapse tutorial"
+            : "Expand tutorial"}
+        >
+          <img
+            src="arrow-down.svg"
+            alt="Toggle arrow"
+            class="w-4 h-4 transition-transform duration-200 {tutorialExpanded
+              ? 'rotate-180'
+              : ''}"
+          />
+        </button>
+      </div>
+      {#if tutorialExpanded}
+        <div in:slide>
+          <p>The participants were asked two main question:</p>
+          <ul class="list-disc list-outside pl-4">
+            <li class="underline">
+              What factors do you think have the most influence on Delta
+              Salinity management?
+            </li>
+            <li class="underline">
+              What is most at risk if salinity increases in the Delta?
+            </li>
+          </ul>
+          <p>
+            Through this mental model we can create a shared understanding for
+            future salinity management strategies in the delta.
+          </p>
+
+          <p class="mt-2">Tip: Click a node to inspect its statistics.</p>
+        </div>
+      {/if}
+    </div>
+  </div>
   <div class="flex">
     <!-- <button
       on:click={goBack}
@@ -111,7 +163,7 @@
     </button> -->
   </div>
 
-  <div class="flex justify-between gap-8 grow">
+  <div class="flex justify-between gap-8 grow relative">
     <div class="flex flex-col flex-1">
       <div class="jt-section-title text-center text-[1.5rem] text-white">
         Interview Mental Models
@@ -158,14 +210,14 @@
     margin-bottom: 1rem;
   }
 
-  p {
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-  }
   :global(.is_top) {
-    fill: var(--jt-secondary);
+    fill: var(--bg-drivers);
   }
   :global(.is_bottom) {
-    fill: var(--neutral-500);
+    fill: var(--bg-impacted);
+  }
+  .tutorial {
+    background-color: var(--bg-page);
+    outline: 1px solid var(--brand-secondary);
   }
 </style>

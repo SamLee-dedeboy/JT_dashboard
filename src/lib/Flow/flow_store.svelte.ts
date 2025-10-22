@@ -179,24 +179,8 @@ export const uiState = {
 let _category_options = $state({} as { [key: string]: string[] });
 let _sections = $state([
   {
-    id: "drivers_of_change",
-    title: "Drivers of Change",
-    hidden: false,
-    columns: [
-      {
-        id: "factors",
-        title: "Factors",
-        section_id: "drivers_of_change",
-        column_id_prefix: Columns.factor_column_id,
-        value_process_func: Columns.category_process_func,
-        type: "many",
-        hidden: false,
-      },
-    ],
-  },
-  {
     id: "future_management",
-    title: "Future Salinity Management Strategies",
+    title: "What should be the Future Salinity Management Strategies?",
     hidden: false,
     columns: [
       {
@@ -211,8 +195,24 @@ let _sections = $state([
     ],
   },
   {
+    id: "drivers_of_change",
+    title: "What are the Drivers of Change?",
+    hidden: false,
+    columns: [
+      {
+        id: "factors",
+        title: "Factors",
+        section_id: "drivers_of_change",
+        column_id_prefix: Columns.factor_column_id,
+        value_process_func: Columns.category_process_func,
+        type: "many",
+        hidden: false,
+      },
+    ],
+  },
+  {
     id: "decision_making",
-    title: "Decision Making: Fairness & Who should be involved",
+    title: "Is the current decision making Fair?",
     hidden: false,
     columns: [
       {

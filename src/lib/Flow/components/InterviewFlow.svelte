@@ -583,9 +583,9 @@
 
 <div class="upper-page flex flex-1 h-full w-full bg-gray-50">
   <div class="control-panel flex min-w-[15rem] max-w-[17rem] flex-col">
-    <span class="flex items-center justify-center font-serif text-lg font-bold">
+    <!-- <span class="flex items-center justify-center font-serif text-lg font-bold">
       JT Participant Transcripts
-    </span>
+    </span> -->
     <!-- <div
       role="button"
       tabindex="0"
@@ -599,7 +599,40 @@
     </div> -->
     <div class="overview-panel w-full"></div>
     <div class="statistics-panel flex h-1 grow flex-col">
-      <div class="flex grow flex-col">
+      <div class="flex grow flex-col gap-8">
+        <div
+          class="tutorial flex flex-col p-3 mx-2 gap-4 divide-y divide-dashed"
+        >
+          <div>
+            <div>We mainly asked three questions in the interview:</div>
+            <ol class="list-decimal list-outside pl-4">
+              <li>What should be the Future Salinity Management Strategies?</li>
+              <li>What are the Drivers of Change?</li>
+              <li>Is the current decision making Fair?</li>
+            </ol>
+            <div class="my-2">
+              Answer the questions yourself by clicking the blocks and see how
+              many participants agree with you!
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <div>How to read the flow diagram:</div>
+            <div>Each block represents a category of public opinion.</div>
+            <div>
+              Connected blocks represent public opinion from the same group of
+              people.
+            </div>
+            <div>
+              Color of connections represent different groups of people.
+              <br />
+              These groups are defined by the participants' responses to
+              <span class="underline">
+                "What should be the Future Salinity Management Strategies?".
+              </span>
+            </div>
+          </div>
+        </div>
         <Combinations
           {block_aggregator}
           leading_section_title={Constants.column_id_to_title[leading_column]}
@@ -657,6 +690,10 @@
   }
   .control-panel span {
     color: var(--text-primary);
+  }
+  .tutorial {
+    background-color: var(--bg-page);
+    outline: 1px solid var(--brand-secondary);
   }
   .sankey-svg {
     @apply absolute bottom-0 left-0 right-0 top-0;

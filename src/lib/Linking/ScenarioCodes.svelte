@@ -59,16 +59,15 @@
             d="M12 8h.01"
           /></svg
         >
-        This chart shows the distribution of participants' responses in our interview.
+        This chart shows the distribution of participants' responses associated with
+        the scenario.
       </span>
-      <!-- <span class="text-left ml-7">
-        Each bubble is a category. Bigger bubbles indicate
-        <span class="font-semibold whitespace-normal">
-          more participants mentioned this category.
-        </span>
-      </span> -->
       <span class="text-left ml-7">
-        Click any bubble to interact with it.
+        Each bubble represents a category of opinion. Bigger bubbles =
+        <span class=""> more participants mentioned this category. </span>
+      </span>
+      <span class="text-left ml-7">
+        Click any bubble to see more details.
       </span>
     </div>
     <div

@@ -93,10 +93,10 @@
             flex: 1;
             position: relative;
             background: linear-gradient(180deg, 
-                #51a2bd 0%, 
-                color-mix(in srgb, #51a2bd 30%, var(--bg-page)) 50%, 
-                color-mix(in srgb, #ffffff 30%, var(--bg-page)) 50%, 
-                #ffffff 100%);
+                var(--dropzone-top-border) 0%, 
+                color-mix(in srgb, #959595 30%, var(--bg-page)) 50%, 
+                color-mix(in srgb, var(--dropzone-bottom-border) 30%, var(--bg-page)) 50%, 
+                var(--dropzone-bottom-border) 100%);
             overflow: hidden;
         }
 
@@ -975,6 +975,115 @@
         let hierarchicalData = {};
         let currentDraggedCodeNode = null;
 
+        // Drag-to-scroll functionality
+        function enableDragToScroll() {
+            // Find all scrollable elements
+            const scrollableElements = document.querySelectorAll('.sidebar, .export-panel, .children-container.expanded');
+            
+            scrollableElements.forEach(element => {
+                let isMouseDown = false;
+                let startY = 0;
+                let scrollTop = 0;
+                let isDragging = false;
+
+                // Mouse down event - start drag
+                element.addEventListener('mousedown', (e) => {
+                    // Only handle left mouse button and avoid interfering with existing drag operations
+                    if (e.button !== 0 || currentDraggedCodeNode) return;
+                    
+                    // Don't interfere with buttons, links, or other interactive elements
+                    if (e.target.tagName === 'BUTTON' || 
+                        e.target.tagName === 'A' || 
+                        e.target.classList.contains('code-node') ||
+                        e.target.closest('.code-node') ||
+                        e.target.closest('button') ||
+                        e.target.closest('a')) {
+                        return;
+                    }
+                    
+                    isMouseDown = true;
+                    startY = e.clientY;
+                    scrollTop = element.scrollTop;
+                    isDragging = false;
+                    
+                    // Change cursor to indicate dragging state
+                    element.style.cursor = 'grabbing';
+                    element.style.userSelect = 'none';
+                });
+
+                // Mouse move event - perform scroll
+                element.addEventListener('mousemove', (e) => {
+                    if (!isMouseDown || currentDraggedCodeNode) return;
+                    
+                    e.preventDefault();
+                    
+                    const y = e.clientY;
+                    const deltaY = startY - y;
+                    
+                    // Set dragging flag if mouse has moved significantly
+                    if (Math.abs(deltaY) > 3) {
+                        isDragging = true;
+                    }
+                    
+                    // Scroll the element
+                    element.scrollTop = scrollTop + deltaY;
+                });
+
+                // Mouse up event - end drag
+                element.addEventListener('mouseup', () => {
+                    isMouseDown = false;
+                    
+                    // Reset cursor
+                    element.style.cursor = '';
+                    element.style.userSelect = '';
+                    
+                    // Reset dragging state after a short delay to prevent clicks
+                    setTimeout(() => {
+                        isDragging = false;
+                    }, 100);
+                });
+
+                // Mouse leave event - handle case where mouse leaves element while dragging
+                element.addEventListener('mouseleave', () => {
+                    isMouseDown = false;
+                    isDragging = false;
+                    
+                    // Reset cursor
+                    element.style.cursor = '';
+                    element.style.userSelect = '';
+                });
+
+                // Prevent click events when dragging (to avoid unintended interactions)
+                element.addEventListener('click', (e) => {
+                    if (isDragging) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }, true);
+
+                // Add visual feedback - change cursor on hover
+                element.addEventListener('mouseenter', () => {
+                    if (!isMouseDown && !currentDraggedCodeNode) {
+                        element.style.cursor = 'grab';
+                    }
+                });
+
+                element.addEventListener('mouseleave', () => {
+                    if (!isMouseDown) {
+                        element.style.cursor = '';
+                    }
+                });
+            });
+        }
+
+        // Function to refresh drag-to-scroll for dynamically added elements
+        function refreshDragToScroll() {
+            // Small delay to ensure DOM updates are complete
+            setTimeout(() => {
+                enableDragToScroll();
+            }, 50);
+        }
+
         // Function to fetch and parse codebook data
         async function loadCodebookData() {
             try {
@@ -1115,6 +1224,8 @@
                 childrenContainer.classList.remove('collapsed');
                 childrenContainer.classList.add('expanded');
                 toggleIcon.classList.remove('collapsed');
+                // Refresh drag-to-scroll for newly expanded container
+                refreshDragToScroll();
             } else {
                 // Collapse
                 parentDiv.classList.remove('expanded');
@@ -1679,6 +1790,8 @@
             document.getElementById('export-data').value = JSON.stringify(exportData, null, 2);
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('export-panel').style.display = 'block';
+            // Refresh drag-to-scroll for the export panel
+            refreshDragToScroll();
         }
 
         function closeExport() {
@@ -1779,6 +1892,9 @@
             updateSidebarIndicators(); // Initialize sidebar indicators
             // Initialize connections as visible
             updateConnections();
+            // Initialize drag-to-scroll functionality
+            enableDragToScroll();
+            console.log('Drag-to-scroll enabled for scrollable elements');
             // Add a global mousemove listener to the document to track cursor
         });
 
