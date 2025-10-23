@@ -93,6 +93,14 @@
                       - {selected_scenario.key_drivers}
                     </div>
                   </div>
+                  <div class="mt-2 px-1 text-left">
+                    <span class="field-label"> Key Questions </span>
+                    <div class="field-content">
+                      {#each selected_scenario.key_questions as question}
+                        - {question} <br />
+                      {/each}
+                    </div>
+                  </div>
                   <!-- <div class="min-h-[2rem]"></div> -->
                 </div>
               {/key}
