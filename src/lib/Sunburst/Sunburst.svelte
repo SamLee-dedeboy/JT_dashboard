@@ -342,28 +342,49 @@
               <div class="text-left">
                 {#if rowIndex === 0}
                   <p class="text">
-                    Compare mental model themes between <strong
-                      >{rowData[0]?.title || ""}</strong
+                    Compare mental model themes between <span class="underline"
+                      >{rowData[0]?.title || ""}</span
                     >
-                    and <strong>{rowData[1]?.title || ""}</strong>. Notice the
-                    differences in theme prominence and distribution patterns
-                    across these two groups.
+                    and
+                    <span class="underline">{rowData[1]?.title || ""}</span>.
+                    The total number of nodes for participants aged 18-35 had on
+                    average less subthemes than the 36-64 age group and 65 years
+                    and older group.
+                    <span class="underline">
+                      This suggests that mental models become more detailed or
+                      developed with increasing age.
+                    </span>
+                    The most mentioned theme in the mental models is human impacts.
+                    The most mentioned driver of salinity was flow for the older
+                    groups and structure (physical geography) for the younger groups.
                   </p>
                 {:else if rowIndex === 1}
                   <p class="text">
                     The visualization above shows how engagement experience
                     affects mental model composition.
-                    <strong>{rowData[0]?.title || ""}</strong> versus
-                    <strong>{rowData[1]?.title || ""}</strong> reveals how different
-                    levels of engagement influence the themes people focus on.
+                    <span class="underline">{rowData[0]?.title || ""}</span>
+                    versus
+                    <span class="underline">{rowData[1]?.title || ""}</span>
+                    reveals how different levels of engagement influence the themes
+                    people focus on. The mental models of people with 0-10 years
+                    of experience had fewer subthemes on average than the mental
+                    models of people with over 30 years of experience.
+                    <span class="underline">
+                      This suggests that as engagement in the delta increases,
+                      individuals learn more about the system and their
+                      conceptualizations of salinity become deeper and broader
+                      as well.
+                    </span>
                   </p>
                 {:else if rowIndex === 2}
                   <p class="text">
-                    Age-based differences in mental models are displayed here.
-                    <strong>{rowData[0]?.title || ""}</strong> and
+                    On average team members had 12 subthemes in their mental
+                    models, in comparison interviewees had 20 subthemes on
+                    average.
+                    <!-- <strong>{rowData[0]?.title || ""}</strong> and
                     <strong>{rowData[1]?.title || ""}</strong> show how different
                     generational perspectives influence the themes that emerge in
-                    mental models.
+                    mental models. -->
                   </p>
                 {:else}
                   <p class="text">
