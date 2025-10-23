@@ -17,6 +17,7 @@ export type tScenarioData = {
     primary_research_importance: string,
     adaptation: string,
     key_drivers: string,
+    key_questions: string[],
 }
 export type tScenarioConnection = {
     scenario: string,
