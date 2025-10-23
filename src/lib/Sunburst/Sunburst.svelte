@@ -278,7 +278,7 @@
 </script>
 
 <div
-  class="min-h-screen bg-[var(--surface-page)] font-body overflow-y-auto relative flex px-4"
+  class="min-h-screen bg-[var(--surface-page)] font-body overflow-y-auto relative flex px-4 text-white"
 >
   <!-- <div class="absolute right-4 top-[20rem]">
     Some descriptive text/caption can be put here
@@ -324,7 +324,7 @@
           <!-- Row of two sunbursts -->
           <div class="flex justify-center gap-8">
             {#each rowData as item, index}
-              <div class="flex-2">
+              <div class="flex-2" style={`z-index: ${rowData.length - index};`}>
                 <SunburstChart
                   data={item.data}
                   title={item.title}

@@ -601,7 +601,7 @@
     <div class="statistics-panel flex h-1 grow flex-col">
       <div class="flex grow flex-col gap-8">
         <div
-          class="tutorial flex flex-col p-3 mx-2 gap-4 divide-y divide-dashed"
+          class="tutorial text-xs flex flex-col p-3 mx-2 gap-4 divide-y divide-dashed text-white"
         >
           <div>
             <div>We mainly asked three questions in the interview:</div>

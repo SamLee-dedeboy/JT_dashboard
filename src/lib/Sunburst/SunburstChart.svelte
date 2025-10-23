@@ -171,7 +171,7 @@
       const originalOuterRadius = zoomedParent.y1;
 
       // Scale all radii by 1.5x and reposition for quarter-circle view
-      const scaleFactor = 1.8;
+      const scaleFactor = 1.65;
       const scaledInnerRadius = originalInnerRadius * scaleFactor;
       const scaledOuterRadius = originalOuterRadius * scaleFactor;
 
@@ -273,7 +273,7 @@
         translateX =
           arcCenterX + offsetFactor * (closestIntersection.x - arcCenterX);
         translateY =
-          arcCenterY + offsetFactor * (closestIntersection.y - arcCenterY);
+          arcCenterY + offsetFactor * (closestIntersection.y - arcCenterY) / 1.25;
       }
     }
 
@@ -360,6 +360,7 @@
           : "default";
       })
       .on("mouseover", function (event: MouseEvent, d: HierarchyNodeExtended) {
+        return
         d3.select(this).style("opacity", 0.8).style("stroke-width", 3);
 
         const value = d.value || 0;
@@ -378,6 +379,7 @@
         // });
       })
       .on("mouseout", function (event: MouseEvent, d: HierarchyNodeExtended) {
+        return
         d3.select(this).style("opacity", 1).style("stroke-width", 1.5);
 
         // handleHideTooltip({});
@@ -467,7 +469,7 @@
               // node.x1 - node.x0 > 0.0
             );
           }
-          return node.depth > 0 && node.depth <= 2 && node.x1 - node.x0 > 0.15;
+          return node.depth > 0 && node.depth <= 2 && node.x1 - node.x0 > 0.10;
         }) as HierarchyNodeExtended[]
       )
       .enter()
@@ -492,7 +494,17 @@
       .attr("dy", "0.35em")
       .style(
         "font-size",
-        (d: HierarchyNodeExtended) => `${Math.min(8, (d.y1 - d.y0) / 4)}px`
+        (d: HierarchyNodeExtended) => {
+          const arcAngle = d.x1 - d.x0; // Arc angle in radians
+          
+          // Create a linear scale for font size based on arc angle
+          const fontScale = d3.scaleLinear()
+            .domain([0, Math.PI * 2]) // Full circle in radians
+            .range([8, 16]) // Font size range from 8px to 14px
+            .clamp(true);
+          
+          return `${fontScale(arcAngle)}px`;
+        }
       )
       .style("fill", (d: HierarchyNodeExtended) =>
         getContrastColor(getHierarchicalColor(d))

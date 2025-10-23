@@ -99,7 +99,7 @@
   <div class="tutorial absolute top-[-1.5rem] max-w-[40rem] left-1/3 z-10">
     <div class="text-left mt-2 px-3 pb-1">
       <div class="flex items-start justify-between">
-        <p class="flex-1">
+        <p class="flex-1 text-white">
           This page lets you compare mental models from a 2023 public interviews
           and a 2025 exhibition participants.
         </p>
@@ -205,10 +205,10 @@
     align-self: flex-start;
   }
 
-  h1 {
+  /* h1 {
     color: #646cff;
     margin-bottom: 1rem;
-  }
+  } */
 
   :global(.is_top) {
     fill: var(--bg-drivers);

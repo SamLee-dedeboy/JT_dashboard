@@ -14,7 +14,7 @@
 
 <div class="page-container flex grow relative">
   <div class="tutorial absolute top-[-1.5rem] max-w-[35rem] left-1/5">
-    <div class="text-left mt-2 px-3 pb-1">
+    <div class="text-left text-white mt-2 px-3 pb-1">
       <p class="">
         This page lets you explore public opinions associated with each
         scenario.

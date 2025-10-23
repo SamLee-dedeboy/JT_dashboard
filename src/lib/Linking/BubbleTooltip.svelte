@@ -60,7 +60,7 @@
     </p>
     <span>
       <button
-        class="expand-button mt-4 px-2 py-1 rounded shadow-md text-sm outline-2 outline-slate-200"
+        class="expand-button mt-4 px-2 py-1 rounded shadow-md text-sm outline-2 outline-slate-200 text-black"
         onclick={() => handleExpand(bubble)}>Expand</button
       > to see its children.
     </span>

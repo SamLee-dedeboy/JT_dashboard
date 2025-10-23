@@ -37,15 +37,15 @@ async def test():
 
 @router.get("/scenarios/")
 def get_scenarios():
-    data = json.load(open(relative_path("linking_data/scenarios.json")))
+    data = json.load(open(relative_path("linking_data/scenarios.json"), encoding="utf-8"))
     return data
 
 
 @router.post("/scenarios/codes_manual/", response_model=ScenarioCodesResponse)
 def get_scenario_codes_manual(request: ScenarioRequest):
     scenario = request.scenario
-    data = json.load(open(relative_path("linking_data/scenario_codes_manual.json")))
-    code_freq = json.load(open(relative_path("linking_data/code_freq.json")))
+    data = json.load(open(relative_path("linking_data/scenario_codes_manual.json"), encoding="utf-8"))
+    code_freq = json.load(open(relative_path("linking_data/code_freq.json"), encoding="utf-8"))
     node_dict = {code["name"]: code for code in code_freq}
 
     if scenario not in data:
@@ -84,7 +84,7 @@ def get_scenario_codes_manual(request: ScenarioRequest):
 @router.post("/codes/summarize/")
 async def codes_summarize(request: CodeSummarizeRequest):
     code = request.code
-    code_summaries = json.load(open(relative_path("linking_data/code_summaries.json")))
+    code_summaries = json.load(open(relative_path("linking_data/code_summaries.json"), encoding="utf-8"))
     code_summaries_dict = {item["name"]: item["summary"] for item in code_summaries}
     if code not in code_summaries_dict:
         raise HTTPException(status_code=404, detail=f"Code '{code}' not found in data")

@@ -83,10 +83,10 @@ export class CodeBubbleRenderer {
         const bubble_group = svg.select("g.bubble_group")
         const radiusScale = d3.scaleSqrt()
             .domain([0, d3.max(bubble_data, (d: tBubble) => d.data.participants.length) || 0])
-            .range([10, this.width/8])
+            .range([25, this.width/5])
         const fontScale = d3.scaleSqrt()
             .domain([0, d3.max(bubble_data, (d: tBubble) => d.data.participants.length) || 0])
-            .range([10, 20])
+            .range([15, 25])
         
         // Update clicked bubble position with correct radius
         if (this.clickedBubble) {

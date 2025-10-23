@@ -20,9 +20,51 @@
 
   // Reactive statement to check if we're not on the home page
   let isNotHomePage = $derived($location !== "/");
+
+  // Fullscreen functionality
+  let isFullscreen = $state(false);
+
+  const enterFullscreen = async () => {
+    try {
+      if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+      isFullscreen = true;
+    } catch (error) {
+      console.warn("Could not enter fullscreen:", error);
+    }
+  };
+
+  const exitFullscreen = async () => {
+    try {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+      isFullscreen = false;
+    } catch (error) {
+      console.warn("Could not exit fullscreen:", error);
+    }
+  };
+
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key === "Enter" && !isFullscreen) {
+      event.preventDefault();
+      enterFullscreen();
+    } else if (event.key === "Escape" && isFullscreen) {
+      event.preventDefault();
+      exitFullscreen();
+    }
+  };
+
+  // Listen for fullscreen change events
+  const handleFullscreenChange = () => {
+    isFullscreen = !!document.fullscreenElement;
+  };
 </script>
 
-<main class="flex flex-col relative w-screen h-screen">
+<svelte:window on:fullscreenchange={handleFullscreenChange} on:keydown={handleKeydown} />
+
+<main class="flex flex-col relative w-screen h-screen overflow-hidden">
   <div
     tabindex="0"
     role="button"
@@ -39,7 +81,7 @@
   </div>
   {#if !isNotHomePage}
     <div
-      class="jt-section-subtitle absolute top-[2.5rem] left-[1rem] text-right"
+      class="jt-section-subtitle absolute top-[2.5rem] left-[2.2rem] text-right"
     >
       <p class="jt-section-subtitle uppercase text-[2.5rem]">In The Delta</p>
       <p class="jt-section-body text-[1.4rem]/2 font-light">

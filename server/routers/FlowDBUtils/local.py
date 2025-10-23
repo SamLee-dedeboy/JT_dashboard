@@ -1,6 +1,7 @@
 import re
 import json
 import glob
+import os
 def save_json(data, filepath):
     with open(filepath, 'w', encoding='utf-8') as fp:
         json.dump(data, fp, indent=4)
@@ -46,7 +47,7 @@ def read_data(data_path, participant_metadata_dict):
     for interview_file in glob.glob(data_path + "*.json"):
         interview_data = json.load(open(interview_file))
         participant_id = interview_data[0]['id'].split("_")[0]
-        participant = interview_file.split('/')[-1].replace(".json", "")
+        participant = os.path.basename(interview_file).replace(".json", "")
         # add id to background summary
         interview_data[0]['summary']['id'] = participant_id
         interview_data[0]['summary']['categories'] = participant_metadata_dict[participant]['Categories']

@@ -222,9 +222,10 @@
                 cx="50"
                 cy="55"
                 r="50"
-                fill={circle_filled[index] ? "#222222" : "white"}
+                fill={circle_filled[index] ? "white" : "white"}
                 opacity={circle_filled[index] ? 1 : 0.5}
-                stroke-width="5"
+                stroke-width="8"
+                stroke={circle_filled[index] ? "gray" : "lightgray"}
               ></circle>
             </svg>
           {/each}
