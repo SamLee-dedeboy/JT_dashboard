@@ -380,7 +380,11 @@
                   <p class="text">
                     On average team members had 12 subthemes in their mental
                     models, in comparison interviewees had 20 subthemes on
-                    average.
+                    average. The top drivers of salinity in the delta for both
+                    groups were flow and policy and regulation. In contrast,
+                    climate change appears as the most identified theme in only
+                    the team mental models.
+
                     <!-- <strong>{rowData[0]?.title || ""}</strong> and
                     <strong>{rowData[1]?.title || ""}</strong> show how different
                     generational perspectives influence the themes that emerge in
