@@ -107,24 +107,24 @@ export class MentalModelRenderer {
           .attr("stroke-width", 2)
           .attr("marker-end", "url(#arrowhead)");
           // Add label "Natural" at the start of the line
-          svg.append("text")
-            .classed("jt-body-3", true)
-            .attr("x", 5) // Slightly offset from the start of the line
-            .attr("y", 25) // Position below the line
-            .attr("text-anchor", "start")
-            .attr("font-size", 18)
-            .attr("fill", "var(--bg-drivers)")
-            .text("Natural");
+          // svg.append("text")
+          //   .classed("jt-body-3", true)
+          //   .attr("x", 5) // Slightly offset from the start of the line
+          //   .attr("y", 25) // Position below the line
+          //   .attr("text-anchor", "start")
+          //   .attr("font-size", 18)
+          //   .attr("fill", "var(--bg-drivers)")
+          //   .text("Natural");
           
           // Add label "Human" at the end of the line
-          svg.append("text")
-            .classed("jt-body-3", true)
-            .attr("x", this.width - 5) // Slightly offset from the end of the line
-            .attr("y", 25) // Position below the line
-            .attr("text-anchor", "end")
-            .attr("font-size", 18)
-            .attr("fill", "var(--bg-drivers)")
-            .text("Human");
+          // svg.append("text")
+          //   .classed("jt-body-3", true)
+          //   .attr("x", this.width - 5) // Slightly offset from the end of the line
+          //   .attr("y", 25) // Position below the line
+          //   .attr("text-anchor", "end")
+          //   .attr("font-size", 18)
+          //   .attr("fill", "var(--bg-drivers)")
+          //   .text("Human");
 
 
             // bottom line
@@ -149,24 +149,24 @@ export class MentalModelRenderer {
             .attr("stroke-width", 2)
             .attr("marker-end", "url(#arrowhead-bot)");
             // Add label "Natural" at the start of the line
-            svg.append("text")
-              .classed("jt-body-3", true)
-              .attr("x", 5) // Slightly offset from the start of the line
-              .attr("y", this.height - 15) // Position below the line
-              .attr("text-anchor", "start")
-              .attr("font-size", 18)
-              .attr("fill", "var(--bg-impacted)")
-              .text("Natural");
+            // svg.append("text")
+            //   .classed("jt-body-3", true)
+            //   .attr("x", 5) // Slightly offset from the start of the line
+            //   .attr("y", this.height - 15) // Position below the line
+            //   .attr("text-anchor", "start")
+            //   .attr("font-size", 18)
+            //   .attr("fill", "var(--bg-impacted)")
+            //   .text("Natural");
             
             // Add label "Human" at the end of the line
-            svg.append("text")
-              .classed("jt-body-3", true)
-              .attr("x", this.width - 5) // Slightly offset from the end of the line
-              .attr("y", this.height - 15) // Position below the line
-              .attr("text-anchor", "end")
-              .attr("font-size", 18)
-              .attr("fill", "var(--bg-impacted)")
-              .text("Human");
+            // svg.append("text")
+            //   .classed("jt-body-3", true)
+            //   .attr("x", this.width - 5) // Slightly offset from the end of the line
+            //   .attr("y", this.height - 15) // Position below the line
+            //   .attr("text-anchor", "end")
+            //   .attr("font-size", 18)
+            //   .attr("fill", "var(--bg-impacted)")
+            //   .text("Human");
     }
 
     update(_nodes_data: Record<string, number>, codebook: any[], code_tsne: Record<string, number>, callback=(d)=>{}) {
@@ -180,8 +180,8 @@ export class MentalModelRenderer {
         console.log("mental model data", nodes_data)
         const svg = d3.select(`#${this.svgId}`)
         const bubble_group = svg.select("g.bubble_group")
-        const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([5, 65])
-        const fontScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([12, 18])
+        const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([18, 65])
+        const fontScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([14, 18])
         const nodes = nodes_data.concat([["Salinity", 80]])
         const classification_force_position_y = {
           "impacts salinity": this.height * center / 2,
@@ -277,22 +277,24 @@ export class MentalModelRenderer {
             // .attr("stroke", "#26414b")
             .attr("stroke", "#c3c3c3")
             .attr("stroke-opacity", 0.5)
+        const canvasRadiusScale = d3.scalePow().exponent(1/2).domain([d3.min(nodes_data, d => d[1]), d3.max(nodes_data, d => d[1])]).range([0, this.height * center / 1.5])
         // update force
         const forceNode = d3.forceManyBody();
         this.simulation = d3
         .forceSimulation(nodes)
-        .alphaMin(0.03)
-        // .alphaMin(0.8)
+        // .alphaMin(0.3)
+        .alphaMin(0.001)
         // .force("parent_x", d3.forceX((d) => d.parent_x).strength(0.1))  
         // .force("parent_y", d3.forceY((d) => d.parent_y).strength(0.1))
         .force("tsne_x", d3.forceX((d) => code_tsne[d[0]] * this.width || this.width/2).strength(0.1))
-        .force("clf_y", d3.forceY((d) => classification_force_position_y[node_types[d[0]]] || this.height * center).strength(0.08))
-        .force("center_x", d3.forceX(this.width/2).strength(0.02))
-        .force("center_y", d3.forceY(this.height*center).strength(0.01))
+        .force("clf_y", d3.forceY((d) => classification_force_position_y[node_types[d[0]]] || this.height * center).strength(0.12))
+        // .force("center_x", d3.forceX(this.width/2).strength(0.02))
+        // .force("center_y", d3.forceY(this.height*center).strength(0.01))
+        .force("frequency_y", d3.forceRadial(null, this.width/2, this.height*center).radius((d) => canvasRadiusScale(d[1]) + 120).strength(1))
         // .force("clf_y", d3.forceY((d) => classification_force_position_y[node_types[d[0]]] || this.height * center).strength(0.08))
         // .force("center", d3.forceCenter(this.width / 2, this.height * center).strength(0.02))
-        .force("charge", forceNode.distanceMin(30))
-        .force("collide", d3.forceCollide((d) => 1.15*d.r))
+        // .force("charge", forceNode.distanceMin(20))
+        .force("collide", d3.forceCollide((d) => 1.2*d.r).strength(0.02))
         .on("tick", () => {
           circles
             .attr(

@@ -323,18 +323,6 @@
         <div class="flex flex-col gap-4">
           <!-- Row of two sunbursts -->
           <div class="flex justify-center gap-8">
-            {#each rowData as item, index}
-              <div class="flex-2" style={`z-index: ${rowData.length - index};`}>
-                <SunburstChart
-                  data={item.data}
-                  title={item.title}
-                  index={rowIndex * 2 + index}
-                  {colorPalette}
-                  {globalColorMap}
-                />
-              </div>
-            {/each}
-
             <!-- Descriptive text for this row -->
             <div
               class="max-w-4xl flex-1 mx-auto bg-[var(--surface-elevated)] p-4 rounded-lg shadow-md"
@@ -402,6 +390,17 @@
                 {/if}
               </div>
             </div>
+            {#each rowData as item, index}
+              <div class="flex-2" style={`z-index: ${rowData.length - index};`}>
+                <SunburstChart
+                  data={item.data}
+                  title={item.title}
+                  index={rowIndex * 2 + index}
+                  {colorPalette}
+                  {globalColorMap}
+                />
+              </div>
+            {/each}
           </div>
         </div>
       {/each}
@@ -423,7 +422,7 @@
     {/if}
 
     <!-- Legend -->
-    <div class="bg-white rounded-lg shadow-md p-5">
+    <!-- <div class="bg-white rounded-lg shadow-md p-5">
       <div class="text-lg text-gray-800 mb-4 text-center">Color Legend</div>
       <div class="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto">
         {#each legendItems as item}
@@ -436,7 +435,7 @@
           </div>
         {/each}
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 

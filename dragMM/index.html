@@ -1885,6 +1885,42 @@
             }, 2000);
         }
 
+        // Fullscreen functionality
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+
+        // Handle keyboard events for fullscreen
+        document.addEventListener('keydown', function(event) {
+            // Enter key to go fullscreen
+            if (event.key === 'Enter' && !document.fullscreenElement) {
+                event.preventDefault();
+                enterFullscreen();
+            }
+            // Escape key to exit fullscreen (this is usually handled automatically, but we'll add it for completeness)
+            else if (event.key === 'Escape' && document.fullscreenElement) {
+                event.preventDefault();
+                exitFullscreen();
+            }
+        });
+
         // Initialize the application when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing application...');

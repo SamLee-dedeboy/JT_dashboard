@@ -120,7 +120,7 @@
         </button>
       </div>
       {#if tutorialExpanded}
-        <div in:slide>
+        <div in:slide class="text-white">
           <p>The participants were asked two main question:</p>
           <ul class="list-disc list-outside pl-4">
             <li class="underline">
@@ -166,7 +166,7 @@
   <div class="flex justify-between gap-8 grow relative">
     <div class="flex flex-col flex-1">
       <div class="jt-section-title text-center text-[1.5rem] text-white">
-        Interview Mental Models
+        Interview Mental Models (39)
       </div>
       <AllMMs
         server_data={interview_server_data}
@@ -177,7 +177,7 @@
     </div>
     <div class="flex flex-col grow flex-1">
       <div class="jt-section-title text-center text-[1.5rem] text-white">
-        Exhibition Mental Models
+        Exhibition Mental Models (9)
       </div>
       <div
         class="flex flex-wrap grow justify-between gap-4 h-1 overflow-y-auto pr-3"

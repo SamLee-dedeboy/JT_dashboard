@@ -154,6 +154,7 @@
       .outerRadius((d) => d.y1 + 75);
 
     const partition = d3.partition<SunburstData>().size([2 * Math.PI, radius]);
+    console.log({ data });
 
     const root = d3
       .hierarchy(data)
@@ -161,6 +162,7 @@
       .sort((a, b) => (b.value || 0) - (a.value || 0));
 
     partition(root);
+    console.log({ root });
 
     const extendedRoot = root as HierarchyNodeExtended;
 
@@ -273,7 +275,8 @@
         translateX =
           arcCenterX + offsetFactor * (closestIntersection.x - arcCenterX);
         translateY =
-          arcCenterY + offsetFactor * (closestIntersection.y - arcCenterY) / 1.25;
+          arcCenterY +
+          (offsetFactor * (closestIntersection.y - arcCenterY)) / 1.25;
       }
     }
 
@@ -360,7 +363,7 @@
           : "default";
       })
       .on("mouseover", function (event: MouseEvent, d: HierarchyNodeExtended) {
-        return
+        return;
         d3.select(this).style("opacity", 0.8).style("stroke-width", 3);
 
         const value = d.value || 0;
@@ -379,7 +382,7 @@
         // });
       })
       .on("mouseout", function (event: MouseEvent, d: HierarchyNodeExtended) {
-        return
+        return;
         d3.select(this).style("opacity", 1).style("stroke-width", 1.5);
 
         // handleHideTooltip({});
@@ -469,7 +472,7 @@
               // node.x1 - node.x0 > 0.0
             );
           }
-          return node.depth > 0 && node.depth <= 2 && node.x1 - node.x0 > 0.10;
+          return node.depth > 0 && node.depth <= 2 && node.x1 - node.x0 > 0.1;
         }) as HierarchyNodeExtended[]
       )
       .enter()
@@ -492,20 +495,18 @@
         return `translate(${x},${y}) rotate(${rotationAngle})`;
       })
       .attr("dy", "0.35em")
-      .style(
-        "font-size",
-        (d: HierarchyNodeExtended) => {
-          const arcAngle = d.x1 - d.x0; // Arc angle in radians
-          
-          // Create a linear scale for font size based on arc angle
-          const fontScale = d3.scaleLinear()
-            .domain([0, Math.PI * 2]) // Full circle in radians
-            .range([8, 16]) // Font size range from 8px to 14px
-            .clamp(true);
-          
-          return `${fontScale(arcAngle)}px`;
-        }
-      )
+      .style("font-size", (d: HierarchyNodeExtended) => {
+        const arcAngle = d.x1 - d.x0; // Arc angle in radians
+
+        // Create a linear scale for font size based on arc angle
+        const fontScale = d3
+          .scaleLinear()
+          .domain([0, Math.PI * 2]) // Full circle in radians
+          .range([8, 16]) // Font size range from 8px to 14px
+          .clamp(true);
+
+        return `${fontScale(arcAngle)}px`;
+      })
       .style("fill", (d: HierarchyNodeExtended) =>
         getContrastColor(getHierarchicalColor(d))
       )

@@ -59,7 +59,7 @@
             d="M12 8h.01"
           /></svg
         >
-        This chart shows the what participants' opinions we considered for this scenario.
+        This chart shows what participants' opinions we considered for this scenario.
       </span>
       <span class="text-left ml-7">
         Each bubble represents a category of opinion. Bigger bubbles =

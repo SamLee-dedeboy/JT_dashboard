@@ -15,3 +15,22 @@ add timeline
 use sunburst to promote the paper 
 - use paper text alongside sunburst
 - 
+
+
+[x] add vertical (y) encoding for mental model 
+[x] remove human-natural axis for mental model
+[x] add total number of respondants to mental model
+fix text color on linking
+expand width of tutorial in flow
+fix flow column 
+change subheading color and title for decision making in flow
+restructure columns: separate fair and represented/underreperesnted
+make tutorial tags green to make visual salient
+[x] fix typo in public opinion chart
+bubble chart needs to go back and preferrably keep nested 
+make the bubble chart force directed like visual thesaurus
+
+add children to show tooltip
+add title to sunburst rows
+sunburst: put text to the left
+add semitransparent arrow to scroll down for sunburtst
