@@ -423,7 +423,7 @@
     {/if}
 
     <!-- Legend -->
-    <div class="bg-white rounded-lg shadow-md p-5">
+    <!-- <div class="bg-white rounded-lg shadow-md p-5">
       <div class="text-lg text-gray-800 mb-4 text-center">Color Legend</div>
       <div class="flex flex-wrap justify-center gap-4 max-w-6xl mx-auto">
         {#each legendItems as item}
@@ -436,7 +436,7 @@
           </div>
         {/each}
       </div>
-    </div>
+    </div> -->
   </div>
 </div>
 
