@@ -647,13 +647,14 @@
             background-color: var(--neutral-800);
             border-radius: 0 0 8px 8px;
             transition: all 0.3s ease;
-            max-height: 0;
+            height: 0;
             overflow: hidden;
             padding: 0 10px;
         }
         
         .children-container.expanded {
-            max-height: 500px;
+            /* max-height: 500px; */
+            height: max-content;
             padding: 10px;
             overflow-y: auto;
         }
