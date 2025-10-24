@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from "svelte";
   import * as d3 from "d3";
+  import { server_address } from "./constant";
 
   // Type definitions
   type SunburstData = {
@@ -40,6 +41,11 @@
   // Zoom state
   let zoomedParent: HierarchyNodeExtended | null = $state(null);
   let isZoomed = $state(false);
+
+  // Modal state for code definitions
+  let showModal = $state(false);
+  let modalCodeData: any = $state(null);
+  let isLoadingCode = $state(false);
 
   // Reactive variables for rendering
   $effect(() => {
@@ -98,6 +104,36 @@
     const rgb = d3.rgb(backgroundColor);
     const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
     return luminance > 0.5 ? "#000000" : "#ffffff";
+  }
+
+  async function fetchCodeDefinition(codeName: string) {
+    isLoadingCode = true;
+    try {
+      const response = await fetch(`${server_address}/code/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code_name: codeName }),
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch code definition: ${response.status}`);
+      }
+      const codeData = await response.json();
+      console.log(codeData);
+      modalCodeData = codeData;
+      showModal = true;
+    } catch (error) {
+      console.error("Error fetching code definition:", error);
+      modalCodeData = {
+        name: codeName,
+        error: "Failed to load code definition",
+        details: error instanceof Error ? error.message : "Unknown error",
+      };
+      showModal = true;
+    } finally {
+      isLoadingCode = false;
+    }
   }
 
   function renderSunburst() {
@@ -354,7 +390,8 @@
       .style("cursor", (d) => {
         if (isZoomed) {
           // In zoomed mode, the parent (inner circle) is clickable for zoom out
-          return d.data.name === zoomedParent?.data.name
+          // and children are clickable for code definitions
+          return d.data.name === zoomedParent?.data.name || d.depth > 1
             ? "pointer"
             : "default";
         }
@@ -388,6 +425,7 @@
         // handleHideTooltip({});
       })
       .on("click", function (event: MouseEvent, d: HierarchyNodeExtended) {
+        console.log({ d });
         if (!isZoomed && d.depth === 1 && d.children && d.children.length > 0) {
           // If we're not zoomed, zoom into this parent
           zoomedParent = d;
@@ -398,6 +436,10 @@
           zoomedParent = null;
           isZoomed = false;
           renderSunburst(); // Re-render with full view
+        } else if (d.depth > 1) {
+          console.log("Clicked on child arc:", d.data.name);
+          // If clicking on a child arc, fetch and display code definition
+          fetchCodeDefinition(d.data.name);
         }
       });
 
@@ -677,6 +719,110 @@
 
   <svg bind:this={svgElement} overflow="visible" viewBox="0 0 400 400"></svg>
 </div>
+
+<!-- Modal for code definitions -->
+{#if showModal}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50"
+    onclick={(e) => {
+      if (e.target === e.currentTarget) {
+        showModal = false;
+        modalCodeData = null;
+      }
+    }}
+  >
+    <div
+      class="bg-[var(--surface-elevated)] outline-2 outline-[var(--brand-primary)] rounded-lg shadow-xl max-w-2xl w-[25rem] mx-4 max-h-[80vh] overflow-hidden"
+    >
+      <!-- Modal Header -->
+      <div
+        class="flex justify-between items-center p-6 border-b border-[var(--brand-primary)]"
+      >
+        <h2 class="text-xl text-white">
+          {modalCodeData?.name || "Loading..."}
+        </h2>
+        <!-- svelte-ignore a11y_consider_explicit_label -->
+        <button
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+          onclick={() => {
+            showModal = false;
+            modalCodeData = null;
+          }}
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto max-h-[60vh] rounded-md">
+        {#if isLoadingCode}
+          <div class="flex items-center justify-center py-8">
+            <div
+              class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"
+            ></div>
+            <span class="ml-2 text-gray-600">Loading code definition...</span>
+          </div>
+        {:else if modalCodeData?.error}
+          <div class="text-red-600 text-center py-8">
+            <p class="font-semibold">Error: {modalCodeData.error}</p>
+            {#if modalCodeData.details}
+              <p class="text-sm mt-2">{modalCodeData.details}</p>
+            {/if}
+          </div>
+        {:else if modalCodeData}
+          <div class="space-y-4 text-white">
+            {#if modalCodeData.description}
+              <div>
+                <h3 class="mb-2">Description:</h3>
+                <p class="">{modalCodeData.description}</p>
+              </div>
+            {/if}
+
+            {#if modalCodeData.definition}
+              <div>
+                <h3 class="mb-2">Definition:</h3>
+                <p class="">{modalCodeData.definition}</p>
+              </div>
+            {/if}
+            {#if modalCodeData.parent}
+              <div>
+                <h3 class="mb-2">Parent:</h3>
+                <p class="">{modalCodeData.parent}</p>
+              </div>
+            {/if}
+          </div>
+        {/if}
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 pb-4 flex justify-end">
+        <button
+          class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+          onclick={() => {
+            showModal = false;
+            modalCodeData = null;
+          }}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   @media (max-width: 768px) {

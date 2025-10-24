@@ -39,7 +39,8 @@
   }
   .tutorial {
     background-color: var(--bg-page);
-    outline: 1px solid var(--brand-secondary);
+    outline: 2px solid var(--brand-primary);
+    border-radius: 4px;
   }
 
   h1 {

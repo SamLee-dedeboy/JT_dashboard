@@ -105,7 +105,7 @@
         </p>
         <button
           onclick={toggleTutorial}
-          class="ml-3 p-1 text-gray-400 hover:text-white transition-colors duration-200"
+          class="ml-3 p-1 text-gray-400 hover:text-white transition-colors duration-200 bg-transparent"
           aria-label={tutorialExpanded
             ? "Collapse tutorial"
             : "Expand tutorial"}
@@ -218,6 +218,7 @@
   }
   .tutorial {
     background-color: var(--bg-page);
-    outline: 1px solid var(--brand-secondary);
+    outline: 2px solid var(--brand-primary);
+    border-radius: 4px;
   }
 </style>

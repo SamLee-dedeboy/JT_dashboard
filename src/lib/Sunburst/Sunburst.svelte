@@ -74,6 +74,8 @@
   let isTop5Mode = $state(true);
   let globalColorMap = $state(new Map<string, string>());
   let legendItems: LegendItem[] = $state([]);
+  let showScrollIndicator = $state(true);
+  let scrollPanelContainer: HTMLDivElement;
   let tooltip: TooltipData = $state({
     visible: false,
     x: 0,
@@ -103,6 +105,29 @@
   onMount(async () => {
     await loadData();
     enableDragToScroll();
+
+    // Add scroll event listener to hide indicator when at bottom
+    const handleScroll = () => {
+      const scrollTop = scrollPanelContainer.scrollTop;
+      const documentHeight = scrollPanelContainer.scrollHeight;
+      const windowHeight = scrollPanelContainer.clientHeight;
+
+      // Hide indicator when scrolled to within 100px of bottom
+      showScrollIndicator = scrollTop + windowHeight < documentHeight - 100;
+      console.log("Scroll position:", {
+        scrollTop,
+        documentHeight,
+        windowHeight,
+        showScrollIndicator,
+      });
+    };
+
+    scrollPanelContainer.addEventListener("scroll", handleScroll);
+
+    // Cleanup event listener
+    // return () => {
+    //   window.removeEventListener("scroll", handleScroll);
+    // };
   });
 
   async function loadData() {
@@ -278,6 +303,7 @@
 </script>
 
 <div
+  bind:this={scrollPanelContainer}
   class="min-h-screen bg-[var(--surface-page)] font-body overflow-y-auto relative flex px-4 text-white"
 >
   <!-- <div class="absolute right-4 top-[20rem]">
@@ -286,7 +312,7 @@
   <div class=" px-5 py-5 grow">
     <!-- <h1 class="text-3xl text-gray-800 mb-8 text-center">Sunburst Gallery</h1> -->
     <div
-      class="max-w-[40rem] bg-[var(--surface-elevated)] p-4 rounded-lg mb-6 shadow-md outline-2 outline-[var(--brand-secondary)]"
+      class="max-w-[40rem] bg-[var(--surface-elevated)] p-4 rounded-lg mb-6 shadow-md outline-2 outline-[var(--brand-primary)]"
     >
       Here we can compare the different themes present in the mental models
       across different populations. You can compare differences across team
@@ -439,7 +465,32 @@
         {/each}
       </div>
     </div> -->
+    <div class="h-[5rem]"></div>
   </div>
+
+  <!-- Scroll indicator arrow -->
+  {#if showScrollIndicator}
+    <div class="scroll-indicator">
+      <div class="w-8 h-8 bg-[var(--brand-primary)] p-1 rounded">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#333333"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-arrow-down-from-line-icon lucide-arrow-down-from-line"
+          ><path d="M19 3H5" /><path d="M12 21V7" /><path
+            d="m6 15 6 6 6-6"
+          /></svg
+        >
+      </div>
+      <span class="scroll-label text-[var(--brand-primary)]"
+        >scroll down for more</span
+      >
+    </div>
+  {/if}
 </div>
 
 <style>
@@ -454,5 +505,32 @@
     font-size: 1.5rem;
     margin-bottom: 0.5rem;
     font-weight: 500;
+  }
+
+  .scroll-indicator {
+    position: fixed;
+    bottom: 2rem;
+    left: 3rem;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .scroll-label {
+    /* color: white; */
+    font-size: 0.875rem;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  /* Optional: Hide the arrow when at the bottom of the page */
+  @media (max-height: 800px) {
+    .scroll-indicator {
+      opacity: 0.6;
+    }
   }
 </style>

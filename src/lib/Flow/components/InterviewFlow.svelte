@@ -693,7 +693,8 @@
   }
   .tutorial {
     background-color: var(--bg-page);
-    outline: 1px solid var(--brand-secondary);
+    outline: 2px solid var(--brand-primary);
+    border-radius: 4px;
   }
   .sankey-svg {
     @apply absolute bottom-0 left-0 right-0 top-0;
