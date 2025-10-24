@@ -329,6 +329,7 @@
             >
               <div class="text-left">
                 {#if rowIndex === 0}
+                  <h2>Age Group</h2>
                   <p class="text">
                     Compare mental model themes between <span class="underline"
                       >{rowData[0]?.title || ""}</span
@@ -347,6 +348,7 @@
                     groups and structure (physical geography) for the younger groups.
                   </p>
                 {:else if rowIndex === 1}
+                  <h2>Experience of Engagement</h2>
                   <p class="text">
                     The visualization above shows how engagement experience
                     affects mental model composition.
@@ -365,6 +367,7 @@
                     </span>
                   </p>
                 {:else if rowIndex === 2}
+                  <h2>Team vs Interviewee</h2>
                   <p class="text">
                     On average team members had 12 subthemes in their mental
                     models, in comparison interviewees had 20 subthemes on
@@ -446,5 +449,10 @@
 
   input:checked + .slider {
     background-color: var(--jt-primary);
+  }
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
   }
 </style>
