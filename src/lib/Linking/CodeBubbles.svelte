@@ -112,7 +112,7 @@
   }
 </script>
 
-<div class="flex flex-col h-0 grow relative">
+<div class="flex flex-col h-0 grow relative pb-2">
   <!-- <div
     bind:this={tooltip}
     class="tooltip absolute hidden bg-gray-100 outline-2 outline-gray-400 rounded p-2 z-10 w-[45rem] text-sm"
@@ -128,7 +128,7 @@
   <svg id={svgId} class="overflow-hidden mt-2"></svg>
   <div
     bind:this={tooltip}
-    class="tooltip transition-all overflow-hidden flex flex-col opacity-0 min-h-[18rem] outline-2 outline-gray-400 rounded mx-2 mt-6 p-2 z-10 text-sm"
+    class="tooltip transition-all overflow-hidden flex flex-col opacity-0 min-h-[25rem] outline-2 outline-gray-400 rounded mx-2 mt-6 p-2 z-10 text-sm"
   >
     {#if selected_bubble}
       <BubbleTooltip

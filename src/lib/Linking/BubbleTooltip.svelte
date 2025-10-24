@@ -36,7 +36,7 @@
 </script>
 
 <div
-  class="tooltip-content h-1 grow overflow-hidden text-lg flex divide-x divide-dashed divide-gray-400 relative gap-2"
+  class="tooltip-content h-1 grow overflow-visible text-lg flex divide-x divide-dashed divide-gray-400 relative gap-2"
 >
   <div class="flex-1 text-left p-1">
     <div class="flex justify-between items-start mb-2">
@@ -65,9 +65,9 @@
       > to see its children.
     </span>
   </div>
-  <div class="flex-2 relative overflow-y-auto">
+  <div class="flex-2 relative overflow-visible">
     <button
-      class="close-button text-xl leading-none absolute right-0 top-0"
+      class="close-button text-xl text-black rounded-full w-4 h-4 flex items-center justify-center leading-none absolute right-[-4px] top-[-4px] hover:bg-gray-300"
       onclick={() => handleClose()}
       title="Close"
     >
