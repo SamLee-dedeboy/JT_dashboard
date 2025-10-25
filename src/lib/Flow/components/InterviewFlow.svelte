@@ -97,6 +97,7 @@
   let section0 = $state(sections[0]);
   let section1 = $state(sections[1]);
   let section2 = $state(sections[2]);
+  let section3 = $state(sections[3]);
 
   // Sync local state back to the store when sections change
   $effect(() => {
@@ -582,7 +583,7 @@
 </script>
 
 <div class="upper-page flex flex-1 h-full w-full bg-gray-50">
-  <div class="control-panel flex min-w-[15rem] max-w-[17rem] flex-col">
+  <div class="control-panel flex w-[28rem] flex-col">
     <!-- <span class="flex items-center justify-center font-serif text-lg font-bold">
       JT Participant Transcripts
     </span> -->
@@ -601,12 +602,14 @@
     <div class="statistics-panel flex h-1 grow flex-col">
       <div class="flex grow flex-col gap-8">
         <div
-          class="tutorial text-xs flex flex-col p-3 mx-2 gap-4 divide-y divide-dashed text-white"
+          class="tutorial text flex flex-col p-3 mx-2 gap-4 divide-y divide-dashed text-white"
         >
           <div>
             <div>We mainly asked three questions in the interview:</div>
             <ol class="list-decimal list-outside pl-4">
-              <li>What should be the Future Salinity Management Strategies?</li>
+              <li>
+                What should Future Salinity Management Strategies focus on?
+              </li>
               <li>What are the Drivers of Change?</li>
               <li>Is the current decision making Fair?</li>
             </ol>
@@ -649,7 +652,7 @@
         return acc + section.columns.length;
       }, 0)}
       {@const total_sections = sections.length}
-      <div class="first-two-sections flex grow justify-around gap-x-2">
+      <!-- <div class="first-two-sections flex justify-around gap-x-2">
         <SectionWrapper
           bind:section={section0}
           index={0}
@@ -668,10 +671,37 @@
           {category_metadata}
           {block_aggregator}
         ></SectionWrapper>
-      </div>
+      </div> -->
+      <SectionWrapper
+        bind:section={section0}
+        index={0}
+        {total_sections}
+        {total_columns}
+        {data}
+        {category_metadata}
+        {block_aggregator}
+      ></SectionWrapper>
+      <SectionWrapper
+        bind:section={section1}
+        index={1}
+        {total_sections}
+        {total_columns}
+        {data}
+        {category_metadata}
+        {block_aggregator}
+      ></SectionWrapper>
       <SectionWrapper
         bind:section={section2}
         index={2}
+        {total_sections}
+        {total_columns}
+        {data}
+        {category_metadata}
+        {block_aggregator}
+      ></SectionWrapper>
+      <SectionWrapper
+        bind:section={section3}
+        index={3}
         {total_sections}
         {total_columns}
         {data}

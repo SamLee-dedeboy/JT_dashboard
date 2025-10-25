@@ -31,7 +31,7 @@
     {#each section.columns as column, index}
       <Column
         bind:column
-        show_column_header={true}
+        show_column_header={section.columns.length > 1}
         blocks={block_aggregator.decision_making_blocks.block_dict[column.id]}
         total_participants={block_aggregator.max_participants}
       ></Column>

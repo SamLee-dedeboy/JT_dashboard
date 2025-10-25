@@ -100,7 +100,7 @@
 >
   <div class="section-title relative w-full">
     {section.title}
-    <div
+    <!-- <div
       role="button"
       tabindex="0"
       onclick={(e) => {
@@ -114,15 +114,15 @@
         alt="hide"
         class="icon hide-icon opaicty-95 absolute bottom-0 left-0 right-0 top-0 hidden h-full w-full cursor-pointer"
       />
-    </div>
+    </div> -->
   </div>
 </div>
 
 <style lang="postcss">
   @reference "tailwindcss";
-  .section-title:hover .hide-icon {
+  /* .section-title:hover .hide-icon {
     @apply block;
-  }
+  } */
   .icon {
     @apply hover:bg-gray-300;
   }
@@ -137,9 +137,9 @@
       @apply absolute left-0 top-0 hidden h-[1.5rem] w-[1.5rem] cursor-pointer  p-1;
     }
   }
-  .section-header:hover .icon {
+  /* .section-header:hover .icon {
     @apply block;
-  }
+  } */
 
   .option-item:hover img {
     @apply block;

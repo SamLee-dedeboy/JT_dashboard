@@ -44,7 +44,7 @@
   </div>
 {:else}
   <div
-    class="section-container pointer-events-none flex flex-1 flex-col"
+    class="section-container pointer-events-none flex flex-col"
     class:leading_section={false}
     style={`width: ${
       (100 * section.columns.length) / total_columns

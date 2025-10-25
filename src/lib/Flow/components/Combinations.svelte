@@ -177,7 +177,7 @@
           <!-- Vertical dotted line for each option -->
           <div
             class="connecting-line"
-            style={`left: ${index * 3.0 + 0.7}rem; height: calc(9rem - ${index * 1.5}rem)`}
+            style={`left: ${index * 2.8 + 1.5}rem; height: calc(9rem - ${index * 1.5}rem)`}
           ></div>
         </div>
         <!-- <div
@@ -189,7 +189,7 @@
       {/each}
     </div>
     <div
-      class="combinations-list flex h-1 grow snap-y flex-col gap-y-2 overflow-auto px-0.5 pr-[0.6rem] mt-6 text-sm"
+      class="combinations-list flex h-1 grow snap-y flex-col gap-y-2 overflow-auto pl-2 pr-[12.5rem] mt-6 text-sm"
       style={`scrollbar-gutter: stable`}
     >
       {#each sorted_combinations as combination, index}

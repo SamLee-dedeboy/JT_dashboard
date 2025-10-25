@@ -21,10 +21,10 @@ use sunburst to promote the paper
 [x] remove human-natural axis for mental model
 [x] add total number of respondants to mental model
 fix text color on linking
-expand width of tutorial in flow
-fix flow column 
-change subheading color and title for decision making in flow
-restructure columns: separate fair and represented/underreperesnted
+[x] expand width of tutorial in flow
+[x] fix flow column 
+[x] change subheading color and title for decision making in flow
+[x] restructure columns: separate fair and represented/underreperesnted
 
 [x] make tutorial tags green to make visual salient
 [x] fix typo in public opinion chart

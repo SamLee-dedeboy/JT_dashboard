@@ -80,6 +80,23 @@
     <FutureManagement bind:section {block_aggregator} />
   </div>
 {:else if section.id === "decision_making"}
+  <div class="flex grow flex-col justify-center items-center">
+    <SectionHeader
+      {category_metadata}
+      bind:section
+      options={{
+        [Constants.fairness_column_id]:
+          data.metadata[Constants.fairness_column_id],
+        [Constants.represented_column_id]: data.metadata.represented_categories,
+        [Constants.not_represented_column_id]:
+          data.metadata.not_represented_categories,
+        [Constants.others_column_id]:
+          data.metadata.others_to_include_categories,
+      }}
+    ></SectionHeader>
+    <DecisionMaking bind:section {block_aggregator} />
+  </div>
+{:else if section.id === "decision_making_2"}
   <div class="flex grow flex-col">
     <SectionHeader
       {category_metadata}

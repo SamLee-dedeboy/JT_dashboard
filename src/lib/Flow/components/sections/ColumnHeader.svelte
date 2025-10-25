@@ -28,11 +28,11 @@
     text-center text-[1rem]  shadow-[0px_0px_1px_rgba(0,0,0,0.2)]
 `}
 >
-  {#if true && Object.keys(column_header_svgs).includes(title)}
+  <!-- {#if true && Object.keys(column_header_svgs).includes(title)}
     <img src={column_header_svgs[title]} class="mr-1 h-4 w-4" alt="*" />
-  {/if}
+  {/if} -->
   {title}
-  <div
+  <!-- <div
     role="button"
     tabindex="0"
     class="toggle hide"
@@ -47,13 +47,14 @@
     {:else}
       <img src="minus.svg" alt="hide" />
     {/if}
-  </div>
+  </div> -->
 </span>
 
 <style lang="postcss">
   @reference "tailwindcss";
   .question-header {
-    background-color: var(--jt-secondary);
+    /* background-color: var(--jt-secondary-dark); */
+    color: white;
     & .toggle {
       @apply absolute flex cursor-pointer justify-center opacity-0;
     }

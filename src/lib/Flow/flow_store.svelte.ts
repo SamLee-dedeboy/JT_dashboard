@@ -180,7 +180,7 @@ let _category_options = $state({} as { [key: string]: string[] });
 let _sections = $state([
   {
     id: "future_management",
-    title: "What should be the Future Salinity Management Strategies?",
+    title: "What should future Salinity Management Strategies focus on?",
     hidden: false,
     columns: [
       {
@@ -224,6 +224,31 @@ let _sections = $state([
         type: "one",
         hidden: false,
       },
+      // {
+      //   id: "represented_groups",
+      //   title: "Represented Groups",
+      //   section_id: "decision_making",
+      //   column_id_prefix: Columns.represented_column_id,
+      //   value_process_func: Columns.category_process_func,
+      //   type: "many",
+      //   hidden: false,
+      // },
+      // {
+      //   id: "not_represented_groups",
+      //   title: "Overlooked Groups",
+      //   section_id: "decision_making",
+      //   column_id_prefix: Columns.not_represented_column_id,
+      //   value_process_func: Columns.category_process_func,
+      //   type: "many",
+      //   hidden: false,
+      // },
+    ],
+  },
+  {
+    id: "decision_making_2",
+    title: "Who is currently represented and overlooked?",
+    hidden: false,
+    columns: [
       {
         id: "represented_groups",
         title: "Represented Groups",
@@ -241,9 +266,10 @@ let _sections = $state([
         value_process_func: Columns.category_process_func,
         type: "many",
         hidden: false,
-      },
-    ],
-  },
+      }
+    ]
+
+  }
 ] as tSectionMetadata[]);
 
 export const sectionState = {
