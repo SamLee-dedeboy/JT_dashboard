@@ -1,9 +1,9 @@
 <script lang="ts">
-  let { bubble, handleExpand, handleClose } = $props();
   import { server_address } from "./constants";
   import { bubble_color } from "./constants";
   import { setOpacity } from "../../constants";
 
+  let { bubble, handleExpand = undefined, handleClose } = $props();
   $effect(() => {
     if (bubble) {
       fetchSummarization();
@@ -58,12 +58,14 @@
       </span>
       participants mentioned this in the interview.
     </p>
-    <span>
-      <button
-        class="expand-button mt-4 px-2 py-1 rounded shadow-md text-sm outline-2 outline-slate-200"
-        onclick={() => handleExpand(bubble)}>Expand</button
-      > to see its children.
-    </span>
+    {#if handleExpand}
+      <span>
+        <button
+          class="expand-button mt-4 px-2 py-1 rounded shadow-md text-sm outline-2 outline-slate-200"
+          onclick={() => handleExpand(bubble)}>Expand</button
+        > to see its children.
+      </span>
+    {/if}
   </div>
   <div class="flex-2 relative overflow-visible">
     <button

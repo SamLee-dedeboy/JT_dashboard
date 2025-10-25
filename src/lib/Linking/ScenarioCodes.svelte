@@ -2,6 +2,7 @@
   import { server_address } from "./constants";
   // import CodeTreeMap from "./CodeTreeMap.svelte";
   import CodeBubbles from "./CodeBubbles.svelte";
+  import CodeGraph from "./CodeGraph.svelte";
   // import EquitySpace from "./EquitySpace.svelte";
   import type { tScenarioData } from "./types";
   import { bubble_color } from "./constants";
@@ -38,10 +39,14 @@
   <div
     class="header-container italic justify-center items-center flex flex-col relative"
   >
-    <span class="title-banner w-full text-center text-[2.5rem] uppercase">
+    <span
+      class="title-banner w-full text-center text-[2.5rem] uppercase absolute top-0 -translate-y-full"
+    >
       Public Opinion
     </span>
-    <div class="info-text px-1 text-[1rem] font-normal w-full flex flex-col">
+    <div
+      class="info-text px-1 text-[1rem] font-normal w-full flex flex-col absolute top-0"
+    >
       <span class="inline-flex">
         <!-- <img src="info.svg" class="info-icon w-5 h-5 inline mr-2" alt="info" /> -->
         <svg
@@ -69,7 +74,7 @@
         Click any bubble to see more details.
       </span>
     </div>
-    <div
+    <!-- <div
       class="absolute right-2 top-1 flex flex-col justify-center gap-y-2 text-white"
     >
       {#each categories as category}
@@ -80,11 +85,12 @@
           <span>{category}</span>
         </div>
       {/each}
-    </div>
+    </div> -->
   </div>
   {#if selected_scenario}
     {#await fetchScenarioCodes(selected_scenario) then codes}
-      <CodeBubbles {codes}></CodeBubbles>
+      <!-- <CodeBubbles {codes}></CodeBubbles> -->
+      <CodeGraph {codes}></CodeGraph>
       <!-- <CodeTreeMap {codes}></CodeTreeMap> -->
       <!-- <EquitySpace></EquitySpace> -->
     {:catch error}

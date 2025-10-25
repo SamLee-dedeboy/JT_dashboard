@@ -25,10 +25,11 @@ expand width of tutorial in flow
 fix flow column 
 change subheading color and title for decision making in flow
 restructure columns: separate fair and represented/underreperesnted
+
 [x] make tutorial tags green to make visual salient
 [x] fix typo in public opinion chart
-bubble chart needs to go back and preferrably keep nested 
-make the bubble chart force directed like visual thesaurus
+[x] bubble chart needs to go back and preferrably keep nested 
+[x] make the bubble chart force directed like visual thesaurus
 
 [x] add children to show tooltip
 [x] add title to sunburst rows
