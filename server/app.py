@@ -22,6 +22,19 @@ app.include_router(linking.router, prefix="/api/linking", tags=["linking"])
 app.include_router(flow.router, prefix="/api/flow", tags=["flow"])
 
 
+@app.get("/")
+async def root():
+    return {"message": "JT Dashboard API", "version": "1.0.0", "status": "running"}
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "message": "JT Dashboard API is running"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port)

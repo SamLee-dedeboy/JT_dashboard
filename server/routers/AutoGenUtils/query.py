@@ -1,6 +1,7 @@
 import asyncio
 import io
 import json
+import os
 from autogen_agentchat.agents import AssistantAgent
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from autogen_agentchat.messages import TextMessage
@@ -102,6 +103,14 @@ def transcribe_mental_model(image_data, api_key: str = None) -> str:
     Returns:
         str: A bullet list of nodes from the mental model.
     """
+
+    # Use environment variable if no API key provided
+    if api_key is None:
+        api_key = os.getenv("OPENAI_API_KEY")
+        if api_key is None:
+            raise ValueError(
+                "OpenAI API key not provided and OPENAI_API_KEY environment variable not set"
+            )
 
     # Read and encode the image as base64
     # base64_image = encode_image(image)

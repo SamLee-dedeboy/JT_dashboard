@@ -5,3 +5,6 @@ numpy
 autogen-agentchat
 autogen-ext[openai]
 asgiref
+requests
+tqdm
+openai
