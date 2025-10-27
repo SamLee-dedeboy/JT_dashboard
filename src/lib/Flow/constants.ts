@@ -1,5 +1,5 @@
-export const server_address = "http://127.0.0.1:8000/api/flow";
-
+import { app_server_address } from "../../app_constants";
+export const server_address = `${app_server_address}api/flow`;
 export const initial_to_id_dict: Record<string, number> = {
     AS: 124,
     BB: 59,

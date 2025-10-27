@@ -1,0 +1,1 @@
+export const app_server_address = "https://jt-dashboard-backend.fly.dev/";
