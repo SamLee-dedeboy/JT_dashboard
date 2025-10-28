@@ -324,6 +324,8 @@
     function updateVisibility() {
       arcs.style("display", function (d: HierarchyNodeExtended) {
         if (d.depth <= 1) return "block";
+        // When zoomed, never hide children
+        if (isZoomed) return "block";
         const parentName = d.parent?.data.name;
         if (!parentName) return "block";
         const childKey = `${parentName}_${d.data.name}`;
@@ -332,6 +334,8 @@
 
       labels.style("display", function (d: HierarchyNodeExtended) {
         if (d.depth <= 1) return "block";
+        // When zoomed, never hide children labels
+        if (isZoomed) return "block";
         const parentName = d.parent?.data.name;
         if (!parentName) return "block";
         const childKey = `${parentName}_${d.data.name}`;
@@ -719,109 +723,109 @@
 
   <svg bind:this={svgElement} overflow="visible" viewBox="0 0 400 400"></svg>
 
-<!-- Modal for code definitions -->
-{#if showModal}
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <div
-    class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-50 flex items-center justify-center z-50"
-    onclick={(e) => {
-      if (e.target === e.currentTarget) {
-        showModal = false;
-        modalCodeData = null;
-      }
-    }}
-  >
+  <!-- Modal for code definitions -->
+  {#if showModal}
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      class="bg-[var(--surface-elevated)] outline-2 outline-[var(--brand-primary)] rounded-lg shadow-xl max-w-2xl w-[25rem] mx-4 max-h-[80vh] overflow-hidden"
+      class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-50 flex items-center justify-center z-50"
+      onclick={(e) => {
+        if (e.target === e.currentTarget) {
+          showModal = false;
+          modalCodeData = null;
+        }
+      }}
     >
-      <!-- Modal Header -->
       <div
-        class="flex justify-between items-center p-6 border-b border-[var(--brand-primary)]"
+        class="bg-[var(--surface-elevated)] outline-2 outline-[var(--brand-primary)] rounded-lg shadow-xl max-w-2xl w-[25rem] mx-4 max-h-[80vh] overflow-hidden"
       >
-        <h2 class="text-xl text-white">
-          {modalCodeData?.name || "Loading..."}
-        </h2>
-        <!-- svelte-ignore a11y_consider_explicit_label -->
-        <button
-          class="text-gray-400 hover:text-gray-600 transition-colors"
-          onclick={() => {
-            showModal = false;
-            modalCodeData = null;
-          }}
+        <!-- Modal Header -->
+        <div
+          class="flex justify-between items-center p-6 border-b border-[var(--brand-primary)]"
         >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          <h2 class="text-xl text-white">
+            {modalCodeData?.name || "Loading..."}
+          </h2>
+          <!-- svelte-ignore a11y_consider_explicit_label -->
+          <button
+            class="text-gray-400 hover:text-gray-600 transition-colors"
+            onclick={() => {
+              showModal = false;
+              modalCodeData = null;
+            }}
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            ></path>
-          </svg>
-        </button>
-      </div>
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+          </button>
+        </div>
 
-      <!-- Modal Content -->
-      <div class="p-6 overflow-y-auto max-h-[60vh] rounded-md z-100">
-        {#if isLoadingCode}
-          <div class="flex items-center justify-center py-8">
-            <div
-              class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"
-            ></div>
-            <span class="ml-2 text-gray-600">Loading code definition...</span>
-          </div>
-        {:else if modalCodeData?.error}
-          <div class="text-red-600 text-center py-8">
-            <p class="font-semibold">Error: {modalCodeData.error}</p>
-            {#if modalCodeData.details}
-              <p class="text-sm mt-2">{modalCodeData.details}</p>
-            {/if}
-          </div>
-        {:else if modalCodeData}
-          <div class="space-y-4 text-white">
-            {#if modalCodeData.description}
-              <div>
-                <h3 class="mb-2">Description:</h3>
-                <p class="">{modalCodeData.description}</p>
-              </div>
-            {/if}
+        <!-- Modal Content -->
+        <div class="p-6 overflow-y-auto max-h-[60vh] rounded-md z-100">
+          {#if isLoadingCode}
+            <div class="flex items-center justify-center py-8">
+              <div
+                class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"
+              ></div>
+              <span class="ml-2 text-gray-600">Loading code definition...</span>
+            </div>
+          {:else if modalCodeData?.error}
+            <div class="text-red-600 text-center py-8">
+              <p class="font-semibold">Error: {modalCodeData.error}</p>
+              {#if modalCodeData.details}
+                <p class="text-sm mt-2">{modalCodeData.details}</p>
+              {/if}
+            </div>
+          {:else if modalCodeData}
+            <div class="space-y-4 text-white">
+              {#if modalCodeData.description}
+                <div>
+                  <h3 class="mb-2">Description:</h3>
+                  <p class="">{modalCodeData.description}</p>
+                </div>
+              {/if}
 
-            {#if modalCodeData.definition}
-              <div>
-                <h3 class="mb-2">Definition:</h3>
-                <p class="">{modalCodeData.definition}</p>
-              </div>
-            {/if}
-            {#if modalCodeData.parent}
-              <div>
-                <h3 class="mb-2">Parent:</h3>
-                <p class="">{modalCodeData.parent}</p>
-              </div>
-            {/if}
-          </div>
-        {/if}
-      </div>
+              {#if modalCodeData.definition}
+                <div>
+                  <h3 class="mb-2">Definition:</h3>
+                  <p class="">{modalCodeData.definition}</p>
+                </div>
+              {/if}
+              {#if modalCodeData.parent}
+                <div>
+                  <h3 class="mb-2">Parent:</h3>
+                  <p class="">{modalCodeData.parent}</p>
+                </div>
+              {/if}
+            </div>
+          {/if}
+        </div>
 
-      <!-- Modal Footer -->
-      <div class="px-6 pb-4 flex justify-end">
-        <button
-          class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-          onclick={() => {
-            showModal = false;
-            modalCodeData = null;
-          }}
-        >
-          Close
-        </button>
+        <!-- Modal Footer -->
+        <div class="px-6 pb-4 flex justify-end">
+          <button
+            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+            onclick={() => {
+              showModal = false;
+              modalCodeData = null;
+            }}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-{/if}
+  {/if}
 </div>
 
 <style>
