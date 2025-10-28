@@ -156,18 +156,12 @@
       })
     );
 
-    // Sort according to the desired order
+    // Sort according to the desired order and only include files in desiredOrder
     sunburstDatasets = desiredOrder
       .map((orderedFilename) =>
         unsortedDatasets.find((dataset) => dataset.filename === orderedFilename)
       )
-      .filter((dataset) => dataset !== undefined) // Remove any missing files
-      .concat(
-        // Add any files not in the desired order at the end
-        unsortedDatasets.filter(
-          (dataset) => !desiredOrder.includes(dataset.filename)
-        )
-      );
+      .filter((dataset) => dataset !== undefined); // Remove any missing files
   }
 
   function resetColorMap() {
@@ -407,20 +401,11 @@
                     generational perspectives influence the themes that emerge in
                     mental models. -->
                   </p>
-                {:else}
-                  <p class="text">
-                    Additional comparison between <strong
-                      >{rowData[0]?.title || ""}</strong
-                    >
-                    and <strong>{rowData[1]?.title || ""}</strong>. Each
-                    visualization reveals unique patterns in how different
-                    groups conceptualize and prioritize various themes.
-                  </p>
                 {/if}
               </div>
             </div>
             {#each rowData as item, index}
-              <div class="flex-2" style={`z-index: ${rowData.length - index};`}>
+              <div class="flex-2" style={`z-index: ${index};`}>
                 <SunburstChart
                   data={item.data}
                   title={item.title}
@@ -438,7 +423,7 @@
     <!-- Tooltip -->
     {#if tooltip.visible}
       <div
-        class="fixed bg-black bg-opacity-80 text-white p-2 rounded text-xs pointer-events-none z-50"
+        class="fixed bg-black bg-opacity-80 text-white p-2 rounded text-xs pointer-events-none z-100"
         style="left: {tooltip.x}px; top: {tooltip.y}px;"
       >
         <div>{tooltip.title}</div>

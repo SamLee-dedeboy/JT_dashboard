@@ -117,7 +117,7 @@
         </ul>
       {/if}
       <button
-        class="mt-1 px-1 py-0.5 rounded text-black hover:bg-[#7ed957] hover:text-[#253439] hover:outline-[#253439] outline outline-2 outline-slate-200 transition-colors duration-200"
+        class="mt-1 px-1 py-0.5 rounded text-white hover:bg-[#7ed957] hover:text-[#253439] hover:outline-[#253439] outline outline-2 outline-slate-200 transition-colors duration-200"
         onclick={handleClose}>Close</button
       >
     </div>

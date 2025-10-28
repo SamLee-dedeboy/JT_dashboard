@@ -105,7 +105,7 @@
         </p>
         <button
           onclick={toggleTutorial}
-          class="ml-3 p-1 text-gray-400 hover:text-white transition-colors duration-200 bg-transparent"
+          class="ml-3 p-1 duration-200 !bg-none"
           aria-label={tutorialExpanded
             ? "Collapse tutorial"
             : "Expand tutorial"}

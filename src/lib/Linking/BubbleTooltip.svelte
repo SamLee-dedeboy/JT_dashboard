@@ -36,7 +36,7 @@
 </script>
 
 <div
-  class="tooltip-content h-1 grow overflow-visible text-lg flex divide-x divide-dashed divide-gray-400 relative gap-2"
+  class="tooltip-content h-1 grow overflow-visible text-lg text-white flex divide-x divide-dashed divide-gray-400 relative gap-2"
 >
   <div class="flex-1 text-left p-1">
     <div class="flex justify-between items-start mb-2">

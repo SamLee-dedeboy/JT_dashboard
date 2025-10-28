@@ -41,7 +41,7 @@
 </script>
 
 <div
-  class="modal-content p-6 flex flex-col min-h-[400px] overflow-y-auto text-left"
+  class="modal-content p-6 flex flex-col min-h-[400px] overflow-y-auto text-left text-white"
 >
   <div class="flex justify-between items-start mb-4">
     <div class="flex-1">

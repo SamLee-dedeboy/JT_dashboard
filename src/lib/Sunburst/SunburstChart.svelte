@@ -711,21 +711,20 @@
 </script>
 
 <div
-  class="sunburst-container bg-[var(--surface-elevated)] rounded-lg shadow-md px-4 pb-4 pt-2 flex-1 flex flex-col items-center justify-center"
+  class="sunburst-container bg-[var(--surface-elevated)] rounded-lg shadow-md px-4 pb-4 pt-2 flex-1 flex flex-col items-center justify-center relative"
 >
   <div class="sunburst-title text-lg mb-4 text-center">
     {isZoomed ? `${title} - ${zoomedParent?.data.name || ""}` : title}
   </div>
 
   <svg bind:this={svgElement} overflow="visible" viewBox="0 0 400 400"></svg>
-</div>
 
 <!-- Modal for code definitions -->
 {#if showModal}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
-    class="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50"
+    class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-50 flex items-center justify-center z-50"
     onclick={(e) => {
       if (e.target === e.currentTarget) {
         showModal = false;
@@ -768,7 +767,7 @@
       </div>
 
       <!-- Modal Content -->
-      <div class="p-6 overflow-y-auto max-h-[60vh] rounded-md">
+      <div class="p-6 overflow-y-auto max-h-[60vh] rounded-md z-100">
         {#if isLoadingCode}
           <div class="flex items-center justify-center py-8">
             <div
@@ -823,6 +822,7 @@
     </div>
   </div>
 {/if}
+</div>
 
 <style>
   @media (max-width: 768px) {

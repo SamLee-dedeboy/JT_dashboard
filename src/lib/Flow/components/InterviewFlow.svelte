@@ -560,6 +560,7 @@
   onMount(() => {
     flowActions.setInterviewFlowRef({ render_paths });
     // add_intro_pseudo_block();
+    blockState.clicked_normal_blocks = [];
     render_paths();
     document
       .querySelector(".flow-container")
