@@ -1,15 +1,15 @@
 @import "tailwindcss";
-@font-face {
-  font-family: 'Proxima Nova';
-  src: url('/src/assets/proximanova/proximanova_regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+
+/* ==========================================================================
+   Fonts (Just Transitions brand — 2025 guidelines)
+   - Hammersmith One: display / section headers (ALL CAPS)
+   - Proxima Nova:    body + sub-headings (regular & ALL CAPS)
+   Hammersmith One is loaded via <link> in index.html (Google Fonts).
+   ========================================================================== */
 
 @font-face {
   font-family: 'Proxima Nova';
-  src: url('/src/assets/proximanova/proximanova_light.ttf') format('truetype');
+  src: url('./assets/proximanova/proximanova_light.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -17,24 +17,244 @@
 
 @font-face {
   font-family: 'Proxima Nova';
-  src: url('/src/assets/proximanova/proximanova_black.ttf') format('truetype');
+  src: url('./assets/proximanova/proximanova_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* No true "medium" (500) file in the asset bundle — bold stands in for
+   both 500 and 600 so Tailwind's font-medium / font-semibold resolve. */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('./assets/proximanova/proximanova_bold.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('./assets/proximanova/proximanova_bold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('./assets/proximanova/proximanova_bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('./assets/proximanova/proximanova_extrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('./assets/proximanova/proximanova_black.ttf') format('truetype');
   font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
-:root {
-  font-family: 'Proxima Nova', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('./assets/proximanova/proximanova_boldit.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('./assets/proximanova/proximanova_blackit.otf') format('opentype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   Brand tokens — aligned with JT_BRAND GUIDELINES_2025
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* ---------- Brand colors — exact hexes from the brand book ---------- */
+
+  /* Primary palette */
+  --jt-ink:    #253439;  /* deep charcoal/teal — page background, dark text */
+  --jt-blue:   #51a2bd;  /* primary blue        — sub-headings, accents */
+  --jt-green:  #7ed957;  /* primary green       — titles, CTAs, brand fill */
+
+  /* Secondary palette (categorical accents) */
+  --jt-cyan:   #7eeaee;
+  --jt-rust:   #cb531b;
+  --jt-yellow: #dee006;
+  --jt-pink:   #e263ff;
+  --jt-amber:  #efa400;
+  --jt-coral:  #ff4c79;
+
+  /* Blue → green gradient stops (section-title band) */
+  --jt-grad-0: #51a2bd;
+  --jt-grad-1: #57aaae;
+  --jt-grad-2: #5eb2a0;
+  --jt-grad-3: #64ba91;
+  --jt-grad-4: #6bc138;  /* brand book ordering retained */
+  --jt-grad-5: #71c974;
+  --jt-grad-6: #78d166;
+  --jt-grad-7: #7ed957;
+
+  --jt-gradient: linear-gradient(
+    90deg,
+    var(--jt-grad-0) 0%,
+    var(--jt-grad-1) 14%,
+    var(--jt-grad-2) 28%,
+    var(--jt-grad-3) 42%,
+    var(--jt-grad-4) 57%,
+    var(--jt-grad-5) 71%,
+    var(--jt-grad-6) 85%,
+    var(--jt-grad-7) 100%
+  );
+
+  /* Tonal variants derived from the primaries */
+  --jt-green-light: #9fe173;
+  --jt-green-dark:  #5fb83f;
+  --jt-blue-light:  #6bd3ff;
+  --jt-blue-dark:   #2b85a0;
+  --jt-ink-light:   #34454b;
+  --jt-ink-dark:    #1b262a;
+
+  /* ---------- Surfaces ---------- */
+  --surface-page:        var(--jt-ink);        /* primary page background */
+  --surface-elevated:    var(--jt-ink-light);  /* cards / raised panels */
+  --surface-interactive: #3d4f55;              /* hover/active surface */
+  --surface-inverse:     #ffffff;              /* light surface on dark page */
+  --border-subtle:       #404a50;
+  --border-accent:       var(--jt-green);
+
+  /* ---------- Typography: family + roles ---------- */
+  --font-display: 'Hammersmith One', system-ui, sans-serif;
+  --font-body:    'Proxima Nova', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Modular scale (rem) */
+  --fs-hero:    2.5rem;   /* JUST TRANSITIONS IN THE DELTA */
+  --fs-title:   2rem;     /* section header  */
+  --fs-heading: 1.5rem;   /* sub heading     */
+  --fs-body:    1rem;
+  --fs-small:   0.875rem;
+  --fs-micro:   0.75rem;  /* footer, labels  */
+
+  --lh-tight:   1.1;
+  --lh-snug:    1.25;
+  --lh-normal:  1.5;
+
+  --tracking-wide:  0.04em;
+  --tracking-wider: 0.08em; /* ALL CAPS headings */
+
+  /* ---------- Text colors (on dark surfaces by default) ---------- */
+  --text-primary:   #ffffff;
+  --text-secondary: #e0e6ea;
+  --text-tertiary:  #9aa5ac;
+  --text-inverse:   var(--jt-ink);
+  --text-title:     var(--jt-green);   /* section title color */
+  --text-subtitle:  var(--jt-blue);    /* sub-heading color */
+  --text-accent:    var(--jt-green);
+  --text-link:      var(--jt-blue);
+  --text-link-hover:var(--jt-blue-light);
+
+  /* ---------- Interactive ---------- */
+  --interactive-primary:         var(--jt-green);
+  --interactive-primary-hover:   var(--jt-green-light);
+  --interactive-primary-active:  var(--jt-green-dark);
+  --interactive-secondary:       var(--jt-blue);
+  --interactive-secondary-hover: var(--jt-blue-light);
+  --interactive-secondary-active:var(--jt-blue-dark);
+
+  /* ---------- Semantic ---------- */
+  --semantic-success: var(--jt-green);
+  --semantic-info:    var(--jt-blue);
+  --semantic-warning: var(--jt-amber);
+  --semantic-danger:  var(--jt-coral);
+
+  /* ---------- Categorical ramp (for charts / bubbles / segments) ---------- */
+  --cat-1: var(--jt-cyan);
+  --cat-2: var(--jt-rust);
+  --cat-3: var(--jt-yellow);
+  --cat-4: var(--jt-pink);
+  --cat-5: var(--jt-amber);
+  --cat-6: var(--jt-coral);
+
+  /* Domain colors used by MM drag zones (kept brand-consistent) */
+  --bg-drivers:  var(--jt-blue);
+  --bg-impacted: var(--jt-amber);
+
+  /* ---------- Legacy aliases — do not remove.
+     Many components still import these names directly. ---------- */
+  --brand-primary:   var(--jt-green);
+  --brand-secondary: var(--jt-blue);
+  --bg-page:         var(--surface-page);
+  --bg-surface:      var(--surface-elevated);
+  --text-muted:      var(--text-tertiary);
+  --link-color:      var(--text-link);
+  --link-hover:      var(--text-link-hover);
+  --button-bg:       var(--interactive-primary);
+  --button-text:     var(--text-inverse);
+  --accent-info:     var(--semantic-info);
+  --accent-success:  var(--semantic-success);
+  --accent-warning:  var(--semantic-warning);
+  --accent-danger:   var(--semantic-danger);
+  --sc-title:        var(--font-display);
+  --body-content:    var(--font-body);
+  --font-family-display: var(--font-display);
+  --font-family-body:    var(--font-body);
+  --jt-primary:           var(--jt-green);
+  --jt-primary-light:     var(--jt-green-light);
+  --jt-primary-dark:      var(--jt-green-dark);
+  --jt-secondary:         var(--jt-blue);
+  --jt-secondary-light:   var(--jt-blue-light);
+  --jt-secondary-dark:    var(--jt-blue-dark);
+  --categorical-one:   var(--cat-1);
+  --categorical-two:   var(--cat-2);
+  --categorical-three: var(--cat-3);
+  --categorical-four:  var(--cat-4);
+  --categorical-five:  var(--cat-5);
+  --categorical-six:   var(--cat-6);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+:root {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: var(--lh-normal);
+  color: var(--text-primary);
+  background-color: var(--surface-page);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  background-color: var(--surface-page);
+  color: var(--text-primary);
 }
 
 #app {
@@ -43,148 +263,81 @@
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
+  color: var(--text-link);
   text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+  transition: color 0.15s ease;
 }
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-} */
+a:hover { color: var(--text-link-hover); }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    /* background-color: #f9f9f9; */
-  }
+/* ==========================================================================
+   Reusable brand typography classes
+   Usage mirrors the roles called out in the 2025 brand book.
+   ========================================================================== */
+
+.jt-display {
+  font-family: var(--font-display);
+  color: var(--text-title);
+  text-transform: uppercase;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-wide);
 }
+
+.jt-hero-title {
+  font-family: var(--font-display);
+  color: var(--text-title);
+  font-size: var(--fs-hero);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+  text-align: right;
+  letter-spacing: var(--tracking-wide);
+}
+
+.jt-hero-subtitle {
+  font-family: var(--font-body);
+  color: var(--text-title);
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: var(--lh-snug);
+}
+
+.jt-section-title {
+  font-family: var(--font-display);
+  color: var(--text-title);
+  font-size: var(--fs-title);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  line-height: var(--lh-tight);
+}
+
+.jt-sub-heading {
+  font-family: var(--font-body);
+  color: var(--text-subtitle);
+  font-size: var(--fs-heading);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  font-weight: 500;
+}
+
+.jt-body {
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: var(--lh-normal);
+}
+
+.jt-footer {
+  font-family: var(--font-body);
+  color: var(--text-tertiary);
+  font-size: var(--fs-micro);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+
+/* Existing utility used by view containers */
 .section-content {
   @apply flex h-full flex-col text-black;
   grid-row: 4/-1;
   z-index: 1;
-}
-
-
-:root {
-  /* --- JT Brand Identity --- */
-  --jt-primary: #7ED957;        /* Just Transitions primary green */
-  --jt-primary-light: #9FE173;  /* Lighter variant for hover/active states */
-  --jt-primary-dark: #5FB83F;   /* Darker variant for text/borders */
-  --jt-primary-accessible: #4A8A2A; /* WCAG AA compliant green for text on white */
-  --jt-secondary: #51a2bd;      /* Complementary blue for accents */
-  --jt-secondary-light: #6BD3FF; /* Lighter blue variant */
-  --jt-secondary-dark: #2B9FDB; /* Darker blue variant */
-  --jt-secondary-accessible: #1B7FB8; /* WCAG AA compliant blue for text on white */
-
-  /* --- Legacy Variables (for backward compatibility) --- */
-  --brand-primary: var(--jt-primary);
-  --brand-secondary: var(--jt-secondary);
-
-  /* --- Surface & Layout --- */
-  --surface-page: #1B262A;      /* Primary page background */
-  --surface-elevated: #253439;  /* Cards, panels, elevated surfaces */
-  --surface-interactive: #343C40; /* Hover states, interactive surfaces */
-  --border-subtle: #404A50;     /* Low contrast borders and dividers */
-  --border-accent: var(--jt-primary); /* Accent borders */
-
-  /* --- Legacy Surface Variables --- */
-  --bg-page: var(--surface-page);
-  --bg-surface: var(--surface-elevated);
-
-  /* --- Typography Colors --- */
-  --text-primary: #FFFFFF;      /* Primary text on dark backgrounds */
-  --text-secondary: #E0E6EA;    /* Secondary text, slightly muted */
-  --text-tertiary: #9AA5AC;     /* Tertiary text, labels, placeholders */
-  --text-inverse: #1B262A;      /* Text on light backgrounds */
-  --text-accent: var(--jt-primary); /* Accent text color */
-
-  /* --- Legacy Text Variables --- */
-  --text-muted: var(--text-tertiary);
-
-  /* --- Interactive States --- */
-  --interactive-primary: var(--jt-primary);
-  --interactive-primary-hover: var(--jt-primary-light);
-  --interactive-primary-active: var(--jt-primary-dark);
-  --interactive-secondary: var(--jt-secondary);
-  --interactive-secondary-hover: var(--jt-secondary-light);
-  --interactive-secondary-active: var(--jt-secondary-dark);
-
-  /* --- Legacy Interactive Variables --- */
-  --link-color: var(--interactive-primary);
-  --link-hover: var(--interactive-primary-hover);
-  --button-bg: var(--interactive-primary);
-  --button-text: var(--text-primary);
-
-  /* --- Semantic Colors --- */
-  --semantic-success: #4ADA64;  /* Success states, confirmations */
-  --semantic-warning: #F5B800;  /* Warnings, cautions */
-  --semantic-error: #FF4444;    /* Errors, destructive actions */
-  --semantic-info: var(--jt-secondary); /* Information, neutral alerts */
-
-  /* --- Legacy Semantic Variables --- */
-  --accent-info: var(--semantic-info);
-  --accent-success: var(--semantic-success);
-  --accent-warning: var(--semantic-warning);
-  --accent-danger: var(--semantic-error);
-
-  /* --- Neutral Palette --- */
-  --neutral-0: #FFFFFF;
-  --neutral-50: #F8FAFB;
-  --neutral-100: #F1F5F7;
-  --neutral-200: #E4EBEF;
-  --neutral-300: #D1DCE2;
-  --neutral-400: #9AA5AC;
-  --neutral-500: #6B7580;
-  --neutral-600: #4A5568;
-  --neutral-700: #2D3748;
-  --neutral-800: #1A202C;
-  --neutral-900: #171923;
-  --neutral-950: #0F1419;
-
-  /* --- Typography Scale --- */
-  --font-family-display: 'Hammersmith One', system-ui, sans-serif;
-  --font-family-body: 'Proxima Nova', system-ui, sans-serif;
-  /* --font-family-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', monospace; */
-
-  /* --- Legacy Typography Variables --- */
-  --sc-title: var(--font-family-display);
-  --body-content: var(--font-family-body);
-  --categorical-one: #7eeaee;
-  --categorical-two: #cb531b;
-  --categorical-three: #dee006;
-  --categorical-four: #e263ff;
-  --categorical-five: #efa400;
-  --categorical-six: #ff4c79;
-
-  --bg-drivers: #51a2bd;    
-  --bg-impacted: #b39037; /* Teal for bottom dropzone */
 }

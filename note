@@ -17,21 +17,35 @@ use sunburst to promote the paper
 - 
 
 
-[x] add vertical (y) encoding for mental model 
-[x] remove human-natural axis for mental model
-[x] add total number of respondants to mental model
-fix text color on linking
-[x] expand width of tutorial in flow
-[x] fix flow column 
-[x] change subheading color and title for decision making in flow
-[x] restructure columns: separate fair and represented/underreperesnted
+meeting notes -- 12/17
+ecology:
+- salinity and temp to fish
+- need to consider: fish species? spawn period? salinity and temp preferences of the fish?
+    -- how about geo? does it migrate?
+- map salinity and temp modeling result to fish preferences
+- need to calculate salinity variation?
+- need tidal cycle aggregation?
 
-[x] make tutorial tags green to make visual salient
-[x] fix typo in public opinion chart
-[x] bubble chart needs to go back and preferrably keep nested 
-[x] make the bubble chart force directed like visual thesaurus
 
-[x] add children to show tooltip
-[x] add title to sunburst rows
-[x] sunburst: put text to the left
-[x] add semitransparent arrow to scroll down for sunburtst
+EJ:
+- daily maximum + thresholds for drinking water quality
+- need to map points that exceeds drinking water quality back to maps to see concentration of impacted area
+
+
+Platform needs:
+1. geographical plotting of points
+2. geographical (and hierarchical?) grouping of points
+2. dynamically selecting points for generating charts
+3. mapping results back to maps
+4. need raw data access for verification (e.g., hover on points to see raw data)
+-- or just public-facing??
+- submission plan for this data platform?
+- what's the research angle? 
+
+
+sunburst
+consistent orders
+all in a link (age, years, team vs interviewee, resident vs. non)
+
+
+

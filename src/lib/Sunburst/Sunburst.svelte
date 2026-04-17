@@ -140,7 +140,7 @@
     // Define the desired order based on dataFiles list
     const desiredOrder = [
       "sunburst_age_18_35.json",
-      "sunburst_age_36_64.json",
+      "sunburst_age_65_plus.json",
       "sunburst_years_0_10_experience.json",
       "sunburst_years_31_plus_experience.json",
       "sunburst_team.json",

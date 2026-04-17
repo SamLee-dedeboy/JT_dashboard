@@ -40,6 +40,11 @@
             padding: 20px;
             position: relative;
         }
+        .sidebar-hint {
+            margin-top: -16px;
+            margin-bottom: 4px;
+            font-style: italic;
+        }
 
         .sidebar::-webkit-scrollbar {
             width: 8px;
@@ -87,6 +92,12 @@
             color: var(--text-primary);
             /* color: var(--brand-secondary); */
             text-align: center;
+        }
+
+        .canvas-hint {
+            position: absolute;
+            top: 48px;
+            left: 4px;
         }
         
         .canvas {
@@ -818,6 +829,7 @@
         <!-- Left Sidebar for Codebook -->
         <div class="sidebar header">
             <h2>Themes</h2>
+            <div class="sidebar-hint">Click a theme to open</div>
             
             <div id="codebook-tree">
                 <!-- Codebook tree will be populated here -->
@@ -826,8 +838,9 @@
         
         <!-- Right Canvas Area -->
         <div class="canvas-area">
-            <div class="canvas-header header">
+            <div class="canvas-header header relative">
                 <h2>What factors are at play for Delta salinity?</h2>
+                <div class="canvas-hint">Drag the themes onto the canvas!</div>
             </div>
             <div class="canvas" 
                  ondrop="handleCanvasAreaDrop(event)" 
@@ -1752,7 +1765,8 @@
         }
 
         function clearCanvas() {
-            if (confirm('Are you sure you want to clear all codes from the canvas?')) {
+            // if (confirm('Are you sure you want to clear all codes from the canvas?')) {
+            if (true) {
                 document.getElementById('code-nodes-container').innerHTML = '';
                 document.getElementById('connections-container').innerHTML = '';
                 droppedCodes = { impact: [], impacted: [] };

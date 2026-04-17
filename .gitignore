@@ -144,3 +144,7 @@ server/mm_data/**/*.json
 server/linking_data/**/*.json
 server/sunburst_data/**/*.json
 server/summarization.ipynb
+sunburst_data/**/*.json
+sunburst_paper
+JT_BRAND GUIDELINES_2025 (1).pdf
+.DS_Store

@@ -65,11 +65,11 @@
 <svelte:window on:fullscreenchange={handleFullscreenChange} on:keydown={handleKeydown} />
 
 <main class="flex flex-col relative w-screen h-screen overflow-hidden">
-  <div
-    tabindex="0"
+  <header
+    class="app-hero"
+    class:app-hero--compact={isNotHomePage}
     role="button"
-    class="jt-section-title text-[2.5rem] pl-4 flex items-center uppercase cursor-pointer"
-    class:jt-section-title--with-bg={isNotHomePage}
+    tabindex="0"
     onclick={navigateHome}
     onkeyup={(e) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -77,18 +77,12 @@
       }
     }}
   >
-    Just Transitions
-  </div>
-  {#if !isNotHomePage}
-    <div
-      class="jt-section-subtitle absolute top-[2.5rem] left-[2.2rem] text-right"
-    >
-      <p class="jt-section-subtitle uppercase text-[2.5rem]">In The Delta</p>
-      <p class="jt-section-body text-[1.4rem]/2 font-light">
-        Drought, salinity, and sea-level rise
-      </p>
-    </div>
-  {/if}
+    <h1 class="app-hero__title">Just Transitions</h1>
+    {#if !isNotHomePage}
+      <h2 class="app-hero__subtitle">In The Delta</h2>
+      <p class="app-hero__tagline">Drought, salinity, and sea-level rise</p>
+    {/if}
+  </header>
   <Router {routes} />
 </main>
 
@@ -99,18 +93,42 @@
     display: flex;
     background-color: var(--surface-elevated);
   }
-  .jt-section-title {
+
+  /* Unified hero: all routes render <h1>Just Transitions</h1>; home adds
+     "In The Delta" + tagline. Right-justified block — all lines share a
+     right edge so they read as one headline. Natural flex flow (no absolute
+     positioning) so the Router area naturally gets the remaining height. */
+  .app-hero {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    padding: 0.75rem 2rem 1.5rem;
+    background-color: var(--surface-elevated);
+    cursor: pointer;
+  }
+  .app-hero--compact {
+    padding-bottom: 0.75rem;
+  }
+
+  .app-hero__title,
+  .app-hero__subtitle {
     color: var(--brand-primary);
     font-family: var(--sc-title);
     font-weight: 400;
-    background-color: var(--surface-elevated);
+    font-size: 2.5rem;
+    line-height: 1;
+    text-transform: uppercase;
+    margin: 0;
   }
-  .jt-section-subtitle {
-    color: var(--brand-primary);
-    font-family: var(--sc-title);
-  }
-  .jt-section-body {
+
+  .app-hero__tagline {
     color: var(--brand-primary);
     font-family: var(--body-content);
+    font-size: 1.4rem;
+    font-weight: 300;
+    line-height: 1.2;
+    margin: 0.25rem 0 0;
   }
 </style>
