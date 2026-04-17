@@ -65,21 +65,14 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: 'Proxima Nova';
-  src: url('./assets/proximanova/proximanova_boldit.otf') format('opentype');
-  font-weight: 700;
-  font-style: italic;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Proxima Nova';
-  src: url('./assets/proximanova/proximanova_blackit.otf') format('opentype');
-  font-weight: 900;
-  font-style: italic;
-  font-display: swap;
-}
+/* We only ship italic files for weights 700 and 900. CSS font-matching
+   filters by style before weight — if any italic face exists for a family,
+   every italic request picks the closest italic weight (ignoring the
+   requested weight entirely). That means an italic-weight-300 request would
+   always resolve to 700 boldit here, defeating .card-hint and any <em>
+   usage. Dropping the real italics means the browser synthesizes italic
+   from the upright face at the requested weight — correct weight preserved
+   across the board. Requires font-synthesis: style (set on :root). */
 
 /* ==========================================================================
    Brand tokens — aligned with JT_BRAND GUIDELINES_2025
@@ -242,7 +235,11 @@
   color: var(--text-primary);
   background-color: var(--surface-page);
 
-  font-synthesis: none;
+  /* Allow the browser to synthesize italics so weight+italic combos we don't
+     ship a dedicated file for (e.g. Light Italic at weight 300) still honor
+     the requested weight. Weight synthesis stays off — real files for every
+     non-italic weight are in the Proxima Nova chain. */
+  font-synthesis: style;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

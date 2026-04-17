@@ -81,8 +81,8 @@
             does salinity impact?
           </p>
           <p class="card-hint">
-            Click ORGANIZING to explore salinity drivers and impacts within this
-            mental model
+            Click to explore salinity drivers and impacts within this mental
+            model
           </p>
         </button>
       </div>
@@ -108,8 +108,8 @@
             or non-resident, and research team members or not.
           </p>
           <p class="card-hint">
-            Click COMPARING to explore how mental models differ across
-            demographic categories
+            Click to explore how mental models differ across demographic
+            categories
           </p>
         </button>
       </div>
@@ -197,8 +197,19 @@
     display: grid;
     grid-template-columns: 1fr 60px 1fr;
     align-items: center;
-    /* margin-bottom: 3rem; */
     width: 100%;
+    /* margin-bottom: 4rem; */
+  }
+
+  /* Interleave cards: every item after the first pulls itself up by ~50%
+     of a typical card's height so left- and right-side cards sit halfway
+     above/below each other. Tunable via the --timeline-overlap var on
+     .timeline-container if card heights change. */
+  .timeline-container {
+    --timeline-overlap: 3rem;
+  }
+  .timeline-item + .timeline-item {
+    margin-top: calc(-1 * var(--timeline-overlap));
   }
 
   .timeline-item.left > .timeline-side {
@@ -234,7 +245,7 @@
     width: 100%;
     max-width: 440px;
     padding: 2rem 2.25rem;
-    text-align: left;
+    text-align: center;
     background: var(--surface-page);
     border: 2px solid var(--jt-blue);
     border-radius: 6px;
@@ -260,7 +271,8 @@
   }
 
   .card-title {
-    font-family: var(--font-display);
+    /* font-family: var(--font-display); */
+    font-family: var(--font-body);
     font-size: 1.75rem;
     font-weight: 400;
     color: var(--text-primary);
@@ -271,7 +283,8 @@
   }
 
   .card-subtitle {
-    font-family: var(--font-display);
+    /* font-family: var(--font-display); */
+    font-family: var(--font-body);
     font-size: 1.05rem;
     font-weight: 400;
     color: var(--jt-green);
@@ -292,6 +305,8 @@
   .card-hint {
     color: var(--text-subtitle);
     font-style: italic;
+    font-weight: 100;
+    font-size: 0.85rem;
   }
 
   /* Stagger the pulse across items so they don't breathe in unison */
