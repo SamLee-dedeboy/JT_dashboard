@@ -180,11 +180,12 @@
     top: 0;
     bottom: 0;
     width: 3px;
-    background: linear-gradient(
+    /* background: linear-gradient(
       to bottom,
       var(--jt-blue) 0%,
       var(--jt-green) 100%
-    );
+    ); */
+    background: var(--jt-blue);
     transform: translateX(-50%);
     z-index: 1;
   }
