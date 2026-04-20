@@ -3,6 +3,7 @@
   import { bubble_color } from "./constants";
   import { setOpacity } from "../../constants";
   import { onMount } from "svelte";
+  import { slide } from "svelte/transition";
 
   let { code, handleExpand = undefined, handleClose } = $props();
   $effect(() => {
@@ -15,7 +16,7 @@
     console.log(
       "Fetching summarization for code:",
       code,
-      code.id.split("\\").at(-1)
+      code.id.split("\\").at(-1),
     );
 
     return fetch(`${server_address}/codes/summarize/`, {
@@ -88,7 +89,7 @@
         <div class="text-gray-500">Loading summary...</div>
       </div>
     {:then summarization}
-      <div class="py-4 rounded-lg text-left">
+      <div class="py-4 rounded-lg text-left" in:slide>
         <p class="text-base leading-relaxed whitespace-pre-wrap">
           {summarization || "No summary available."}
         </p>

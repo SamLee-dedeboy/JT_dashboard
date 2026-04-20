@@ -20,6 +20,7 @@
       .then((data) => {
         console.log("Scenario Overview:", data);
         scenario_overview = data;
+        selected_scenario = data[0];
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -69,16 +70,17 @@
                   />
                 </div>
                 <div
-                  class="scenario-content flex p-2 flex-col min-w-[18rem] relative shadow-[0_1px_6px_rgb(81,162,189,0.5)]"
+                  class="scenario-content flex px-2 flex-col min-w-[18rem] relative outline-0"
+                  style="outline-color: var(--jt-green);"
                   in:slide
                 >
-                  <div class="p-1 text-left">
+                  <div class="px-1 text-left">
                     <!-- <span class="field-label"> Description - </span> -->
                     <span class="field-name text-2xl font-semibold">
                       {selected_scenario.name}
                     </span>
                   </div>
-                  <div class="p-1 text-left">
+                  <div class="px-1 text-left">
                     <!-- <span class="field-label"> Description - </span> -->
                     <span class="field-content">
                       {selected_scenario.narrative}
@@ -116,11 +118,12 @@
               {/key}
             {/if}
           </div>
-          <div
-            class="code-detail-panel mx-2 mt-2 min-h-0 grow rounded outline-1 outline-gray-100 relative"
-          >
-            {#if selected_code}
-              {#key selected_code.id}
+          {#if selected_scenario}
+            <div
+              class="code-detail-panel mx-2 mt-2 min-h-0 grow border border-dashed relative"
+              style="border-color: var(--jt-green);"
+            >
+              {#if selected_code}
                 <div
                   class="absolute top-0 bottom-0 left-0 right-0 overflow-auto"
                 >
@@ -129,16 +132,16 @@
                     handleClose={() => (selected_code = undefined)}
                   />
                 </div>
-              {/key}
-            {:else}
-              <div
-                class="flex h-full items-center justify-center p-4 text-center text-sm italic opacity-70"
-              >
-                Click a bubble on the right to see participant opinions about it
-                here.
-              </div>
-            {/if}
-          </div>
+              {:else}
+                <div
+                  class="flex h-full items-center justify-center p-4 text-center text-sm italic opacity-70"
+                >
+                  Click a bubble on the right to see participant opinions about
+                  it here.
+                </div>
+              {/if}
+            </div>
+          {/if}
         </div>
       </div>
     </div>
