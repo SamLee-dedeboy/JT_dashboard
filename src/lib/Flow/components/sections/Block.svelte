@@ -35,7 +35,7 @@
   // Use $derived to get state values
   const participant_colors = $derived(participantState.participant_colors);
   const participant_combinations = $derived(
-    participantState.participant_combinations
+    participantState.participant_combinations,
   );
   const transcript_view = $derived(uiState.transcript_view);
   const view_mode = $derived(uiState.view_mode);
@@ -49,13 +49,13 @@
 
   const clicked = $derived(
     clicked_leading_blocks.map((b) => b.id).includes(block.id) ||
-      clicked_normal_blocks.map((b) => b.id).includes(block.id)
+      clicked_normal_blocks.map((b) => b.id).includes(block.id),
   );
 
   const block_combinations = $derived(
     block.participants.map((pid) => {
       return participant_combinations[pid];
-    })
+    }),
   );
 
   // Local state using $state
@@ -110,23 +110,24 @@
   class={`block-container pointer-events-auto relative flex w-full
   max-w-[8rem]
   justify-center
-  rounded 
   text-[0.9rem]
-  outline-1 outline-gray-200
+  outline-1
   ${grow ? "grow" : "flex-none"}
   `}
   class:showing-content={show_content}
   class:clicked
   class:leading={view_mode && block.column_id === strategy_column_id}
-  style={`height:${encode_height(block, total_participants)}; ${missing_style(
-    block_combinations
-  )}`}
+  style={`
+  height:${encode_height(block, total_participants)}; 
+  ${missing_style(block_combinations)}
+  outline-color: var(--jt-blue-dark);
+  `}
   onclick={(e) => {
     if (!e.defaultPrevented) {
       e.preventDefault();
       blockState.clicked_normal_blocks = update_blocks(
         clicked_normal_blocks,
-        block
+        block,
       );
     }
   }}
@@ -157,8 +158,8 @@
   {/if}
   <div
     id={block.id}
-    class={`block-element relative flex w-full flex-col items-center justify-center rounded p-1 text-center`}
-    style={`background-color: white`}
+    class={`block-element relative flex w-full flex-col items-center justify-center rounded p-1 text-center text-white`}
+    style={`background-color: #506a74`}
     data-json={JSON.stringify({
       column: block.column_id,
       combinations: block_combinations,
