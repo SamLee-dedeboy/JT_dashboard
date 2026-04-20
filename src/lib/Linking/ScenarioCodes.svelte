@@ -12,7 +12,7 @@
     console.log(
       "Fetching Scenario Codes for Scenario:",
       scenario.number,
-      scenario.name
+      scenario.name,
     );
     return fetch(server_address + `/scenarios/codes_manual/`, {
       method: "POST",
@@ -39,14 +39,12 @@
   <div
     class="header-container italic justify-center items-center flex flex-col relative"
   >
-    <span
-      class="title-banner w-full text-center text-[2.5rem] uppercase absolute top-0 -translate-y-full"
-    >
-      Public Opinion
-    </span>
     <div
       class="info-text px-1 text-[1rem] font-normal w-full flex flex-col absolute top-0"
     >
+      <span class="title-banner w-full text-center text-[2.5rem] uppercase">
+        Public Opinion
+      </span>
       <span class="inline-flex">
         <!-- <img src="info.svg" class="info-icon w-5 h-5 inline mr-2" alt="info" /> -->
         <svg

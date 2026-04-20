@@ -32,17 +32,19 @@
 {:else}
   <div class="scenario-container flex flex-col flex-1 gap-y-2">
     <div class="flex flex-col flex-1 gap-y-2">
-      <div class="flex flex-col py-1 grow gap-y-2">
+      <div class="flex grow gap-y-2">
         <div class="selector flex flex-col gap-y-4 z-10">
-          <div class="scenario-label italic text-left pl-1">Scenarios:</div>
-          <div class="flex gap-x-4 gap-y-4 flex-wrap mx-1">
+          <!-- <div class="scenario-label italic text-left pl-1">Scenarios:</div> -->
+          <div
+            class="flex flex-col gap-x-4 gap-y-4 flex-wrap mx-1 grow justify-between"
+          >
             {#each scenario_overview as scenario}
               <button
-                class="scenario-button w-fit min-h-[4rem] text-lg italic outline outline-2 rounded px-4 py-2 uppercase transition-all"
+                class="scenario-button max-w-[9rem] min-h-[4rem] text-lg italic outline outline-2 rounded px-4 py-2 uppercase transition-all"
                 class:active={selected_scenario?.name === scenario.name}
                 onclick={() =>
                   (selected_scenario = scenario_overview?.find(
-                    (s) => s.name === scenario.name
+                    (s) => s.name === scenario.name,
                   ))}
               >
                 {scenario.name}
@@ -51,29 +53,34 @@
           </div>
         </div>
         <div class="content-area flex flex-col grow">
-          <div
-            class="content-container px-2 flex flex-col items-center justify-center grow rounded relative"
-          >
+          <div class="content-container px-4 flex rounded relative gap-1">
             {#if selected_scenario}
               {#key selected_scenario.name}
-                <div class="p-1 absolute left-0 right-0 top-0 bottom-0">
+                <!-- <div class="p-1 absolute left-0 right-0 top-0 bottom-0"> -->
+                <div class="">
                   <img
                     src={`scenario_imagery/${selected_scenario.name}.jpg`}
                     alt="Scenario Image"
-                    class="w-full h-full object-contain"
+                    class=" object-contain"
                   />
                 </div>
                 <div
-                  class="scenario-content flex p-2 flex-col max-w-[45rem] self-center relative mt-4 shadow-[0_1px_6px_rgb(81,162,189,0.5)]"
+                  class="scenario-content flex p-2 flex-col min-w-[18rem] relative shadow-[0_1px_6px_rgb(81,162,189,0.5)]"
                   in:slide
                 >
+                  <div class="p-1 text-left">
+                    <!-- <span class="field-label"> Description - </span> -->
+                    <span class="field-name text-2xl font-semibold">
+                      {selected_scenario.name}
+                    </span>
+                  </div>
                   <div class="p-1 text-left">
                     <!-- <span class="field-label"> Description - </span> -->
                     <span class="field-content">
                       {selected_scenario.narrative}
                     </span>
                   </div>
-                  <div class="mt-2 px-1 text-left">
+                  <!-- <div class="mt-2 px-1 text-left">
                     <span class="field-label">
                       Why is this scenario important?
                     </span>
@@ -100,11 +107,13 @@
                         - {question} <br />
                       {/each}
                     </div>
-                  </div>
-                  <!-- <div class="min-h-[2rem]"></div> -->
+                  </div> -->
                 </div>
               {/key}
             {/if}
+          </div>
+          <div class="mx-2 mt-2 min-h-20 grow outline-1 outline-gray-100">
+            PlaceHolder
           </div>
         </div>
       </div>
@@ -133,23 +142,52 @@
   .scenario-button {
     background-color: var(--surface-interactive);
     color: var(--text-primary);
-    outline-color: var(--neutral-500);
+    outline-color: var(--jt-blue);
+    box-shadow: 0 2px 10px rgba(81, 162, 189, 0.35);
+    animation: pulse-shadow 3s ease-in-out infinite;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      outline-color 0.25s ease;
   }
 
-  /* .scenario-button:hover {
-    background-color: var(--neutral-200);
-    box-shadow:
-      0 4px 6px -1px rgb(0 0 0 / 0.1),
-      0 2px 4px -2px rgb(0 0 0 / 0.1);
-  } */
+  .scenario-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(81, 162, 189, 0.45);
+  }
+
+  /* Stagger the pulse so buttons don't breathe in unison */
+  .scenario-button:nth-of-type(2) {
+    animation-delay: 0.75s;
+  }
+  .scenario-button:nth-of-type(3) {
+    animation-delay: 1.5s;
+  }
+  .scenario-button:nth-of-type(4) {
+    animation-delay: 2.25s;
+  }
+  .scenario-button:nth-of-type(5) {
+    animation-delay: 3s;
+  }
+
+  @keyframes pulse-shadow {
+    0%,
+    100% {
+      box-shadow: 0 2px 10px rgba(81, 162, 189, 0.35);
+    }
+    50% {
+      box-shadow:
+        0 4px 20px rgba(81, 162, 189, 0.55),
+        0 0 15px rgba(126, 217, 87, 0.25);
+    }
+  }
 
   .active {
-    /* background-color: var(--brand-secondary); */
-    outline-color: var(--brand-secondary);
-    transform: translateY(-8px), scale(1.05);
-
-    /* font-weight: 600; */
-    /* color: var(--neutral-800); */
+    outline-color: var(--jt-green);
+    animation: none;
+    box-shadow:
+      0 4px 20px rgba(126, 217, 87, 0.5),
+      0 0 15px rgba(126, 217, 87, 0.35);
   }
 
   .content-area {
