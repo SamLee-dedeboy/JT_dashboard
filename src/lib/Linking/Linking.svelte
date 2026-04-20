@@ -3,12 +3,15 @@
   import CodeBubbles from "./CodeBubbles.svelte";
   import ScenarioOverview from "./ScenarioOverview.svelte";
   import type { tScenarioData } from "./types";
+  import type { GraphNode } from "./renderers/CodeGraphRenderer";
   import ScenarioCodes from "./ScenarioCodes.svelte";
 
   let selected_scenario: tScenarioData | undefined = $state(undefined);
+  let selected_code: GraphNode | undefined = $state(undefined);
   let tutorial_open = $state(true);
   $effect(() => {
     console.log("Linking selected_scenario changed", selected_scenario);
+    selected_code = undefined;
   });
   onMount(() => {});
 </script>
@@ -23,11 +26,11 @@
     Tutorial
   </button>
   <!-- <CodeBubbles {codes} /> -->
-  <div class="flex flex-col w-[60%]">
-    <ScenarioOverview bind:selected_scenario />
+  <div class="flex flex-col w-[60%] min-h-0">
+    <ScenarioOverview bind:selected_scenario bind:selected_code />
   </div>
-  <div class="bubble-container flex flex-col w-[40%]">
-    <ScenarioCodes {selected_scenario} />
+  <div class="bubble-container flex flex-col w-[40%] min-h-0">
+    <ScenarioCodes {selected_scenario} bind:selected_code />
   </div>
 </div>
 

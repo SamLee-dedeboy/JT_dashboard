@@ -6,7 +6,7 @@ export type tCode = {
     scenario_children: string[];
   };
 
-type GraphNode = d3.SimulationNodeDatum & {
+export type GraphNode = d3.SimulationNodeDatum & {
     id: string;
     name: string;
     radius: number;
@@ -33,14 +33,14 @@ export class CodeGraphRenderer {
     svgId: string;
     width: number = 600
     height: number = 600
-    dispatchClick: (node: tCode) => void = () => {};
+    dispatchClick: (node: GraphNode) => void = () => {};
     private allNodes: GraphNode[] = [];
     private allLinks: GraphLink[] = [];
     private expandedNodes: Set<string> = new Set();
     private contextMenu: any = null;
     private currentNode: GraphNode | null = null;
 
-    constructor(svgId: string, dispatchClick: (node: tCode) => void) {
+    constructor(svgId: string, dispatchClick: (node: GraphNode) => void) {
         this.svgId = svgId
         this.dispatchClick = dispatchClick;
     }

@@ -5,8 +5,15 @@
   import CodeGraph from "./CodeGraph.svelte";
   // import EquitySpace from "./EquitySpace.svelte";
   import type { tScenarioData } from "./types";
+  import type { GraphNode } from "./renderers/CodeGraphRenderer";
   import { bubble_color } from "./constants";
-  let { selected_scenario = undefined } = $props();
+  let {
+    selected_scenario = undefined,
+    selected_code = $bindable(),
+  }: {
+    selected_scenario?: tScenarioData;
+    selected_code?: GraphNode | undefined;
+  } = $props();
 
   function fetchScenarioCodes(scenario: tScenarioData) {
     console.log(
@@ -88,7 +95,7 @@
   {#if selected_scenario}
     {#await fetchScenarioCodes(selected_scenario) then codes}
       <!-- <CodeBubbles {codes}></CodeBubbles> -->
-      <CodeGraph {codes}></CodeGraph>
+      <CodeGraph {codes} bind:selected_code></CodeGraph>
       <!-- <CodeTreeMap {codes}></CodeTreeMap> -->
       <!-- <EquitySpace></EquitySpace> -->
     {:catch error}

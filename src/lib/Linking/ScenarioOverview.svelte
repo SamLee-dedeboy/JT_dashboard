@@ -3,10 +3,14 @@
   import { server_address } from "./constants";
   import { slide, scale } from "svelte/transition";
   import type { tScenarioData } from "./types";
+  import type { GraphNode } from "./renderers/CodeGraphRenderer";
+  import GraphNodeTooltip from "./GraphNodeTooltip.svelte";
   let {
     selected_scenario = $bindable(),
+    selected_code = $bindable(),
   }: {
     selected_scenario: tScenarioData | undefined;
+    selected_code?: GraphNode | undefined;
   } = $props();
   let scenario_overview: tScenarioData[] | undefined = $state(undefined);
 
@@ -30,9 +34,9 @@
 {#if !scenario_overview}
   <div class="loading">Loading...</div>
 {:else}
-  <div class="scenario-container flex flex-col flex-1 gap-y-2">
-    <div class="flex flex-col flex-1 gap-y-2">
-      <div class="flex grow gap-y-2">
+  <div class="scenario-container flex flex-col flex-1 gap-y-2 min-h-0">
+    <div class="flex flex-col flex-1 gap-y-2 min-h-0">
+      <div class="flex grow gap-y-2 min-h-0">
         <div class="selector flex flex-col gap-y-4 z-10">
           <!-- <div class="scenario-label italic text-left pl-1">Scenarios:</div> -->
           <div
@@ -40,7 +44,7 @@
           >
             {#each scenario_overview as scenario}
               <button
-                class="scenario-button max-w-[9rem] min-h-[4rem] text-lg italic outline outline-2 rounded px-4 py-2 uppercase transition-all"
+                class="scenario-button w-[9rem] min-h-[4rem] rounded outline-1 px-4 py-2 uppercase transition-all"
                 class:active={selected_scenario?.name === scenario.name}
                 onclick={() =>
                   (selected_scenario = scenario_overview?.find(
@@ -52,7 +56,7 @@
             {/each}
           </div>
         </div>
-        <div class="content-area flex flex-col grow">
+        <div class="content-area flex flex-col grow min-h-0">
           <div class="content-container px-4 flex rounded relative gap-1">
             {#if selected_scenario}
               {#key selected_scenario.name}
@@ -112,8 +116,28 @@
               {/key}
             {/if}
           </div>
-          <div class="mx-2 mt-2 min-h-20 grow outline-1 outline-gray-100">
-            PlaceHolder
+          <div
+            class="code-detail-panel mx-2 mt-2 min-h-0 grow rounded outline-1 outline-gray-100 relative"
+          >
+            {#if selected_code}
+              {#key selected_code.id}
+                <div
+                  class="absolute top-0 bottom-0 left-0 right-0 overflow-auto"
+                >
+                  <GraphNodeTooltip
+                    code={selected_code}
+                    handleClose={() => (selected_code = undefined)}
+                  />
+                </div>
+              {/key}
+            {:else}
+              <div
+                class="flex h-full items-center justify-center p-4 text-center text-sm italic opacity-70"
+              >
+                Click a bubble on the right to see participant opinions about it
+                here.
+              </div>
+            {/if}
           </div>
         </div>
       </div>
