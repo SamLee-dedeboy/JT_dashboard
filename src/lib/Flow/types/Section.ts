@@ -10,4 +10,5 @@ export type tSectionMetadata = {
   columns: tColumnMetadata[];
   // disable_toggle?: boolean;
   hidden: boolean;
+  revealed: boolean;
 };

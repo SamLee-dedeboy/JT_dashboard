@@ -33,7 +33,7 @@
   async function handleAddCategory(e) {
     e.preventDefault();
     const editable = curate_category_container?.querySelector(
-      ".editable"
+      ".editable",
     ) as HTMLElement;
     const value = editable?.innerText;
     if (value === "") {
@@ -65,7 +65,7 @@
     e.preventDefault();
     if (
       Object.keys(category_metadata).includes(
-        `${Constants.column_to_participant_data_key[column]}-${category}`
+        `${Constants.column_to_participant_data_key[column]}-${category}`,
       )
     ) {
       alert(`Cannot remove ${category} from ${column} because it is not empty`);
@@ -90,7 +90,7 @@
   function category_to_title(category) {
     return Constants.column_to_participant_data_key[category].replaceAll(
       "_",
-      " "
+      " ",
     );
   }
 </script>
@@ -127,9 +127,9 @@
     @apply hover:bg-gray-300;
   }
   .section-header {
-    @apply relative mb-0 flex select-none items-center justify-center rounded  px-1 text-center;
+    @apply relative mb-0 w-full flex select-none items-center justify-center px-1 text-center;
     @apply shadow-[0px_0px_1px_rgba(0,0,0,0.3)];
-    background-color: var(--jt-secondary);
+    background-color: var(--jt-primary);
     & .move-icon {
       @apply absolute right-0 top-0 hidden h-[1.5rem] w-[1.5rem] cursor-pointer p-1;
     }
@@ -169,6 +169,14 @@
     @apply pointer-events-none cursor-not-allowed opacity-50;
   }
   .section-title {
-    background-color: var(--jt-secondary);
+    /* background-color: var(--jt-primary); */
+    color: black;
+    font-size: 15px;
+    min-height: 4.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.8rem;
+    margin-right: 0.8rem;
   }
 </style>

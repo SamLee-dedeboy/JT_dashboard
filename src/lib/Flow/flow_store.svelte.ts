@@ -1,14 +1,16 @@
 import type { tBlock, tSectionMetadata } from "./types";
 import * as Columns from "./constants";
 import { render } from "svelte/server";
+import { tick } from "svelte";
 let interviewFlowComponent: any = $state(null);
 
 export const flowActions = {
   setInterviewFlowRef(component: any) {
     interviewFlowComponent = component;
   },
-  
-  triggerRenderPaths() {
+
+  async triggerRenderPaths() {
+    await tick();
     if (interviewFlowComponent?.render_paths) {
       interviewFlowComponent.render_paths();
     }
@@ -80,6 +82,23 @@ export const blockState = {
   },
   set clicked_normal_blocks(blocks: tBlock[]) {
     _clicked_normal_blocks = JSON.parse(JSON.stringify(blocks))
+    // Progressive disclosure: reveal section N+1 for any clicked block in section N.
+    // Monotonic — once revealed, stays revealed.
+    let next_sections = _sections;
+    let mutated = false;
+    for (const b of _clicked_normal_blocks) {
+      const idx = next_sections.findIndex((s) =>
+        s.columns.some((c) => c.column_id_prefix === b.column_id)
+      );
+      if (idx >= 0 && idx + 1 < next_sections.length && !next_sections[idx + 1].revealed) {
+        if (!mutated) {
+          next_sections = [...next_sections];
+          mutated = true;
+        }
+        next_sections[idx + 1] = { ...next_sections[idx + 1], revealed: true };
+      }
+    }
+    if (mutated) _sections = next_sections;
     flowActions.triggerRenderPaths();
   },
   get clicked_leading_blocks() {
@@ -182,6 +201,7 @@ let _sections = $state([
     id: "future_management",
     title: "What should future Salinity Management Strategies focus on?",
     hidden: false,
+    revealed: true,
     columns: [
       {
         id: "strategies",
@@ -198,6 +218,7 @@ let _sections = $state([
     id: "drivers_of_change",
     title: "What are the Drivers of Change?",
     hidden: false,
+    revealed: false,
     columns: [
       {
         id: "factors",
@@ -211,9 +232,44 @@ let _sections = $state([
     ],
   },
   {
-    id: "decision_making",
-    title: "Is the current decision making Fair?",
+    id: "decision_making_2",
+    title: "Who is currently represented?",
     hidden: false,
+    revealed: false,
+    columns: [
+      {
+        id: "represented_groups",
+        title: "Represented Groups",
+        section_id: "decision_making",
+        column_id_prefix: Columns.represented_column_id,
+        value_process_func: Columns.category_process_func,
+        type: "many",
+        hidden: false,
+      }
+    ]
+  },
+  {
+    id: "decision_making_3",
+    title: "Who is currently not represented?",
+    hidden: false,
+    revealed: false,
+    columns: [
+      {
+        id: "not_represented_groups",
+        title: "Overlooked Groups",
+        section_id: "decision_making",
+        column_id_prefix: Columns.not_represented_column_id,
+        value_process_func: Columns.category_process_func,
+        type: "many",
+        hidden: false,
+      }
+    ]
+  },
+  {
+    id: "decision_making",
+    title: "Is current decision making Fair?",
+    hidden: false,
+    revealed: false,
     columns: [
       {
         id: "fairness",
@@ -244,32 +300,6 @@ let _sections = $state([
       // },
     ],
   },
-  {
-    id: "decision_making_2",
-    title: "Who is currently represented and overlooked?",
-    hidden: false,
-    columns: [
-      {
-        id: "represented_groups",
-        title: "Represented Groups",
-        section_id: "decision_making",
-        column_id_prefix: Columns.represented_column_id,
-        value_process_func: Columns.category_process_func,
-        type: "many",
-        hidden: false,
-      },
-      {
-        id: "not_represented_groups",
-        title: "Overlooked Groups",
-        section_id: "decision_making",
-        column_id_prefix: Columns.not_represented_column_id,
-        value_process_func: Columns.category_process_func,
-        type: "many",
-        hidden: false,
-      }
-    ]
-
-  }
 ] as tSectionMetadata[]);
 
 export const sectionState = {

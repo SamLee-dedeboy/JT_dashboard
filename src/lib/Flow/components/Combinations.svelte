@@ -29,15 +29,15 @@
   const base_blocks = $derived(blockState.base_blocks);
   const combination_content = $derived(combinationState.combination_content);
   const participant_combinations = $derived(
-    participantState.participant_combinations
+    participantState.participant_combinations,
   );
   const all_participants = $derived(participantState.all_participants);
   const sections = $derived(sectionState.sections);
   const highlighted_combinations = $derived(
-    combinationState.highlighted_combinations
+    combinationState.highlighted_combinations,
   );
   const rendered_combinations = $derived(
-    combinationState.rendered_combinations
+    combinationState.rendered_combinations,
   );
   const leading_blocks = $derived(blockState.leading_blocks);
   const clicked_normal_blocks = $derived(blockState.clicked_normal_blocks);
@@ -47,14 +47,16 @@
   let sorted_options = $derived(options.sort((a, b) => b.length - a.length));
 
   let clicked_options = $derived(
-    options.filter((o) => clicked_normal_blocks.map((b) => b.title).includes(o))
+    options.filter((o) =>
+      clicked_normal_blocks.map((b) => b.title).includes(o),
+    ),
   );
 
   let first_block_title = $derived(base_blocks[0]?.title || "");
   let second_block_title = $derived(base_blocks[1]?.title || "");
 
   let combination_participants = $derived(
-    aggregate_combinations(participant_combinations)
+    aggregate_combinations(participant_combinations),
   );
 
   let sorted_combinations = $derived(
@@ -63,8 +65,8 @@
         -(
           (combination_participants[a]?.length || 0) -
           (combination_participants[b]?.length || 0)
-        )
-    )
+        ),
+    ),
   );
   $effect(() => console.log(combinationState.rendered_combinations));
 
@@ -74,8 +76,8 @@
         acc[cur] = false;
         return acc;
       },
-      { empty: false }
-    )
+      { empty: false },
+    ),
   );
 
   // State for tracking trigger times
@@ -119,7 +121,7 @@
           combination_participants[combination] = [];
         }
         combination_participants[combination].push(participant);
-      }
+      },
     );
     combination_participants["empty"] = [];
     all_participants.forEach((participant) => {
@@ -147,57 +149,36 @@
       class="relative z-[40] mb-[-0.5rem] mt-[-2.5rem] flex max-w-full select-none gap-x-[1.3rem] overflow-x-visible pl-12"
     > -->
     <div
-      class="relative z-[40] flex flex-col max-w-full select-none overflow-x-visible"
+      class="column-headers relative z-[40] mt-6 flex max-w-full select-none justify-between overflow-x-visible"
+      style={`padding-left: 0.875rem; padding-right: 12.875rem; height: ${sorted_options.length * 1.5}rem;`}
     >
       {#each sorted_options as option, index}
-        {@const option_filled = sorted_combinations
-          .map((c) => combination_content[c].map((b) => b.title))
-          .flat()
-          .includes(option)}
         {@const option_clicked = clicked_options.includes(option)}
-        {@const abbr_length = 17}
-        <!-- <div
-          class="shortened-title vertical-title"
-          style={`color: ${
-            option_clicked ? "darkgray" : "white"
-          }; text-decoration-line: ${option_filled ? "none" : "line-through"}`}
-        >
-          {option.slice(0, abbr_length) +
-            (option.length > abbr_length ? "..." : "")}
-        </div> -->
-        <div
-          class="flex w-max relative"
-          style={`color: ${
-            option_clicked ? "white" : "darkgray"
-          }; text-decoration-line: ${option_filled ? "none" : "line-through"};
-          padding-left: ${index * 3.1}rem
-          `}
-        >
-          {option}
-          <!-- Vertical dotted line for each option -->
+        {@const label_bottom = (sorted_options.length - index) * 1.5}
+        <div class="column-anchor relative w-[1.3rem] flex-none">
+          <span
+            class="absolute whitespace-nowrap"
+            style={`bottom: ${label_bottom + 0.25}rem; left: 0; color: ${option_clicked ? "white" : "darkgray"};`}
+          >
+            {option}
+          </span>
           <div
             class="connecting-line"
-            style={`left: ${index * 2.8 + 1.5}rem; height: calc(9rem - ${index * 1.5}rem)`}
+            style={`bottom: 0; left: 50%; height: ${label_bottom + 0.25}rem;`}
           ></div>
         </div>
-        <!-- <div
-          class="full-title pointer-events-none absolute top-8 z-[999] hidden w-max px-2 text-base outline-1 outline-gray-200"
-          style={`left: ${(index + 1) * 1.3}rem`}
-        >
-          {option}
-        </div> -->
       {/each}
     </div>
     <div
-      class="combinations-list flex h-1 grow snap-y flex-col gap-y-2 overflow-auto pl-2 pr-[12.5rem] mt-6 text-sm"
+      class="combinations-list flex h-1 grow snap-y flex-col gap-y-2 overflow-auto pl-2 pr-[11.5rem] text-sm"
       style={`scrollbar-gutter: stable`}
     >
       {#each sorted_combinations as combination, index}
         {@const combination_titles = combination_content[combination].map(
-          (b) => b.title
+          (b) => b.title,
         )}
         {@const circle_filled = sorted_options.map((o) =>
-          combination_titles.includes(o)
+          combination_titles.includes(o),
         )}
         {@const filled_circle_indices = circle_filled
           .map((c, i) => (c ? i : -1))
@@ -234,6 +215,22 @@
           </div>
         </div>
       {/each}
+      <div class="combinations-legend mt-3 -mr-40 flex flex-col gap-2 rounded p-3 text-base">
+        <div class="font-semibold">How to read this chart</div>
+        <div>
+          Each row is a group of participants who share the same set of
+          <span class="underline">Future Salinity Management Strategies</span>.
+        </div>
+        <div>
+          <span class="legend-swatch-filled"></span> A filled circle means the
+          group picked that strategy;
+          <span class="legend-swatch-empty"></span> an empty circle means they
+          did not.
+        </div>
+        <div>
+          The number on the right is how many participants share that combination.
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -263,10 +260,32 @@
   }
   .connecting-line {
     position: absolute;
-    top: 100%;
     width: 2px;
     border-left: 2px dotted rgba(255, 255, 255, 0.5);
     z-index: 30;
     pointer-events: none;
+  }
+  .combinations-legend {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    outline: 1px dashed rgba(255, 255, 255, 0.2);
+  }
+  .legend-swatch-filled,
+  .legend-swatch-empty {
+    display: inline-block;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 9999px;
+    vertical-align: -0.25rem;
+    margin: 0 0.15rem;
+  }
+  .legend-swatch-filled {
+    background: white;
+    border: 2px solid gray;
+  }
+  .legend-swatch-empty {
+    background: white;
+    opacity: 0.5;
+    border: 2px solid lightgray;
   }
 </style>

@@ -26,7 +26,7 @@
 
 <div class={`section-content`}>
   <div
-    class="nodes-container flex h-full justify-between gap-x-4 rounded py-1 pl-[0rem] text-sm"
+    class="nodes-container flex h-full justify-center gap-x-4 rounded py-1 pl-[0rem] text-sm"
   >
     {#each section.columns as column, index}
       <Column

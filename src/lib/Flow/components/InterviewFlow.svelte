@@ -39,47 +39,48 @@
   let container = $state<HTMLElement>();
   let chat_response_audio = $state<HTMLAudioElement>();
   let intro_step = $state(0);
+  let tutorial_open = $state(true);
   let recorder = $state<any>(null);
   let is_recording = $state(false);
   let chunks = $state<any[]>([]);
 
   // Use $derived to get state values
   const all_participants: string[] = $derived(
-    participantState.all_participants
+    participantState.all_participants,
   );
   const mentioned_participants: string[] = $derived(
-    participantState.mentioned_participants
+    participantState.mentioned_participants,
   );
   const participant_colors: { [key: string]: string } = $derived(
-    participantState.participant_colors
+    participantState.participant_colors,
   );
   const participant_combinations: { [key: string]: string } = $derived(
-    participantState.participant_combinations
+    participantState.participant_combinations,
   );
 
   const base_blocks: tBlock[] = $derived(blockState.base_blocks);
   const leading_blocks: tBlock[] = $derived(blockState.leading_blocks);
   const leading_column: string = $derived(blockState.leading_column);
   const clicked_normal_blocks: tBlock[] = $derived(
-    blockState.clicked_normal_blocks
+    blockState.clicked_normal_blocks,
   );
   const clicked_leading_blocks: tBlock[] = $derived(
-    blockState.clicked_leading_blocks
+    blockState.clicked_leading_blocks,
   );
   const clicked_block: tBlock | null = $derived(blockState.clicked_block);
   const hovered_block: tBlock | undefined = $derived(blockState.hovered_block);
 
   const combination_colors: { [key: string]: string } = $derived(
-    combinationState.combination_colors
+    combinationState.combination_colors,
   );
   const combination_content: {
     [key: string]: { id: string; title: string }[];
   } = $derived(combinationState.combination_content);
   const highlighted_combinations: string[] = $derived(
-    combinationState.highlighted_combinations
+    combinationState.highlighted_combinations,
   );
   const rendered_combinations: string[] = $derived(
-    combinationState.rendered_combinations
+    combinationState.rendered_combinations,
   );
 
   const showing_introduction: boolean = $derived(uiState.showing_introduction);
@@ -89,7 +90,7 @@
   const transcript_view: any = $derived(uiState.transcript_view);
 
   const category_options: { [key: string]: string[] } = $derived(
-    sectionState.category_options
+    sectionState.category_options,
   );
   const sections: tSectionMetadata[] = $derived(sectionState.sections);
 
@@ -98,6 +99,7 @@
   let section1 = $state(sections[1]);
   let section2 = $state(sections[2]);
   let section3 = $state(sections[3]);
+  let section4 = $state(sections[4]);
 
   // Sync local state back to the store when sections change
   $effect(() => {
@@ -105,21 +107,27 @@
     section0 = currentSections[0];
     section1 = currentSections[1];
     section2 = currentSections[2];
+    section3 = currentSections[3];
+    section4 = currentSections[4];
   });
 
   // Sync changes back to the store when local sections change
   $effect(() => {
-    if (section0 && section1 && section2) {
+    if (section0 && section1 && section2 && section3 && section4) {
       const currentSections = sections;
       if (
         currentSections[0] !== section0 ||
         currentSections[1] !== section1 ||
-        currentSections[2] !== section2
+        currentSections[2] !== section2 ||
+        currentSections[3] !== section3 ||
+        currentSections[4] !== section4
       ) {
         const newSections = [...currentSections];
         newSections[0] = section0;
         newSections[1] = section1;
         newSections[2] = section2;
+        newSections[3] = section3;
+        newSections[4] = section4;
         sectionState.sections = newSections;
       }
     }
@@ -149,7 +157,7 @@
   // });
 
   function handleHighlightCombinationChanged(
-    highlighted_combinations: string[]
+    highlighted_combinations: string[],
   ) {
     console.log("highlight combinations changed", highlighted_combinations);
     highlight_paths_by_combinations(highlighted_combinations);
@@ -181,11 +189,11 @@
     console.log(svg.node());
 
     const block_participants = Utils.block_participants_to_dict(
-      block_aggregator.get_all_block_participants()
+      block_aggregator.get_all_block_participants(),
     );
 
     const filtered_column_orders = flatten_section_columns(
-      sections.filter((section) => !section.hidden)
+      sections.filter((section) => !section.hidden && section.revealed),
     );
 
     let sankey_paths: tPathData[] = [];
@@ -194,14 +202,14 @@
       sankey_paths = comparison_mode_paths(
         filtered_column_orders,
         block_participants,
-        block_aggregator
+        block_aggregator,
       );
     } else {
       sankey_paths = normal_mode_paths(
         filtered_column_orders,
         clicked_normal_blocks,
         block_participants,
-        block_aggregator
+        block_aggregator,
       );
     }
     console.log("paths: ", sankey_paths);
@@ -232,31 +240,31 @@
     if (highlighted_participants.length > 0) {
       highlight_paths_by_clicked_blocks(
         highlighted_participants,
-        clicked_normal_blocks
+        clicked_normal_blocks,
       );
     }
   }
 
   function highlight_paths_by_clicked_blocks(
     leading_column_participants: string[],
-    clicked_normal_blocks: tBlock[]
+    clicked_normal_blocks: tBlock[],
   ) {
     const clicked_block_participants = clicked_normal_blocks
       .map((b) => b.participants)
       .flat();
     const clicked_block_participant_intersection = Utils.intersection(
-      clicked_normal_blocks.map((b) => b.participants)
+      clicked_normal_blocks.map((b) => b.participants),
     );
     const highlight_participants = leading_column_participants.filter(
       (pid) =>
         clicked_block_participants.length === 0 ||
-        clicked_block_participant_intersection.includes(pid)
+        clicked_block_participant_intersection.includes(pid),
     );
     console.log(
       "highlight paths by clicked_blocks",
       leading_column_participants,
       clicked_normal_blocks,
-      highlight_participants
+      highlight_participants,
     );
     const svg = d3.select("#sankey-svg");
     const paths = svg.selectAll("path.sankey");
@@ -321,27 +329,27 @@
     if (clicked_block)
       Utils.highlight_blocks_by_combinations(
         highlight_combinations,
-        clicked_block
+        clicked_block,
       );
   }
 
   function comparison_mode_paths(
     filtered_column_orders: tColumnMetadata[],
     block_participants: { [key: string]: string[] },
-    block_aggregator: BlockAggregator
+    block_aggregator: BlockAggregator,
   ) {
     let sankey_paths: tPathData[] = [];
     for (let i = 0; i < filtered_column_orders.length - 1; i++) {
       const src_blocks_ids = block_aggregator
         .get_blocks(
           filtered_column_orders[i].section_id,
-          filtered_column_orders[i].id
+          filtered_column_orders[i].id,
         )
         .map((b) => b.id);
       const dst_blocks_ids = block_aggregator
         .get_blocks(
           filtered_column_orders[i + 1].section_id,
-          filtered_column_orders[i + 1].id
+          filtered_column_orders[i + 1].id,
         )
         .map((b) => b.id);
       if (i === 0) {
@@ -352,7 +360,7 @@
           base_blocks.map((b) => b.id),
           dst_blocks_ids,
           filtered_column_orders[i].column_id_prefix,
-          filtered_column_orders[i + 1].column_id_prefix
+          filtered_column_orders[i + 1].column_id_prefix,
         );
         sankey_paths = sankey_paths.concat(new_paths);
       } else {
@@ -363,7 +371,7 @@
           src_blocks_ids,
           dst_blocks_ids,
           filtered_column_orders[i].column_id_prefix,
-          filtered_column_orders[i + 1].column_id_prefix
+          filtered_column_orders[i + 1].column_id_prefix,
         );
         sankey_paths = sankey_paths.concat(new_paths);
       }
@@ -375,14 +383,14 @@
     filtered_column_orders: tColumnMetadata[],
     passthrough_blocks: tBlock[],
     block_participants: { [key: string]: string[] },
-    block_aggregator: BlockAggregator
+    block_aggregator: BlockAggregator,
   ) {
     const showed_column_ids = filtered_column_orders.map((c) => c.id);
     const passthrough_block_ids = passthrough_blocks
       .filter((b) =>
         showed_column_ids.includes(
-          Constants.column_to_participant_data_key[b.column_id]
-        )
+          Constants.column_to_participant_data_key[b.column_id],
+        ),
       )
       .map((b) => b.id);
 
@@ -406,20 +414,20 @@
     let sankey_paths: tPathData[] = [];
     const connected_components = Utils.connected_components(
       filtered_column_orders,
-      passthrough_blocks
+      passthrough_blocks,
     );
     console.log({ filtered_column_orders, passthrough_blocks });
     let all_pass_through_combinations: Set<string> = new Set();
     connected_components.forEach((component: tColumnMetadata[]) => {
       const all_column_block_ids = component
         .map((column_order) =>
-          block_aggregator.get_blocks(column_order.section_id, column_order.id)
+          block_aggregator.get_blocks(column_order.section_id, column_order.id),
         )
         .map((blocks) => blocks.map((b) => b.id));
       let all_combinations: string[][] = [];
       all_column_block_ids.forEach((block_ids) => {
         block_ids = block_ids.filter((id) =>
-          passthrough_block_ids.includes(id)
+          passthrough_block_ids.includes(id),
         );
         if (block_ids.length === 0) return;
         const combinations = block_ids
@@ -429,7 +437,7 @@
       });
       const passthrough_combinations = Utils.intersection(all_combinations);
       passthrough_combinations.forEach((c) =>
-        all_pass_through_combinations.add(c)
+        all_pass_through_combinations.add(c),
       );
       console.log({ component, all_combinations, passthrough_combinations });
       for (let i = 0; i < component.length - 1; i++) {
@@ -448,21 +456,21 @@
           src_blocks_ids,
           dst_blocks_ids,
           component[i].column_id_prefix,
-          component[i + 1].column_id_prefix
+          component[i + 1].column_id_prefix,
         );
         sankey_paths = sankey_paths.concat(new_paths);
       }
     });
     combinationState.rendered_combinations = Array.from(
-      new Set(sankey_paths.map((p) => p.id))
+      new Set(sankey_paths.map((p) => p.id)),
     );
     console.log(
       "InterviewFlow.svelte:458",
-      combinationState.rendered_combinations
+      combinationState.rendered_combinations,
     );
     combination_controller.setParticipantColor(
       rendered_combinations,
-      participant_combinations
+      participant_combinations,
     );
     return sankey_paths;
   }
@@ -475,7 +483,7 @@
     let column_orders: tColumnMetadata[] = [];
     sections.forEach((section) => {
       column_orders = column_orders.concat(
-        section.columns.filter((c) => !c.hidden)
+        section.columns.filter((c) => !c.hidden),
       );
     });
     return column_orders;
@@ -524,17 +532,17 @@
         if (intro_step === 4) {
           d3.selectAll(".combination-container").classed(
             "intro-activated",
-            true
+            true,
           );
         }
         if (intro_step === 4) {
           const first_driver_block = block_aggregator.get_blocks(
             sections[0].id,
-            sections[0].columns[0].id
+            sections[0].columns[0].id,
           )[0];
           const first_strategy_block = block_aggregator.get_blocks(
             sections[1].id,
-            sections[1].columns[0].id
+            sections[1].columns[0].id,
           )[0];
           blockState.clicked_normal_blocks = [
             first_driver_block,
@@ -546,7 +554,7 @@
       .onbeforeexit(() => {
         d3.selectAll(".combination-container").classed(
           "intro-activated",
-          false
+          false,
         );
         intro_step = 0;
         if (clicked_normal_blocks.length > 0) {
@@ -602,41 +610,14 @@
     <div class="overview-panel w-full"></div>
     <div class="statistics-panel flex h-1 grow flex-col">
       <div class="flex grow flex-col gap-8">
-        <div
-          class="tutorial text flex flex-col p-3 mx-2 gap-4 divide-y divide-dashed text-white"
+        <button
+          type="button"
+          class="tutorial-trigger mx-2 flex items-center justify-center gap-2 rounded-md p-2 text-sm font-medium"
+          onclick={() => (tutorial_open = true)}
         >
-          <div>
-            <div>We mainly asked three questions in the interview:</div>
-            <ol class="list-decimal list-outside pl-4">
-              <li>
-                What should Future Salinity Management Strategies focus on?
-              </li>
-              <li>What are the Drivers of Change?</li>
-              <li>Is the current decision making Fair?</li>
-            </ol>
-            <div class="my-2">
-              Answer the questions yourself by clicking the blocks and see how
-              many participants agree with you!
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-2">
-            <div>How to read the flow diagram:</div>
-            <div>Each block represents a category of public opinion.</div>
-            <div>
-              Connected blocks represent public opinion from the same group of
-              people.
-            </div>
-            <div>
-              Color of connections represent different groups of people.
-              <br />
-              These groups are defined by the participants' responses to
-              <span class="underline">
-                "What should be the Future Salinity Management Strategies?".
-              </span>
-            </div>
-          </div>
-        </div>
+          <span aria-hidden="true">?</span>
+          Tutorial
+        </button>
         <Combinations
           {block_aggregator}
           leading_section_title={Constants.column_id_to_title[leading_column]}
@@ -644,10 +625,7 @@
       </div>
     </div>
   </div>
-  <div
-    bind:this={container}
-    class="flow-container relative flex grow justify-between gap-x-2"
-  >
+  <div bind:this={container} class="flow-container relative flex grow">
     {#if sections.length > 0}
       {@const total_columns = sections.reduce((acc, section) => {
         return acc + section.columns.length;
@@ -673,46 +651,133 @@
           {block_aggregator}
         ></SectionWrapper>
       </div> -->
-      <SectionWrapper
-        bind:section={section0}
-        index={0}
-        {total_sections}
-        {total_columns}
-        {data}
-        {category_metadata}
-        {block_aggregator}
-      ></SectionWrapper>
-      <SectionWrapper
-        bind:section={section1}
-        index={1}
-        {total_sections}
-        {total_columns}
-        {data}
-        {category_metadata}
-        {block_aggregator}
-      ></SectionWrapper>
-      <SectionWrapper
-        bind:section={section2}
-        index={2}
-        {total_sections}
-        {total_columns}
-        {data}
-        {category_metadata}
-        {block_aggregator}
-      ></SectionWrapper>
-      <SectionWrapper
-        bind:section={section3}
-        index={3}
-        {total_sections}
-        {total_columns}
-        {data}
-        {category_metadata}
-        {block_aggregator}
-      ></SectionWrapper>
+      {#if sections[0]?.revealed}
+        <SectionWrapper
+          bind:section={section0}
+          index={0}
+          {total_sections}
+          {total_columns}
+          {data}
+          {category_metadata}
+          {block_aggregator}
+        ></SectionWrapper>
+      {/if}
+      {#if sections[1]?.revealed}
+        <SectionWrapper
+          bind:section={section1}
+          index={1}
+          {total_sections}
+          {total_columns}
+          {data}
+          {category_metadata}
+          {block_aggregator}
+        ></SectionWrapper>
+      {/if}
+      {#if sections[2]?.revealed}
+        <SectionWrapper
+          bind:section={section2}
+          index={2}
+          {total_sections}
+          {total_columns}
+          {data}
+          {category_metadata}
+          {block_aggregator}
+        ></SectionWrapper>
+      {/if}
+      {#if sections[3]?.revealed}
+        <SectionWrapper
+          bind:section={section3}
+          index={3}
+          {total_sections}
+          {total_columns}
+          {data}
+          {category_metadata}
+          {block_aggregator}
+        ></SectionWrapper>
+      {/if}
+      {#if sections[4]?.revealed}
+        <SectionWrapper
+          bind:section={section4}
+          index={4}
+          {total_sections}
+          {total_columns}
+          {data}
+          {category_metadata}
+          {block_aggregator}
+        ></SectionWrapper>
+      {/if}
     {/if}
     <svg id="sankey-svg" class="sankey-svg"></svg>
   </div>
 </div>
+
+{#if tutorial_open}
+  <div
+    class="tutorial-overlay fixed inset-0 z-50 flex items-center justify-center"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="tutorial-title"
+  >
+    <div
+      class="tutorial-backdrop absolute inset-0"
+      role="button"
+      tabindex="-1"
+      aria-label="Close tutorial"
+      onclick={() => (tutorial_open = false)}
+      onkeydown={(e) => {
+        if (e.key === "Escape") tutorial_open = false;
+      }}
+    ></div>
+    <div
+      class="tutorial-modal relative z-10 flex max-h-[85vh] w-160 max-w-[90vw] flex-col gap-4 overflow-auto rounded-lg p-6 text-white shadow-xl"
+    >
+      <div class="flex items-start justify-between gap-4">
+        <h2 id="tutorial-title" class="text-lg font-semibold">
+          How to use this interface
+        </h2>
+        <button
+          type="button"
+          class="tutorial-close rounded-md px-2 py-1 text-sm"
+          aria-label="Close tutorial"
+          onclick={() => (tutorial_open = false)}
+        >
+          ✕
+        </button>
+      </div>
+      <div class="flex flex-col gap-4 divide-y divide-dashed">
+        <div>
+          <div>We mainly asked three questions in the interview:</div>
+          <ol class="list-decimal list-outside pl-4">
+            <li>What should Future Salinity Management Strategies focus on?</li>
+            <li>What are the Drivers of Change?</li>
+            <li>Is the current decision making Fair?</li>
+          </ol>
+          <div class="my-2">
+            Answer the questions yourself by clicking the blocks and see how
+            many participants agree with you!
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 pt-4">
+          <div>How to read the flow diagram:</div>
+          <div>Each block represents a category of public opinion.</div>
+          <div>
+            Connected blocks represent public opinion from the same group of
+            people.
+          </div>
+          <div>
+            Color of connections represent different groups of people.
+            <br />
+            These groups are defined by the participants' responses to
+            <span class="underline">
+              "What should be the Future Salinity Management Strategies?".
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style lang="postcss">
   @reference "tailwindcss";
@@ -722,10 +787,29 @@
   .control-panel span {
     color: var(--text-primary);
   }
-  .tutorial {
+  .tutorial-trigger {
+    background-color: var(--brand-primary);
+    color: white;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .tutorial-trigger:hover {
+    filter: brightness(1.1);
+  }
+  .tutorial-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .tutorial-modal {
     background-color: var(--bg-page);
     outline: 2px solid var(--brand-primary);
-    border-radius: 4px;
+  }
+  .tutorial-close {
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+  }
+  .tutorial-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
   .sankey-svg {
     @apply absolute bottom-0 left-0 right-0 top-0;

@@ -36,7 +36,7 @@
 </script>
 
 {#if section.id === "participant"}
-  <div class="flex max-w-[10rem] grow flex-col">
+  <div class="flex grow flex-col">
     <SectionHeader
       {category_metadata}
       bind:section
@@ -96,7 +96,7 @@
     ></SectionHeader>
     <DecisionMaking bind:section {block_aggregator} />
   </div>
-{:else if section.id === "decision_making_2"}
+{:else if section.id === "decision_making_2" || section.id === "decision_making_3"}
   <div class="flex grow flex-col">
     <SectionHeader
       {category_metadata}

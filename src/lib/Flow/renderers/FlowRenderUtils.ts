@@ -177,10 +177,9 @@ export function compute_block_offset(
   svg_bbox: { x: number; y: number },
   isStart: boolean,
 ) {
-  const block_position = d3
-    .select(`#${block_id}`)
-    .node()
-    .getBoundingClientRect();
+  const node = d3.select(`#${block_id}`).node() as HTMLElement | null;
+  if (!node) return null;
+  const block_position = node.getBoundingClientRect();
   const offset = block_position.height * combination_offset[0];
   const height =
     block_position.height * (combination_offset[1] - combination_offset[0]);
@@ -274,6 +273,7 @@ export function generate_paths(
       svg_bbox,
       true,
     );
+    if (!source_computation) return;
     const source_end = source_computation.pos;
     const source_height = source_computation.height;
     // target
@@ -285,6 +285,7 @@ export function generate_paths(
       svg_bbox,
       false,
     );
+    if (!target_computation) return;
     const target_start = target_computation.pos;
     const target_height = target_computation.height;
     // render path
@@ -623,6 +624,7 @@ function generate_overlapping_paths(
       svg_bbox,
       true,
     );
+    if (!source_computation) return;
     const source_end = source_computation.pos;
     const source_height = source_computation.height;
     const target_block_combination_offset =
@@ -633,6 +635,7 @@ function generate_overlapping_paths(
       svg_bbox,
       false,
     );
+    if (!target_computation) return;
     const target_start = target_computation.pos;
     const target_height = target_computation.height;
     let path = generate_flow(
@@ -668,6 +671,7 @@ function generate_overlapping_paths(
       svg_bbox,
       true,
     );
+    if (!source_computation) return;
     const source_end = source_computation.pos;
     const source_height = source_computation.height;
     source_x = source_end.x;
@@ -686,6 +690,7 @@ function generate_overlapping_paths(
       svg_bbox,
       false,
     );
+    if (!target_computation) return;
     const target_start = target_computation.pos;
     const target_height = target_computation.height;
     let path = generate_flow(
