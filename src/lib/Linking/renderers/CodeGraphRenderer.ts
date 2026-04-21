@@ -24,35 +24,56 @@ type GraphLink = d3.SimulationLinkDatum<GraphNode> & {
     target: string | GraphNode;
 };
 
-interface MenuItemData {
-    text: string;
-    action: () => void;
-}
-
 export class CodeGraphRenderer {
     svgId: string;
     width: number = 600
     height: number = 600
-    dispatchClick: (node: GraphNode) => void = () => {};
+    dispatchHover: (node: GraphNode | null) => void = () => {};
+    onZoomChange: (scale: number) => void = () => {};
     private allNodes: GraphNode[] = [];
     private allLinks: GraphLink[] = [];
-    private expandedNodes: Set<string> = new Set();
-    private contextMenu: any = null;
-    private currentNode: GraphNode | null = null;
+    private zoomBehavior: d3.ZoomBehavior<SVGSVGElement, unknown> | null = null;
 
-    constructor(svgId: string, dispatchClick: (node: GraphNode) => void) {
+    constructor(svgId: string, dispatchHover: (node: GraphNode | null) => void) {
         this.svgId = svgId
-        this.dispatchClick = dispatchClick;
+        this.dispatchHover = dispatchHover;
     }
     init() {
         console.log("Initializing CodeGraphRenderer");
-        const svg = d3.select(`#${this.svgId}`)
+        const svg = d3.select<SVGSVGElement, unknown>(`#${this.svgId}`)
             .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-            .on("click", () => this.hideContextMenu()); // Hide menu when clicking elsewhere
-        svg.append("g").attr("class", "link-group")
-        svg.append("g").attr("class", "node-group")
-        svg.append("g").attr("class", "label-group")
-        svg.append("g").attr("class", "context-menu-group")
+
+        // Zoomable group: link/node/label layers pan and zoom together.
+        const zoomGroup = svg.append("g").attr("class", "zoom-group")
+        zoomGroup.append("g").attr("class", "link-group")
+        zoomGroup.append("g").attr("class", "node-group")
+        zoomGroup.append("g").attr("class", "label-group")
+
+        this.zoomBehavior = d3.zoom<SVGSVGElement, unknown>()
+            .scaleExtent([0.1, 4])
+            .on("zoom", (event) => {
+                zoomGroup.attr("transform", event.transform.toString());
+                this.onZoomChange(event.transform.k);
+            });
+        svg.call(this.zoomBehavior);
+    }
+
+    zoomIn() {
+        if (!this.zoomBehavior) return;
+        const svg = d3.select<SVGSVGElement, unknown>(`#${this.svgId}`);
+        svg.transition().duration(250).call(this.zoomBehavior.scaleBy, 1.4);
+    }
+
+    zoomOut() {
+        if (!this.zoomBehavior) return;
+        const svg = d3.select<SVGSVGElement, unknown>(`#${this.svgId}`);
+        svg.transition().duration(250).call(this.zoomBehavior.scaleBy, 1 / 1.4);
+    }
+
+    resetZoom() {
+        if (!this.zoomBehavior) return;
+        const svg = d3.select<SVGSVGElement, unknown>(`#${this.svgId}`);
+        svg.transition().duration(350).call(this.zoomBehavior.transform, d3.zoomIdentity);
     }
     
     private calculateNodeDepths(codes: tCode[]): Map<string, number> {
@@ -117,8 +138,8 @@ export class CodeGraphRenderer {
             radius: scaleRadius(code.participants.length),
             participantCount: code.participants.length,
             depth: nodeDepths.get(code.name) || 0,
-            isVisible: nodeDepths.get(code.name) === 1, // Initially only show top-level nodes
-            isExpanded: false,
+            isVisible: true, // All nodes visible by default
+            isExpanded: true,
             children: code.scenario_children,
             hasChildren: code.scenario_children.length > 0,
             x: Math.random() * this.width,
@@ -167,15 +188,65 @@ export class CodeGraphRenderer {
         console.log("Visible Links:", visibleLinks);
 
         const scaleRadialRadius = d3.scalePow()
-            .exponent(1/2)
+            .exponent(2)
             .domain([1, d3.max(this.allNodes, d => d.depth) || 1])
-            .range([0, Math.max(this.width / 2, this.height / 2)])
+            .range([0, Math.max(this.width, this.height) * 1.2])
+        // Anchors placed well outside the viewBox so the four category branches
+        // splay clearly in four directions rather than clustering at center.
         const cornerForce = {
-            "Drivers": [0, 0],
-            "Strategies": [this.width, 0],
-            "Value": [0, this.height],
-            "Governance": [this.width, this.height],
+            "Drivers": [-this.width / 2, -this.height / 2],
+            "Strategies": [this.width * 1.5, -this.height / 2],
+            "Value": [-this.width / 2, this.height * 1.5],
+            "Governance": [this.width * 1.5, this.height * 1.5],
         }
+
+        // Build sibling groups: visible nodes that share a parent and depth.
+        // Used by the "sibling-repel" custom force below to push same-parent
+        // same-level nodes apart without affecting unrelated nodes.
+        const visibleById = new Map<string, GraphNode>(
+            visibleNodes.map((n) => [n.id, n])
+        );
+        const siblingGroups: GraphNode[][] = [];
+        const childrenByParent = new Map<string, GraphNode[]>();
+        visibleLinks.forEach((l) => {
+            const srcId = typeof l.source === "string" ? l.source : l.source.id;
+            const tgtId = typeof l.target === "string" ? l.target : l.target.id;
+            const child = visibleById.get(tgtId);
+            if (!child) return;
+            if (!childrenByParent.has(srcId)) childrenByParent.set(srcId, []);
+            childrenByParent.get(srcId)!.push(child);
+        });
+        childrenByParent.forEach((group) => {
+            if (group.length > 1) siblingGroups.push(group);
+        });
+
+        // Custom force: pairwise repulsion between siblings (same parent, and
+        // therefore same depth). Scoped to each sibling group so nodes from
+        // different branches don't push each other.
+        const siblingRepelStrength = 400;
+        const siblingRepel = (alpha: number) => {
+            for (const group of siblingGroups) {
+                for (let i = 0; i < group.length; i++) {
+                    const a = group[i];
+                    for (let j = i + 1; j < group.length; j++) {
+                        const b = group[j];
+                        let dx = (b.x ?? 0) - (a.x ?? 0);
+                        let dy = (b.y ?? 0) - (a.y ?? 0);
+                        let d2 = dx * dx + dy * dy;
+                        if (d2 === 0) {
+                            dx = Math.random() - 0.5;
+                            dy = Math.random() - 0.5;
+                            d2 = dx * dx + dy * dy || 1;
+                        }
+                        const k = (siblingRepelStrength * alpha) / d2;
+                        a.vx = (a.vx ?? 0) - dx * k;
+                        a.vy = (a.vy ?? 0) - dy * k;
+                        b.vx = (b.vx ?? 0) + dx * k;
+                        b.vy = (b.vy ?? 0) + dy * k;
+                    }
+                }
+            }
+        };
 
         // Set up D3 force simulation with visible nodes
         const simulation = d3.forceSimulation(visibleNodes)
@@ -185,10 +256,17 @@ export class CodeGraphRenderer {
                     // Scale distance by the radius of connected nodes
                     const sourceNode = typeof d.source === 'object' ? d.source : visibleNodes.find(n => n.id === d.source);
                     const targetNode = typeof d.target === 'object' ? d.target : visibleNodes.find(n => n.id === d.target);
-                    const baseDistance = 50;
-                    const minDistance = 80;  // Minimum distance between any linked nodes
-                    const maxDistance = 300; // Maximum distance between any linked nodes
-                    
+
+                    // Depth-1 → depth-2 edges use a tighter range so second-level
+                    // clusters hug their category root.
+                    const isTopToSecond =
+                        sourceNode && targetNode &&
+                        ((sourceNode.depth === 1 && targetNode.depth === 2) ||
+                         (sourceNode.depth === 2 && targetNode.depth === 1));
+                    const baseDistance = isTopToSecond ? 40 : 100;
+                    const minDistance = isTopToSecond ? 60 : 140;
+                    const maxDistance = isTopToSecond ? 100 : 500;
+
                     if (sourceNode && targetNode) {
                         // Distance is base distance plus sum of radii with a multiplier
                         const calculatedDistance = baseDistance + (sourceNode.radius + targetNode.radius) * 1.5;
@@ -197,25 +275,37 @@ export class CodeGraphRenderer {
                     }
                     return Math.max(minDistance, baseDistance);
                 })
-                .strength(0.1))
-            .force("charge", d3.forceManyBody()
-                .strength(-300)
-                .distanceMax(200))
-            .force("radial", d3.forceRadial(null, this.width / 2, this.height / 2).radius(d => {
-                return scaleRadialRadius(d.depth)
-            }).strength(0.5))
-            .force("x", d3.forceX().x(d => {
+                .strength(1))
+            .force("charge", d3.forceManyBody().strength(-1))
+            // .force("radial", d3.forceRadial(null, this.width / 2, this.height / 2).radius(d => {
+            //     return scaleRadialRadius(d.depth)
+            // }).strength(0.5))
+            // Depth-1 nodes are pulled strongly toward the viewport center so
+            // they form a tight cluster there; deeper nodes are pulled toward
+            // their category's corner anchor so branches splay outward.
+            .force("x", d3.forceX<GraphNode>().x(d => {
+                if (d.depth <= 1) return this.width / 2;
                 const corner = cornerForce[d.id.split("\\")[0]];
                 return corner ? corner[0] : this.width / 2;
-            }).strength(0.1))
-            .force("y", d3.forceY().y(d => {
+            }).strength(d => d.depth <= 1 ? 2 : 0.03))
+            .force("y", d3.forceY<GraphNode>().y(d => {
+                if (d.depth <= 1) return this.height / 2;
                 const corner = cornerForce[d.id.split("\\")[0]];
                 return corner ? corner[1] : this.height / 2;
-            }).strength(0.1))
+            }).strength(d => d.depth <= 1 ? 2 : 0.05))
             // .force("center", d3.forceCenter(this.width / 2, this.height / 2))
             .force("collision", d3.forceCollide<GraphNode>()
-                .radius(d => d.radius + 2)
-                .strength(0.8));
+                .radius(d => d.radius + 5)
+                .strength(1))
+            // .force("sibling-repel", siblingRepel);
+            // svg.append("circle")
+            //     .attr("cx", this.width / 2)
+            //     .attr("cy", this.height / 2)
+            //     .attr("r", scaleRadialRadius(1) + 20)
+            //     .attr("fill", "none")
+            //     .attr("stroke", "#ccc")
+            //     .attr("stroke-width", 1)
+            //     .lower(); // Send to back
         
         // Render links
         const link = svg.select(".link-group")
@@ -246,19 +336,14 @@ export class CodeGraphRenderer {
                     }
                     return d.color;
                 })
-                .attr("stroke", d => d.isExpanded && d.hasChildren ? "white" : "#333")
-                .attr("stroke-width", d => d.isExpanded && d.hasChildren ? 3 : 1.5)
+                .attr("stroke", "#333")
+                .attr("stroke-width", 1.5)
                 .style("cursor", "pointer")
-                .on("click", (event, d) => {
-                    event.stopPropagation();
-                    this.showContextMenu(event, d);
-                }),
+                .on("mouseover", (_event, d) => this.dispatchHover(d))
+                .on("mouseleave", () => this.dispatchHover(null)),
                 update => update
                     .attr("cx", d => d.x = d.x!)
                     .attr("cy", d => d.y = d.y!)
-                    .attr("stroke", d => d.isExpanded && d.hasChildren ? "#7ED957" : "#333")
-                    .attr("stroke-width", d => d.isExpanded && d.hasChildren ? 3 : 1.5)
-
             )
         
         // Add labels
@@ -295,14 +380,6 @@ export class CodeGraphRenderer {
         
         // Update positions on simulation tick
         simulation.on("tick", () => {
-            // Apply boundary constraints to visible nodes
-            visibleNodes.forEach(d => {
-                // Constrain x position within viewBox bounds, accounting for node radius
-                d.x = Math.max(d.radius, Math.min(this.width - d.radius, d.x!));
-                // Constrain y position within viewBox bounds, accounting for node radius
-                d.y = Math.max(d.radius, Math.min(this.height - d.radius, d.y!));
-            });
-            
             link
                 .attr("x1", d => (d.source as GraphNode).x!)
                 .attr("y1", d => (d.source as GraphNode).y!)
@@ -319,149 +396,6 @@ export class CodeGraphRenderer {
         });
     }
     
-    private handleNodeClick(clickedNode: any) {
-        if (!clickedNode.hasChildren) return;
-        
-        clickedNode.isExpanded = !clickedNode.isExpanded;
-        
-        // Update visibility of children
-        clickedNode.children.forEach(childId => {
-            const childNode = this.allNodes.find(n => n.id === childId);
-            if (childNode) {
-                childNode.isVisible = clickedNode.isExpanded;
-                // If collapsing, also collapse and hide all descendants
-                if (!clickedNode.isExpanded) {
-                    this.hideDescendants(childNode);
-                }
-            }
-        });
-        
-        // Re-render the graph
-        this.renderVisibleGraph();
-    }
-
-    private showContextMenu(event: MouseEvent, node: GraphNode) {
-        this.hideContextMenu(); // Hide any existing menu
-        this.currentNode = node;
-        
-        const svg = d3.select(`#${this.svgId}`);
-        const menuGroup = svg.select(".context-menu-group");
-        
-        // Get mouse position relative to SVG
-        const [x, y] = d3.pointer(event, svg.node());
-        
-        // Create menu items based on available actions
-        const menuItems: MenuItemData[] = [];
-        if (node.hasChildren) {
-            menuItems.push({
-                text: node.isExpanded ? "Collapse" : "Expand",
-                action: () => this.handleExpandNode(node)
-            });
-        }
-        menuItems.push({
-            text: "View Details",
-            action: () => this.handleViewDetails(node)
-        });
-        
-        // Create context menu
-        this.contextMenu = menuGroup.append("g")
-            .attr("class", "context-menu")
-            .attr("transform", `translate(${x}, ${y})`);
-        
-        const menuWidth = 120;
-        const menuHeight = menuItems.length * 30;
-        
-        // Background rectangle
-        this.contextMenu!.append("rect")
-            .attr("width", menuWidth)
-            .attr("height", menuHeight)
-            .attr("fill", "white")
-            .attr("stroke", "#ccc")
-            .attr("stroke-width", 1)
-            .attr("rx", 4)
-            .style("filter", "drop-shadow(2px 2px 4px rgba(0,0,0,0.2))");
-        
-        // Menu items
-        const menuItemGroups = this.contextMenu!.selectAll(".menu-item")
-            .data(menuItems)
-            .enter()
-            .append("g")
-            .attr("class", "menu-item")
-            .style("cursor", "pointer")
-            .on("click", (event, d) => {
-                event.stopPropagation();
-                d.action();
-                this.hideContextMenu();
-            })
-            .on("mouseover", function() {
-                d3.select(this).select("rect").attr("fill", "#f0f0f0");
-            })
-            .on("mouseout", function() {
-                d3.select(this).select("rect").attr("fill", "transparent");
-            });
-        
-        // Menu item backgrounds
-        menuItemGroups.append("rect")
-            .attr("width", menuWidth)
-            .attr("height", 30)
-            .attr("y", (d, i) => i * 30)
-            .attr("fill", "transparent");
-        
-        // Menu item text
-        menuItemGroups.append("text")
-            .attr("x", 10)
-            .attr("y", (d, i) => i * 30 + 20)
-            .attr("font-size", "12px")
-            .attr("fill", "#333")
-            .text(d => d.text);
-    }
-    
-    private hideContextMenu() {
-        if (this.contextMenu) {
-            this.contextMenu.remove();
-            this.contextMenu = null;
-        }
-    }
-    
-    private handleExpandNode(node: GraphNode) {
-        node.isExpanded = !node.isExpanded;
-        
-        // Update visibility of children
-        node.children.forEach(childId => {
-            const childNode = this.allNodes.find(n => n.id === childId);
-            if (childNode) {
-                childNode.isVisible = node.isExpanded;
-                // If collapsing, also collapse and hide all descendants
-                if (!node.isExpanded) {
-                    this.hideDescendants(childNode);
-                }
-            }
-        });
-        
-        // Re-render the graph
-        this.renderVisibleGraph();
-    }
-    
-    private handleViewDetails(node: any) {
-        // Convert GraphNode to tCode format for the callback
-        // const tCodeNode: tCode = {
-        //     name: node.name,
-        //     participants: [], // This would need to be populated with actual data
-        //     scenario_children: node.children
-        // };
-        this.dispatchClick(node);
-    }
-
-    private hideDescendants(node: GraphNode) {
-        node.isVisible = false;
-        node.isExpanded = false;
-        node.children.forEach(childId => {
-            const childNode = this.allNodes.find(n => n.id === childId);
-            if (childNode) {
-                this.hideDescendants(childNode);
-            }
-        });
-    }
 }
   function wrap(text, width) {
     text.each(function (d, i) {

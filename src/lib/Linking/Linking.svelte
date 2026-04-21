@@ -26,10 +26,10 @@
     Tutorial
   </button>
   <!-- <CodeBubbles {codes} /> -->
-  <div class="flex flex-col w-[60%] min-h-0">
+  <div class="flex-1 flex flex-col min-h-0">
     <ScenarioOverview bind:selected_scenario bind:selected_code />
   </div>
-  <div class="bubble-container flex flex-col w-[40%] min-h-0">
+  <div class="bubble-container flex flex-col flex-1 min-h-0">
     <ScenarioCodes {selected_scenario} bind:selected_code />
   </div>
 </div>
