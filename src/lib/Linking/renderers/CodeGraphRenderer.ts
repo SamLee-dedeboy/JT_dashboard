@@ -263,7 +263,7 @@ export class CodeGraphRenderer {
                         sourceNode && targetNode &&
                         ((sourceNode.depth === 1 && targetNode.depth === 2) ||
                          (sourceNode.depth === 2 && targetNode.depth === 1));
-                    const baseDistance = isTopToSecond ? 40 : 100;
+                    const baseDistance = isTopToSecond ? 20 : 100;
                     const minDistance = isTopToSecond ? 60 : 140;
                     const maxDistance = isTopToSecond ? 100 : 500;
 
@@ -289,7 +289,7 @@ export class CodeGraphRenderer {
                 return corner ? corner[0] : this.width / 2;
             }).strength(d => d.depth <= 1 ? 2 : 0.03))
             .force("y", d3.forceY<GraphNode>().y(d => {
-                if (d.depth <= 1) return this.height / 2;
+                if (d.depth <= 1) return this.height / 1.5;
                 const corner = cornerForce[d.id.split("\\")[0]];
                 return corner ? corner[1] : this.height / 2;
             }).strength(d => d.depth <= 1 ? 2 : 0.05))

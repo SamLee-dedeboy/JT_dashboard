@@ -7,6 +7,8 @@
   import type { tScenarioData } from "./types";
   import type { GraphNode } from "./renderers/CodeGraphRenderer";
   import { bubble_color } from "./constants";
+  import { scale } from "svelte/transition";
+  import { cubicOut } from "svelte/easing";
   let {
     selected_scenario = undefined,
     selected_code = $bindable(),
@@ -40,23 +42,81 @@
       });
   }
   const categories = ["Drivers", "Strategies", "Value", "Governance"];
+  let info_open = $state(true);
 </script>
 
 {#key selected_scenario}
-  <div
-    class="header-container italic justify-center items-center flex flex-col relative"
-  >
-    <div
-      class="info-text px-1 text-[1rem] font-normal w-full flex flex-col absolute top-0"
-    >
-      <span class="title-banner w-full text-center text-[2.5rem] uppercase">
-        Public Opinion
-      </span>
-      <span class="inline-flex">
-        <!-- <img src="info.svg" class="info-icon w-5 h-5 inline mr-2" alt="info" /> -->
+  <div class="info-panel absolute right-3 top-3 z-20 italic">
+    {#if info_open}
+      <div
+        class="info-panel-expanded flex flex-col gap-2 rounded-md p-3 text-sm text-left"
+        transition:scale={{ start: 0.85, duration: 200, easing: cubicOut }}
+      >
+        <div class="flex items-start justify-between gap-2">
+          <span class="title-banner uppercase not-italic font-normal text-xl">
+            Public Opinion
+          </span>
+          <button
+            type="button"
+            class="info-toggle shrink-0 rounded px-1.5 leading-none flex items-center justify-center"
+            aria-label="Collapse info panel"
+            onclick={() => (info_open = false)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-minus-icon lucide-minus"
+              ><path d="M5 12h14" /></svg
+            >
+          </button>
+        </div>
+        <span class="inline-flex items-start gap-2 font-normal">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="mt-0.5 h-5 w-5 shrink-0"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path
+              d="M12 8h.01"
+            /></svg
+          >
+          <span>
+            This chart shows what participants' opinions we considered for this
+            scenario.
+          </span>
+        </span>
+        <div class="ml-7 font-normal">
+          Each bubble is a category of opinion. Bigger bubbles = more
+          participants mentioned this category.
+        </div>
+        <div class="ml-7 font-normal">
+          Hover any bubble to see more details.
+        </div>
+      </div>
+    {:else}
+      <button
+        type="button"
+        class="info-panel-collapsed flex h-8 w-8 items-center justify-center rounded-full"
+        aria-label="Expand info panel"
+        onclick={() => (info_open = true)}
+        transition:scale={{ start: 0.85, duration: 200, easing: cubicOut }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="info-icon w-5 h-5 inline mr-2"
+          class="h-5 w-5"
           width="24"
           height="24"
           viewBox="0 0 24 24"
@@ -69,28 +129,8 @@
             d="M12 8h.01"
           /></svg
         >
-        This chart shows what participants' opinions we considered for this scenario.
-      </span>
-      <span class="text-left ml-7">
-        Each bubble represents a category of opinion. Bigger bubbles =
-        <span class=""> more participants mentioned this category. </span>
-      </span>
-      <span class="text-left ml-7">
-        Click any bubble to see more details.
-      </span>
-    </div>
-    <!-- <div
-      class="absolute right-2 top-1 flex flex-col justify-center gap-y-2 text-white"
-    >
-      {#each categories as category}
-        <div class="flex items-center gap-x-2 text-sm">
-          <svg class="w-6 h-6" viewBox="0 0 10 10">
-            <circle cx="5" cy="5" r="5" fill={bubble_color(category)} />
-          </svg>
-          <span>{category}</span>
-        </div>
-      {/each}
-    </div> -->
+      </button>
+    {/if}
   </div>
   {#if selected_scenario}
     {#await fetchScenarioCodes(selected_scenario) then codes}
@@ -111,21 +151,48 @@
 {/key}
 
 <style lang="postcss">
-  .header-container {
-    color: var(--neutral-700);
-  }
-
   .title-banner {
-    /* background-color: var(--neutral-100); */
     color: var(--jt-secondary);
   }
 
-  .info-text {
+  .info-panel {
     color: var(--text-primary);
   }
-
-  .info-icon svg {
-    stroke: white;
+  .info-panel-expanded {
+    max-width: 22rem;
+    transform-origin: top right;
+    background-color: color-mix(
+      in srgb,
+      var(--surface-elevated) 92%,
+      transparent
+    );
+    outline: 1px solid var(--border-subtle);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+  .info-panel-collapsed {
+    transform-origin: top right;
+    background-color: color-mix(
+      in srgb,
+      var(--surface-elevated) 92%,
+      transparent
+    );
+    color: var(--text-primary);
+    outline: 1px solid var(--border-subtle);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .info-panel-collapsed:hover {
+    filter: brightness(1.15);
+  }
+  .info-toggle {
+    color: var(--text-primary);
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 1.1rem;
+  }
+  .info-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.08);
   }
   .select-hint {
     color: var(--text-primary);
