@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { colorForNode } from "./constants";
   type tCodeTooltipProps = {
     codebook: {
       parent: string;
@@ -17,16 +18,21 @@
     selected_code,
     handleClose,
   }: tCodeTooltipProps = $props();
+  // Categorical color for the hovered node's type, used to tint the tooltip's
+  // border so it stays visually linked to the node on the canvas.
+  let node_color = $derived(
+    colorForNode(codebook.find((code) => code.name === selected_code)?.type),
+  );
   let child_dict = $derived(
     codebook.reduce((acc, code) => {
       const parent_code = code.parent === "N/A" ? code.name : code.parent;
       acc[parent_code] = acc[parent_code] || [];
       acc[parent_code].push(code.name);
       return acc;
-    }, {})
+    }, {}),
   );
   let parent_codes = $derived(
-    codebook.filter((code) => code.parent === "N/A").map((code) => code.name)
+    codebook.filter((code) => code.parent === "N/A").map((code) => code.name),
   );
   let parent_to_child_participants = $derived(
     parent_codes.reduce((acc, parent) => {
@@ -38,21 +44,21 @@
         })
         .filter((item) => (Object.values(item) as any)[0].length > 0);
       return acc;
-    }, {})
+    }, {}),
   );
 
   let tooltip_data = $derived(
-    selected_code ? parent_to_child_participants[selected_code] : undefined
+    selected_code ? parent_to_child_participants[selected_code] : undefined,
   );
   let total_participants = $derived(
     tooltip_data
       ? tooltip_data.reduce((acc, item) => {
           (Object.values(item) as any)[0].forEach((participant) =>
-            acc.add(participant)
+            acc.add(participant),
           );
           return acc;
         }, new Set()).size
-      : 0
+      : 0,
   );
   onMount(() => {
     console.log("Parent to Child Participants:", parent_to_child_participants);
@@ -62,14 +68,12 @@
 
 <div class="">
   {#if tooltip_data}
-    <div
-      class="tooltip-content text-lg px-3 py-1 jt-body-2 outline outline-4 outline-slate-200 rounded shadow-md bg-[#253439] text-white"
-    >
+    <div class="tooltip-content text-lg px-3 py-1 jt-body-2 rounded text-white">
       <div class="text-left mt-2">
         <!-- is defined as: -->
         <p
           class="mt-0 text-[1.2rem] border-r-[4px] bg-[#323b3e] p-3 py-1 rounded"
-          style={`border-color: var(--jt-secondary);`}
+          style={`border-color: ${node_color};`}
         >
           <span class="text-white italic rounded">
             {selected_code} -
@@ -116,10 +120,12 @@
           {/each}
         </ul>
       {/if}
-      <button
-        class="mt-1 px-1 py-0.5 rounded text-white hover:bg-[#7ed957] hover:text-[#253439] hover:outline-[#253439] outline outline-2 outline-slate-200 transition-colors duration-200"
-        onclick={handleClose}>Close</button
-      >
+      {#if handleClose}
+        <button
+          class="mt-1 px-1 py-0.5 rounded text-white hover:bg-[#7ed957] hover:text-[#253439] hover:outline-[#253439] outline outline-2 outline-slate-200 transition-colors duration-200"
+          onclick={handleClose}>Close</button
+        >
+      {/if}
     </div>
   {:else}
     <div class="tooltip-content text-slate-700 text-lg">

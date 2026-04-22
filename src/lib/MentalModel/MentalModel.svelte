@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import AllMMs from "./AllMMs.svelte";
   import PastExhibitionMMs from "./PastExhibitionMMs.svelte";
+  import CodeTooltip from "./CodeTooltip.svelte";
   import { server_address } from "./constants";
   import { push } from "svelte-spa-router";
 
@@ -104,6 +105,18 @@
       });
   }
   let tutorial_open = $state(true);
+  let selected_code: string | undefined = $state(undefined);
+  let tooltip_y: number | undefined = $state(undefined);
+  let sidebar_el = $state<HTMLDivElement | undefined>(undefined);
+  // Convert the hovered bubble's viewport y into a top offset inside the
+  // sidebar, then clamp so the tooltip doesn't spill off the sidebar's edges.
+  let tooltip_top = $derived.by(() => {
+    if (tooltip_y === undefined || !sidebar_el) return 0;
+    const rect = sidebar_el.getBoundingClientRect();
+    const raw = tooltip_y - rect.top;
+    const max = Math.max(0, rect.height - 80);
+    return Math.max(0, Math.min(max, raw));
+  });
 
   onMount(() => {
     fetchCodebook();
@@ -152,12 +165,32 @@
         {code_tsne}
         {codebook}
         svgId="mm_svg"
+        bind:selected_code
+        bind:tooltip_y
       ></AllMMs>
     </div>
     <div
-      class="mm-sidebar flex w-[40%] flex-col items-center justify-center rounded p-4 text-center text-white italic"
+      bind:this={sidebar_el}
+      class="mm-sidebar relative w-[40%] rounded p-4 text-white overflow-hidden min-h-0"
     >
-      <span class="opacity-70">Placeholder for additional text.</span>
+      {#if merged_server_data && selected_code}
+        {#key selected_code}
+          <div
+            class="absolute left-4 right-4 -translate-y-1/2 transition-all duration-200"
+            style={`top: ${tooltip_top}px`}
+          >
+            <CodeTooltip
+              {codebook}
+              all_code_participants={merged_server_data}
+              {selected_code}
+            ></CodeTooltip>
+          </div>
+        {/key}
+      {:else}
+        <div class="flex h-full items-center justify-center p-4 text-center italic opacity-70">
+          Hover over a bubble on the left to see details about that code.
+        </div>
+      {/if}
     </div>
   </div>
 </div>

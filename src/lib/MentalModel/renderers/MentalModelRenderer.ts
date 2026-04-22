@@ -1,26 +1,19 @@
 import * as d3 from "d3"
 import { contrastTextColor } from "../../../constants/colors"
+import { colorForNode } from "../constants"
 const center = 1.8/3;
-
-// Map each node_type to a categorical color from app.css, matching the
-// Linking graph's categorical palette.
-const nodeTypeColor: Record<string, string> = {
-    "impacts salinity": "var(--cat-1)",
-    "impacted by salinity": "var(--cat-2)",
-};
-const defaultNodeColor = "var(--cat-3)";
-function colorForNode(nodeType: string | undefined): string {
-    return (nodeType && nodeTypeColor[nodeType]) || defaultNodeColor;
-}
 export class MentalModelRenderer {
     svgId: string;
     width: number = 1000
     height: number = 1000
-    handleClick: Function
+    dispatchHover: (node: [string, number] | null, clientY?: number) => void
     simulation: any
-    constructor(svgId: string, handleClick: Function) {
+    constructor(
+        svgId: string,
+        dispatchHover: (node: [string, number] | null, clientY?: number) => void,
+    ) {
         this.svgId = svgId
-        this.handleClick = handleClick
+        this.dispatchHover = dispatchHover
     }
 
     init() {
@@ -120,18 +113,19 @@ export class MentalModelRenderer {
                 .attr("stroke", "#333")
                 .attr("stroke-width", 1.5)
                 .attr("cursor", "pointer")
-                .on("mouseover", function() {
-                    d3.select(this)
+                .on("mouseover", (event, d) => {
+                    const target = event.currentTarget as SVGCircleElement
+                    d3.select(target)
                       .style("stroke", "#fff")
                       .style("stroke-width", "3px")
+                    const rect = target.getBoundingClientRect()
+                    this.dispatchHover(d, rect.top + rect.height / 2)
                 })
-                .on("mouseout", function() {
-                    d3.select(this)
+                .on("mouseout", (event) => {
+                    d3.select(event.currentTarget as SVGCircleElement)
                       .style("stroke", "#333")
                       .style("stroke-width", "1.5px")
-                })
-                .on("click", (e, d) => {
-                    this.handleClick(d)
+                    this.dispatchHover(null)
                 })
                 .attr("cx", (d) => d.x = code_tsne[d[0]] * this.width || this.width/2)
                 .attr("cy", (d) => d.y = classification_force_position_y[node_types[d[0]]] || this.height*center)
