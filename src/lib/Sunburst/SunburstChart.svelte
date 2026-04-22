@@ -61,7 +61,7 @@
   function getConsistentColor(
     name: string,
     depth = 0,
-    parentColor: string | null = null
+    parentColor: string | null = null,
   ): string {
     const key = `${name}_${depth}`;
 
@@ -81,7 +81,7 @@
               globalColorMap
                 .get(k)
                 ?.toString()
-                .includes(baseColor.formatHex().substring(1, 3))
+                .includes(baseColor.formatHex().substring(1, 3)),
           ).length;
           const selectedVariation =
             variations[siblingIndex % variations.length];
@@ -195,7 +195,11 @@
     const root = d3
       .hierarchy(data)
       .sum((d) => d.value || 0)
-      .sort((a, b) => (b.value || 0) - (a.value || 0));
+      // Alphabetical by name so the same top-level category sits in the same
+      // angular slot across every sunburst in the gallery.
+      .sort((a, b) =>
+        d3.ascending(a.data?.name ?? "", b.data?.name ?? ""),
+      );
 
     partition(root);
     console.log({ root });
@@ -252,7 +256,7 @@
 
       // Normalize the direction vector
       const directionLength = Math.sqrt(
-        directionX * directionX + directionY * directionY
+        directionX * directionX + directionY * directionY,
       );
       const normalizedDirX = directionX / directionLength;
       const normalizedDirY = directionY / directionLength;
@@ -301,7 +305,7 @@
       // Find the closest intersection
       if (intersections.length > 0) {
         const closestIntersection = intersections.reduce((closest, current) =>
-          current.distance < closest.distance ? current : closest
+          current.distance < closest.distance ? current : closest,
         );
 
         // Use offset factor e to control position on the line
@@ -454,8 +458,8 @@
           .descendants()
           .filter(
             (d) =>
-              !isZoomed && d.depth === 1 && d.children && d.children.length > 0
-          ) as HierarchyNodeExtended[]
+              !isZoomed && d.depth === 1 && d.children && d.children.length > 0,
+          ) as HierarchyNodeExtended[],
       )
       .enter()
       .append("path")
@@ -477,8 +481,8 @@
           .descendants()
           .filter(
             (d) =>
-              !isZoomed && d.depth === 1 && d.children && d.children.length > 0
-          ) as HierarchyNodeExtended[]
+              !isZoomed && d.depth === 1 && d.children && d.children.length > 0,
+          ) as HierarchyNodeExtended[],
       )
       .enter()
       .append("text")
@@ -519,7 +523,7 @@
             );
           }
           return node.depth > 0 && node.depth <= 2 && node.x1 - node.x0 > 0.1;
-        }) as HierarchyNodeExtended[]
+        }) as HierarchyNodeExtended[],
       )
       .enter()
       .append("text")
@@ -554,7 +558,7 @@
         return `${fontScale(arcAngle)}px`;
       })
       .style("fill", (d: HierarchyNodeExtended) =>
-        getContrastColor(getHierarchicalColor(d))
+        getContrastColor(getHierarchicalColor(d)),
       )
       .style("text-anchor", "middle")
       .style("pointer-events", "none")
@@ -715,7 +719,7 @@
 </script>
 
 <div
-  class="sunburst-container bg-[var(--surface-elevated)] rounded-lg shadow-md px-4 pb-4 pt-2 flex-1 flex flex-col items-center justify-center relative"
+  class="sunburst-container rounded-lg px-4 pb-4 pt-2 flex-1 flex flex-col items-center justify-center relative"
 >
   <div class="sunburst-title text-lg mb-4 text-center">
     {isZoomed ? `${title} - ${zoomedParent?.data.name || ""}` : title}

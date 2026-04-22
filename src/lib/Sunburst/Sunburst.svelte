@@ -70,6 +70,7 @@
   ];
 
   // Component state
+  let tutorial_open = $state(true);
   let sunburstDatasets: SunburstDataWithTitle[] = $state([]);
   let isTop5Mode = $state(true);
   let globalColorMap = $state(new Map<string, string>());
@@ -88,12 +89,16 @@
 
   // Reactive statements
   let processedDatasets: SunburstDataWithTitle[] = $derived(
-    isTop5Mode
+    (isTop5Mode
       ? sunburstDatasets.map((item) => ({
           ...item,
           data: filterToTop5(item.data),
         }))
       : sunburstDatasets
+    ).map((item) => ({
+      ...item,
+      data: sortTopLevelAlphabetically(item.data),
+    })),
   );
 
   $effect(() => {
@@ -140,7 +145,7 @@
     // Define the desired order based on dataFiles list
     const desiredOrder = [
       "sunburst_age_18_35.json",
-      "sunburst_age_65_plus.json",
+      "sunburst_age_36_64.json",
       "sunburst_years_0_10_experience.json",
       "sunburst_years_31_plus_experience.json",
       "sunburst_team.json",
@@ -153,13 +158,15 @@
         data: data as SunburstData,
         title: generateTitle(filename),
         filename: filename,
-      })
+      }),
     );
 
     // Sort according to the desired order and only include files in desiredOrder
     sunburstDatasets = desiredOrder
       .map((orderedFilename) =>
-        unsortedDatasets.find((dataset) => dataset.filename === orderedFilename)
+        unsortedDatasets.find(
+          (dataset) => dataset.filename === orderedFilename,
+        ),
       )
       .filter((dataset) => dataset !== undefined); // Remove any missing files
   }
@@ -171,7 +178,7 @@
   function getConsistentColor(
     name: string,
     depth = 0,
-    parentColor: string | null = null
+    parentColor: string | null = null,
   ): string {
     const key = `${name}_${depth}`;
 
@@ -191,7 +198,7 @@
               globalColorMap
                 .get(k)
                 ?.toString()
-                .includes(baseColor.formatHex().substring(1, 3))
+                .includes(baseColor.formatHex().substring(1, 3)),
           ).length;
           const selectedVariation =
             variations[siblingIndex % variations.length];
@@ -200,6 +207,18 @@
       }
     }
     return globalColorMap.get(key) || colorPalette[0];
+  }
+
+  // Sort the top-level children of a sunburst alphabetically by name so the
+  // same category always sits in the same angular position across every chart.
+  function sortTopLevelAlphabetically(data: SunburstData): SunburstData {
+    if (!data.children) return data;
+    return {
+      ...data,
+      children: [...data.children].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      ),
+    };
   }
 
   function filterToTop5(data: SunburstData): SunburstData {
@@ -211,7 +230,7 @@
       .sort(
         (a, b) =>
           (d3.sum(b.children || [], (d: SunburstData) => d.value || 0) || 0) -
-          (d3.sum(a.children || [], (d: SunburstData) => d.value || 0) || 0)
+          (d3.sum(a.children || [], (d: SunburstData) => d.value || 0) || 0),
       )
       .slice(0, 5);
 
@@ -224,13 +243,13 @@
   function collectCategoryNames(
     node: SunburstData,
     depth = 0,
-    parentColor: string | null = null
+    parentColor: string | null = null,
   ) {
     if (node.name) {
       const color = getConsistentColor(node.name, depth, parentColor);
       if (node.children) {
         node.children.forEach((child) =>
-          collectCategoryNames(child, depth + 1, color)
+          collectCategoryNames(child, depth + 1, color),
         );
       }
     }
@@ -267,7 +286,7 @@
       data: any;
       value: number;
       percentage: number;
-    }>
+    }>,
   ) {
     console.log("Tooltip event detail:", event.detail);
     const {
@@ -304,15 +323,14 @@
     Some descriptive text/caption can be put here
   </div> -->
   <div class=" px-5 py-5 grow">
-    <!-- <h1 class="text-3xl text-gray-800 mb-8 text-center">Sunburst Gallery</h1> -->
-    <div
-      class="max-w-[40rem] bg-[var(--surface-elevated)] p-4 rounded-lg mb-6 shadow-md outline-2 outline-[var(--brand-primary)]"
+    <button
+      type="button"
+      class="tutorial-trigger absolute top-2 left-2 flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium"
+      onclick={() => (tutorial_open = true)}
     >
-      Here we can compare the different themes present in the mental models
-      across different populations. You can compare differences across team
-      members and interviewees, different years of engagement in the delta,
-      residents and non residents, and different ages.
-    </div>
+      <span aria-hidden="true">?</span>
+      Tutorial
+    </button>
 
     <!-- Controls -->
     <div class="fixed top-5 right-5 bg-white rounded-lg shadow-md p-4 z-50">
@@ -339,69 +357,70 @@
 
     <!-- Gallery -->
     <div class="flex flex-col gap-8 mb-8">
-      {#each Array.from( { length: Math.ceil(processedDatasets.length / 2) }, (_, i) => processedDatasets.slice(i * 2, i * 2 + 2) ) as rowData, rowIndex}
+      {#each Array.from( { length: Math.ceil(processedDatasets.length / 2) }, (_, i) => processedDatasets.slice(i * 2, i * 2 + 2), ) as rowData, rowIndex}
         <div class="flex flex-col gap-4">
           <!-- Row of two sunbursts -->
           <div class="flex justify-center gap-8">
-            <!-- Descriptive text for this row -->
-            <div
-              class="max-w-4xl flex-1 mx-auto bg-[var(--surface-elevated)] p-4 rounded-lg shadow-md"
-            >
-              <div class="text-left">
-                {#if rowIndex === 0}
-                  <h2>Age Group</h2>
-                  <p class="text">
-                    Compare mental model themes between <span class="underline"
-                      >{rowData[0]?.title || ""}</span
-                    >
-                    and
-                    <span class="underline">{rowData[1]?.title || ""}</span>.
-                    The total number of nodes for participants aged 18-35 had on
-                    average less subthemes than the 36-64 age group and 65 years
-                    and older group.
-                    <span class="underline">
-                      This suggests that mental models become more detailed or
-                      developed with increasing age.
-                    </span>
-                    The most mentioned theme in the mental models is human impacts.
-                    The most mentioned driver of salinity was flow for the older
-                    groups and structure (physical geography) for the younger groups.
-                  </p>
-                {:else if rowIndex === 1}
-                  <h2>Experience of Engagement</h2>
-                  <p class="text">
-                    The visualization above shows how engagement experience
-                    affects mental model composition.
-                    <span class="underline">{rowData[0]?.title || ""}</span>
-                    versus
-                    <span class="underline">{rowData[1]?.title || ""}</span>
-                    reveals how different levels of engagement influence the themes
-                    people focus on. The mental models of people with 0-10 years
-                    of experience had fewer subthemes on average than the mental
-                    models of people with over 30 years of experience.
-                    <span class="underline">
-                      This suggests that as engagement in the delta increases,
-                      individuals learn more about the system and their
-                      conceptualizations of salinity become deeper and broader
-                      as well.
-                    </span>
-                  </p>
-                {:else if rowIndex === 2}
-                  <h2>Team vs Interviewee</h2>
-                  <p class="text">
-                    On average team members had 12 subthemes in their mental
-                    models, in comparison interviewees had 20 subthemes on
-                    average. The top drivers of salinity in the delta for both
-                    groups were flow and policy and regulation. In contrast,
-                    climate change appears as the most identified theme in only
-                    the team mental models.
-
-                    <!-- <strong>{rowData[0]?.title || ""}</strong> and
-                    <strong>{rowData[1]?.title || ""}</strong> show how different
-                    generational perspectives influence the themes that emerge in
-                    mental models. -->
-                  </p>
-                {/if}
+            <!-- Descriptive text for this row + Takeaways placeholder -->
+            <div class="max-w-4xl flex-1 mx-auto flex flex-col gap-4">
+              <div
+                class="bg-[var(--surface-elevated)] p-4 rounded-lg shadow-md"
+              >
+                <div class="text-left">
+                  {#if rowIndex === 0}
+                    <h2>Age Group</h2>
+                    <p class="text">
+                      Compare mental model themes between <span
+                        class="underline">{rowData[0]?.title || ""}</span
+                      >
+                      and
+                      <span class="underline">{rowData[1]?.title || ""}</span>.
+                      The total number of nodes for participants aged 18-35 had
+                      on average less subthemes than the 36-64 age group and 65
+                      years and older group.
+                      <span class="underline">
+                        This suggests that mental models become more detailed or
+                        developed with increasing age.
+                      </span>
+                      The most mentioned theme in the mental models is human impacts.
+                      The most mentioned driver of salinity was flow for the older
+                      groups and structure (physical geography) for the younger groups.
+                    </p>
+                  {:else if rowIndex === 1}
+                    <h2>Experience of Engagement</h2>
+                    <p class="text">
+                      The visualization above shows how engagement experience
+                      affects mental model composition.
+                      <span class="underline">{rowData[0]?.title || ""}</span>
+                      versus
+                      <span class="underline">{rowData[1]?.title || ""}</span>
+                      reveals how different levels of engagement influence the themes
+                      people focus on. The mental models of people with 0-10 years
+                      of experience had fewer subthemes on average than the mental
+                      models of people with over 30 years of experience.
+                      <span class="underline">
+                        This suggests that as engagement in the delta increases,
+                        individuals learn more about the system and their
+                        conceptualizations of salinity become deeper and broader
+                        as well.
+                      </span>
+                    </p>
+                  {:else if rowIndex === 2}
+                    <h2>Team vs Interviewee</h2>
+                    <p class="text">
+                      On average team members had 12 subthemes in their mental
+                      models, in comparison interviewees had 20 subthemes on
+                      average. The top drivers of salinity in the delta for both
+                      groups were flow and policy and regulation. In contrast,
+                      climate change appears as the most identified theme in
+                      only the team mental models.
+                    </p>
+                  {/if}
+                </div>
+                <h2 class="mt-2">Takeaways</h2>
+                <p class="text italic opacity-70">
+                  Placeholder for key takeaways from this comparison.
+                </p>
               </div>
             </div>
             {#each rowData as item, index}
@@ -453,8 +472,54 @@
     <div class="h-[5rem]"></div>
   </div>
 
+  {#if tutorial_open}
+    <div
+      class="tutorial-overlay fixed inset-0 z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="sunburst-tutorial-title"
+    >
+      <div
+        class="tutorial-backdrop absolute inset-0"
+        role="button"
+        tabindex="-1"
+        aria-label="Close tutorial"
+        onclick={() => (tutorial_open = false)}
+        onkeydown={(e) => {
+          if (e.key === "Escape") tutorial_open = false;
+        }}
+      ></div>
+      <div
+        class="tutorial-modal relative z-10 flex max-h-[85vh] w-160 max-w-[90vw] flex-col gap-4 overflow-auto rounded-lg p-6 text-white shadow-xl"
+      >
+        <div class="flex items-start justify-between gap-4">
+          <h2 id="sunburst-tutorial-title" class="text-lg font-semibold">
+            Comparing mental models across populations
+          </h2>
+          <button
+            type="button"
+            class="tutorial-close rounded-md px-2 py-1 text-sm"
+            aria-label="Close tutorial"
+            onclick={() => (tutorial_open = false)}
+          >
+            ✕
+          </button>
+        </div>
+        <div class="flex flex-col gap-3 text-left">
+          <p>
+            Here we can compare the different themes present in the mental
+            models across different populations. You can compare differences
+            across team members and interviewees, different years of engagement
+            in the delta, residents and non residents, and different ages.
+          </p>
+        </div>
+      </div>
+    </div>
+  {/if}
+
   <!-- Scroll indicator arrow -->
-  {#if showScrollIndicator}
+  <!-- {#if showScrollIndicator} -->
+  {#if false}
     <div class="scroll-indicator">
       <div class="w-8 h-8 bg-[var(--brand-primary)] p-1 rounded">
         <svg
@@ -517,5 +582,31 @@
     .scroll-indicator {
       opacity: 0.6;
     }
+  }
+
+  .tutorial-trigger {
+    background-color: var(--brand-primary);
+    color: white;
+    cursor: pointer;
+    transition: filter 0.15s;
+    z-index: 20;
+  }
+  .tutorial-trigger:hover {
+    filter: brightness(1.1);
+  }
+  .tutorial-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .tutorial-modal {
+    background-color: var(--bg-page);
+    outline: 2px solid var(--brand-primary);
+  }
+  .tutorial-close {
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+  }
+  .tutorial-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 </style>
