@@ -125,7 +125,7 @@
             >
               {#if selected_code}
                 <div
-                  class="absolute top-0 bottom-0 left-0 right-0 overflow-auto"
+                  class="absolute top-0 bottom-0 left-0 right-0 overflow-auto p-3"
                 >
                   <GraphNodeTooltip
                     code={selected_code}

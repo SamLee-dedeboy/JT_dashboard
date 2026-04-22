@@ -24,6 +24,37 @@ type GraphLink = d3.SimulationLinkDatum<GraphNode> & {
     target: string | GraphNode;
 };
 
+// Returns "#000" or "#fff" depending on which gives better contrast against
+// `cssColor` (which may be a hex, rgb(), or var(--cat-1) string). Results are
+// cached so the DOM resolution only runs once per distinct input.
+const contrastCache = new Map<string, string>();
+function contrastTextColor(cssColor: string): string {
+    const cached = contrastCache.get(cssColor);
+    if (cached) return cached;
+    const el = document.createElement("span");
+    el.style.color = cssColor;
+    el.style.display = "none";
+    document.body.appendChild(el);
+    const resolved = getComputedStyle(el).color;
+    document.body.removeChild(el);
+    const match = resolved.match(/\d+(\.\d+)?/g);
+    let textColor = "#fff";
+    if (match && match.length >= 3) {
+        const [r, g, b] = match.slice(0, 3).map(Number);
+        const toLinear = (c: number) => {
+            const s = c / 255;
+            return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+        };
+        const L =
+            0.2126 * toLinear(r) +
+            0.7152 * toLinear(g) +
+            0.0722 * toLinear(b);
+        textColor = L > 0.5 ? "#000" : "#fff";
+    }
+    contrastCache.set(cssColor, textColor);
+    return textColor;
+}
+
 export class CodeGraphRenderer {
     svgId: string;
     width: number = 600
@@ -324,18 +355,7 @@ export class CodeGraphRenderer {
                 .attr("cx", d => d.x = d.x!)
                 .attr("cy", d => d.y = d.y!)
                 .attr("r", d => d.radius)
-                .attr("fill", d => {
-                    // Scale saturation based on depth: deeper nodes have less saturation
-                    const maxDepth = d3.max(this.allNodes, n => n.depth) || 1;
-                    const saturationScale = 1 - (d.depth / (maxDepth + 1)) * 0.95; // Reduce saturation by up to 70%
-                    const color = d3.color(d.color);
-                    if (color) {
-                        const hslColor = d3.hsl(color);
-                        hslColor.s *= saturationScale;
-                        return hslColor.toString();
-                    }
-                    return d.color;
-                })
+                .attr("fill", d => d.color)
                 .attr("stroke", "#333")
                 .attr("stroke-width", 1.5)
                 .style("cursor", "pointer")
@@ -346,18 +366,22 @@ export class CodeGraphRenderer {
                     .attr("cy", d => d.y = d.y!)
             )
         
-        // Add labels
+        // Add labels. Font-size is scaled from the node radius so the text
+        // always reads at a similar weight relative to its bubble; `wrap` then
+        // breaks it over multiple lines using the node's diameter as the line
+        // width, and a final shrink pass catches anything that still overflows
+        // (e.g. a single long word that wrap can't split).
         const label = svg.select(".label-group")
             .selectAll("text")
             .data(visibleNodes)
             .join("text")
             .text(d => d.name)
-            .attr("font-size", "10px")
+            .attr("font-size", d => Math.max(6, Math.min(14, d.radius * 0.35)) + "px")
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")
             .style("pointer-events", "none")
-            .style("fill", "white")
-            .call(wrap, 80);
+            .style("fill", d => contrastTextColor(d.color))
+            .call(wrap);
         
         // Add drag behavior
         const drag = d3.drag<SVGCircleElement, GraphNode>()
@@ -397,18 +421,20 @@ export class CodeGraphRenderer {
     }
     
 }
-  function wrap(text, width) {
+  function wrap(text) {
     text.each(function (d, i) {
-        let text = d3.select(this)
-        let words = text.text().split(/[\s-]+/).reverse(),
+        const textSel = d3.select(this)
+        // Available width inside the circle, with small padding.
+        const width = d.radius * 2 * 0.85;
+        const lineHeight = 1.1; // ems
+        let words = textSel.text().split(/[\s-]+/).reverse(),
             word,
             line: any[] = [],
             lineNumber = 0,
-            lineHeight = 1.1, // ems
             x = d.x,
             y = d.y,
             dy = 0, //parseFloat(text.attr("dy")),
-            tspan = text.text(null)
+            tspan = textSel.text(null)
                 .append("tspan")
                 .attr("x", x)
                 .attr("y", y)
@@ -422,7 +448,7 @@ export class CodeGraphRenderer {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];
-                tspan = text.append("tspan")
+                tspan = textSel.append("tspan")
                     .attr("x", x)
                     .attr("y", y)
                     .attr("dy", ++lineNumber * lineHeight + dy + "em")
@@ -430,14 +456,29 @@ export class CodeGraphRenderer {
                     .text(word);
             }
           }
-          const line_num = text.selectAll("tspan").nodes().length
+          const line_num = textSel.selectAll("tspan").nodes().length
           if(line_num > 1) {
             const offset = lineHeight * (line_num - 1) / 2
-            text.selectAll("tspan").attr("dy", function() {
+            textSel.selectAll("tspan").attr("dy", function() {
               const dy = parseFloat(d3.select(this).attr("dy"))
               return dy - offset + "em"
             })
-            // text.selectAll("tspan").attr("dy", parseFloat(y) - em_to_px / 2 * lineHeight * (line_num - 1) / 2)
+          }
+          // Post-fit: if any single line (e.g. an unsplittable long word) or
+          // the total stack height still overflows the circle, shrink the
+          // font-size uniformly to make it fit.
+          const currentSize = parseFloat(textSel.attr("font-size")) || 10;
+          let maxLen = 0;
+          textSel.selectAll("tspan").each(function () {
+            maxLen = Math.max(maxLen, (this as SVGTextContentElement).getComputedTextLength());
+          });
+          const availableHeight = d.radius * 2 * 0.85;
+          const stackHeight = line_num * currentSize * lineHeight;
+          const widthRatio = maxLen > width ? width / maxLen : 1;
+          const heightRatio = stackHeight > availableHeight ? availableHeight / stackHeight : 1;
+          const shrink = Math.min(widthRatio, heightRatio);
+          if (shrink < 1) {
+            textSel.attr("font-size", (currentSize * shrink) + "px");
           }
     });
   }

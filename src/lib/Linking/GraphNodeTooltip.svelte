@@ -1,7 +1,6 @@
 <script lang="ts">
   import { server_address } from "./constants";
-  import { bubble_color } from "./constants";
-  import { setOpacity } from "../../constants";
+  import { bubble_color, contrastTextColor } from "./constants";
   import { onMount } from "svelte";
   import { slide } from "svelte/transition";
 
@@ -49,8 +48,8 @@
       <h2 class="text-xl mb-2">
         You're looking at participant responses about
         <span
-          class="italic px-3 py-1 rounded text-black ml-1"
-          style={`background-color: ${setOpacity(bubble_color(code.id.split("\\").at(0)), 0.9, "rgbHex")}`}
+          class="category-chip italic px-3 py-1 rounded ml-1"
+          style={`background-color: color-mix(in srgb, ${bubble_color(code.id.split("\\").at(0))} 90%, transparent); color: ${contrastTextColor(bubble_color(code.id.split("\\").at(0)))}`}
         >
           {code.id.split("\\").at(-1)}
         </span>
@@ -100,4 +99,11 @@
 
 <style lang="postcss">
   @reference "tailwindcss";
+  .category-chip {
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    line-height: 1.8;
+    padding: 0.25rem 0.6rem;
+    border-radius: 0.5rem;
+  }
 </style>
