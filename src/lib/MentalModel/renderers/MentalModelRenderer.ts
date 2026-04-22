@@ -1,5 +1,17 @@
 import * as d3 from "d3"
+import { contrastTextColor } from "../../../constants/colors"
 const center = 1.8/3;
+
+// Map each node_type to a categorical color from app.css, matching the
+// Linking graph's categorical palette.
+const nodeTypeColor: Record<string, string> = {
+    "impacts salinity": "var(--cat-1)",
+    "impacted by salinity": "var(--cat-2)",
+};
+const defaultNodeColor = "var(--cat-3)";
+function colorForNode(nodeType: string | undefined): string {
+    return (nodeType && nodeTypeColor[nodeType]) || defaultNodeColor;
+}
 export class MentalModelRenderer {
     svgId: string;
     width: number = 1000
@@ -35,38 +47,34 @@ export class MentalModelRenderer {
           .attr("height", this.height* (1- center))
           .attr("fill", "#ffffff")
           .attr("opacity", 0.1)
-        regions.append("text").attr("class", "top_region_label")
-          .classed("jt-body-3", true)
-          .attr("x", this.width/2)
-          .attr("y", 10)
-          .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "hanging")
-          .attr("font-size", 20)
-          .attr("fill", "var(--bg-drivers)")
-          .attr("pointer-events", "none")
-          .attr("font-family", "monospace")
-          .text("Factors that Drive Salinity")
-        regions.append("text").attr("class", "bottom_region_label")
-          .classed("jt-body-3", true)
-          .attr("x", this.width/2)
-          .attr("y", this.height - 15)
-          .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "bottom")
-          .attr("font-size", 20)
-            .attr("fill", "var(--bg-impacted)")
-          .attr("pointer-events", "none")
-          // .attr("font-family", "")
-          .text("Factors Impacted by Salinity")
+        // regions.append("text").attr("class", "top_region_label")
+        //   .classed("jt-body-3", true)
+        //   .attr("x", this.width/2)
+        //   .attr("y", 10)
+        //   .attr("text-anchor", "middle")
+        //   .attr("dominant-baseline", "hanging")
+        //   .attr("font-size", 20)
+        //   .attr("fill", "var(--bg-drivers)")
+        //   .attr("pointer-events", "none")
+        //   .attr("font-family", "monospace")
+        //   .text("Factors that Drive Salinity")
+        // regions.append("text").attr("class", "bottom_region_label")
+        //   .classed("jt-body-3", true)
+        //   .attr("x", this.width/2)
+        //   .attr("y", this.height - 15)
+        //   .attr("text-anchor", "middle")
+        //   .attr("dominant-baseline", "bottom")
+        //   .attr("font-size", 20)
+        //     .attr("fill", "var(--bg-impacted)")
+        //   .attr("pointer-events", "none")
+        //   // .attr("font-family", "")
+        //   .text("Factors Impacted by Salinity")
         svg.append("circle")
           .attr("class", "bubble")
           .classed("is_center", true)
-          // .attr("fill", "oklch(95.6% 0.045 203.388)")
-          // .attr("fill", "#74b1d2")
           .attr("fill", "var(--brand-primary)")
-          .attr("filter", "drop-shadow(0px 0px 1.5px rgba(255, 255, 255, 1))")
-          .attr("stroke", "#26414b")
-          // .attr("stroke", "#5d8397")
-          .attr("stroke-width", 6)
+          .attr("stroke", "#333")
+          .attr("stroke-width", 1.5)
           .attr("cx", this.width/2)
           .attr("cy", this.height * center)
           .attr("r", 80)
@@ -77,96 +85,12 @@ export class MentalModelRenderer {
           .attr("y", this.height * center)
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "middle")
-          .attr("font-size", 21)
+          .attr("font-family", "'Hammersmith One', sans-serif")
+          .attr("font-size", Math.max(8, Math.min(20, 80 * 0.3)))
           .attr("pointer-events", "none")
-          // .attr('fill', "#253439")
-          // .attr('fill', "#eeeeee")
-          .attr("fill", "#2c4b56")
-          .text("Salinity")
+          .attr("fill", contrastTextColor("var(--brand-primary)"))
+          .text("SALINITY")
 
-        // top line
-        svg.append("defs")
-          .append("marker")
-          .attr("id", "arrowhead")
-          .attr("viewBox", "0 0 10 10")
-          .attr("refX", 10)
-          .attr("refY", 5)
-          .attr("markerWidth", 6)
-          .attr("markerHeight", 6)
-          .attr("orient", "auto")
-          .append("path")
-          .attr("d", "M 0 0 L 10 5 L 0 10 Z")
-          .attr("fill", "var(--bg-drivers)");
-        
-        svg.append("line")
-          .attr("x1", 0)
-          .attr("y1", 5)
-          .attr("x2", this.width)
-          .attr("y2", 5)
-          .attr("stroke", "var(--bg-drivers)")
-          .attr("stroke-width", 2)
-          .attr("marker-end", "url(#arrowhead)");
-          // Add label "Natural" at the start of the line
-          // svg.append("text")
-          //   .classed("jt-body-3", true)
-          //   .attr("x", 5) // Slightly offset from the start of the line
-          //   .attr("y", 25) // Position below the line
-          //   .attr("text-anchor", "start")
-          //   .attr("font-size", 18)
-          //   .attr("fill", "var(--bg-drivers)")
-          //   .text("Natural");
-          
-          // Add label "Human" at the end of the line
-          // svg.append("text")
-          //   .classed("jt-body-3", true)
-          //   .attr("x", this.width - 5) // Slightly offset from the end of the line
-          //   .attr("y", 25) // Position below the line
-          //   .attr("text-anchor", "end")
-          //   .attr("font-size", 18)
-          //   .attr("fill", "var(--bg-drivers)")
-          //   .text("Human");
-
-
-            // bottom line
-        svg.append("defs")
-          .append("marker")
-          .attr("id", "arrowhead-bot")
-          .attr("viewBox", "0 0 10 10")
-          .attr("refX", 10)
-          .attr("refY", 5)
-          .attr("markerWidth", 6)
-          .attr("markerHeight", 6)
-          .attr("orient", "auto")
-          .append("path")
-          .attr("d", "M 0 0 L 10 5 L 0 10 Z")
-            .attr("fill", "var(--bg-impacted)")
-            svg.append("line")
-            .attr("x1", 0)
-            .attr("y1", this.height - 5)
-            .attr("x2", this.width)
-            .attr("y2", this.height - 5)
-              .attr("stroke", "var(--bg-impacted)")
-            .attr("stroke-width", 2)
-            .attr("marker-end", "url(#arrowhead-bot)");
-            // Add label "Natural" at the start of the line
-            // svg.append("text")
-            //   .classed("jt-body-3", true)
-            //   .attr("x", 5) // Slightly offset from the start of the line
-            //   .attr("y", this.height - 15) // Position below the line
-            //   .attr("text-anchor", "start")
-            //   .attr("font-size", 18)
-            //   .attr("fill", "var(--bg-impacted)")
-            //   .text("Natural");
-            
-            // Add label "Human" at the end of the line
-            // svg.append("text")
-            //   .classed("jt-body-3", true)
-            //   .attr("x", this.width - 5) // Slightly offset from the end of the line
-            //   .attr("y", this.height - 15) // Position below the line
-            //   .attr("text-anchor", "end")
-            //   .attr("font-size", 18)
-            //   .attr("fill", "var(--bg-impacted)")
-            //   .text("Human");
     }
 
     update(_nodes_data: Record<string, number>, codebook: any[], code_tsne: Record<string, number>, callback=(d)=>{}) {
@@ -181,7 +105,6 @@ export class MentalModelRenderer {
         const svg = d3.select(`#${this.svgId}`)
         const bubble_group = svg.select("g.bubble_group")
         const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([18, 65])
-        const fontScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([14, 18])
         const nodes = nodes_data.concat([["Salinity", 80]])
         const classification_force_position_y = {
           "impacts salinity": this.height * center / 2,
@@ -193,27 +116,31 @@ export class MentalModelRenderer {
               enter => enter.append("circle")
                 .attr("class", "bubble")
                 .classed("is_center", d => d[0] === "Salinity")
-                .attr("fill", "lightgray")
-                // .attr("fill-opacity", 0.8)
+                .attr("fill", d => d[0] === "Salinity" ? "var(--brand-primary)" : colorForNode(node_types[d[0]]))
+                .attr("stroke", "#333")
+                .attr("stroke-width", 1.5)
                 .attr("cursor", "pointer")
                 .on("mouseover", function() {
-                    d3.select(this).classed("hovered", true)
+                    d3.select(this)
+                      .style("stroke", "#fff")
+                      .style("stroke-width", "3px")
                 })
                 .on("mouseout", function() {
-                    d3.select(this).classed("hovered", false)
+                    d3.select(this)
+                      .style("stroke", "#333")
+                      .style("stroke-width", "1.5px")
                 })
                 .on("click", (e, d) => {
                     this.handleClick(d)
                 })
-                // .attr("cx", (d) => d.x = this.width/2)
                 .attr("cx", (d) => d.x = code_tsne[d[0]] * this.width || this.width/2)
                 .attr("cy", (d) => d.y = classification_force_position_y[node_types[d[0]]] || this.height*center)
                 .attr("r", 0)
                 .transition().duration(300).delay(300)
                 .attr("r", d => d.r = d[0] === "Salinity"? 80: radiusScale(d[1])),
-                // .attr("r", d => d.r = d[0] === "Salinity"?  50: radiusScale(d[1])),
-              update => update.transition().duration(100)
-                // .attr("cx", (d) => d.x || this.width/2)
+              update => update
+                .attr("fill", d => d[0] === "Salinity" ? "var(--brand-primary)" : colorForNode(node_types[d[0]]))
+                .transition().duration(100)
                 .attr("cx", (d) => d.x = code_tsne[d[0]] * this.width || this.width/2)
                 .attr("cy", (d) => d.y = classification_force_position_y[node_types[d[0]]] || this.height*center)
                 .attr("r", d => d.r = d[0] === "Salinity"? 80: radiusScale(d[1])),
@@ -229,13 +156,21 @@ export class MentalModelRenderer {
             .attr("y", (d) => d.y)
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
-            .attr("font-size", (d) => d[0] === "Salinity"? fontScale(50) : fontScale(d[1]))
-            .attr("fill", "white")
+            .attr("font-family", "'Hammersmith One', sans-serif")
+            .attr("font-size", (d) => {
+              const r = d[0] === "Salinity" ? 80 : radiusScale(d[1]);
+              return Math.max(8, Math.min(20, r * 0.3)) + "px";
+            })
+            .attr("fill", (d) =>
+              d[0] === "Salinity"
+                ? contrastTextColor("var(--brand-primary)")
+                : contrastTextColor(colorForNode(node_types[d[0]]))
+            )
             .attr("pointer-events", "none")
             .text((d) => d[0])
             .each(function(d) {
               wrap(d3.select(this), d.r*2)
-              const line_num = d3.select(this).selectAll("tspan").nodes().length 
+              const line_num = d3.select(this).selectAll("tspan").nodes().length
               d3.select(this).append("tspan")
                 .text(`(${d[1]})`)
                 .attr("text-anchor", "middle")

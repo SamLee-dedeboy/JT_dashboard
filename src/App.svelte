@@ -65,19 +65,16 @@
 <svelte:window on:fullscreenchange={handleFullscreenChange} on:keydown={handleKeydown} />
 
 <main class="flex flex-col relative w-screen h-screen overflow-hidden">
-  <header
-    class="app-hero"
-    class:app-hero--compact={isNotHomePage}
-    role="button"
-    tabindex="0"
-    onclick={navigateHome}
-    onkeyup={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        navigateHome();
-      }
-    }}
-  >
-    <h1 class="app-hero__title">Just Transitions</h1>
+  <header class="app-hero" class:app-hero--compact={isNotHomePage}>
+    <h1 class="app-hero__title">
+      <button
+        type="button"
+        class="app-hero__title-button"
+        onclick={navigateHome}
+      >
+        Just Transitions
+      </button>
+    </h1>
     {#if !isNotHomePage}
       <h2 class="app-hero__subtitle">In The Delta</h2>
       <p class="app-hero__tagline">Drought, salinity, and sea-level rise</p>
@@ -106,6 +103,16 @@
     text-align: right;
     padding: 0.75rem 2rem 1.5rem;
     background-color: var(--surface-elevated);
+  }
+  .app-hero__title-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
     cursor: pointer;
   }
   .app-hero--compact {
