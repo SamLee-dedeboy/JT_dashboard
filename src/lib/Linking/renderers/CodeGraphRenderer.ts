@@ -359,8 +359,18 @@ export class CodeGraphRenderer {
                 .attr("stroke", "#333")
                 .attr("stroke-width", 1.5)
                 .style("cursor", "pointer")
-                .on("mouseover", (_event, d) => this.dispatchHover(d))
-                .on("mouseleave", () => this.dispatchHover(null)),
+                .on("mouseover", (event, d) => {
+                    d3.select(event.currentTarget as SVGCircleElement)
+                        .attr("stroke", "#fff")
+                        .attr("stroke-width", 3);
+                    this.dispatchHover(d);
+                })
+                .on("mouseleave", (event) => {
+                    d3.select(event.currentTarget as SVGCircleElement)
+                        .attr("stroke", "#333")
+                        .attr("stroke-width", 1.5);
+                    this.dispatchHover(null);
+                }),
                 update => update
                     .attr("cx", d => d.x = d.x!)
                     .attr("cy", d => d.y = d.y!)
@@ -375,8 +385,9 @@ export class CodeGraphRenderer {
             .selectAll("text")
             .data(visibleNodes)
             .join("text")
-            .text(d => d.name)
+            .text(d => (d.depth <= 1 ? d.name.toUpperCase() : d.name))
             .attr("font-size", d => Math.max(6, Math.min(14, d.radius * 0.35)) + "px")
+            .attr("font-family", "'Hammersmith One', sans-serif")
             .attr("text-anchor", "middle")
             .attr("dy", ".35em")
             .style("pointer-events", "none")

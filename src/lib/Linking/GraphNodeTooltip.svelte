@@ -48,10 +48,12 @@
       <h2 class="text-xl mb-2">
         You're looking at participant responses about
         <span
-          class="category-chip italic px-3 py-1 rounded ml-1"
+          class="category-chip px-3 py-1 rounded ml-1"
           style={`background-color: color-mix(in srgb, ${bubble_color(code.id.split("\\").at(0))} 90%, transparent); color: ${contrastTextColor(bubble_color(code.id.split("\\").at(0)))}`}
         >
-          {code.id.split("\\").at(-1)}
+          {code.depth <= 1
+            ? code.id.split("\\").at(-1)?.toUpperCase()
+            : code.id.split("\\").at(-1)}
         </span>
       </h2>
     </div>
@@ -99,6 +101,9 @@
 
 <style lang="postcss">
   @reference "tailwindcss";
+  .modal-content {
+    font-family: "Hammersmith One", sans-serif;
+  }
   .category-chip {
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
