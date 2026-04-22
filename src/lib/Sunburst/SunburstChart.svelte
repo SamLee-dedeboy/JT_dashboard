@@ -46,6 +46,15 @@
   let showModal = $state(false);
   let modalCodeData: any = $state(null);
   let isLoadingCode = $state(false);
+  // Used to ignore stale async responses when the user hovers quickly off or
+  // onto another segment while a fetch is still in flight.
+  let hoveredCode: string | null = $state(null);
+  // Color of the currently hovered segment; used to tint the tooltip so it
+  // reads as belonging to that slice.
+  let hoveredColor: string = $state("var(--brand-primary)");
+  // Every other chart in the row is on the right side of its row; offset the
+  // hover tooltip to the side with more space.
+  let isLeftChart = $derived(index % 2 === 0);
 
   // Reactive variables for rendering
   $effect(() => {
@@ -120,11 +129,13 @@
         throw new Error(`Failed to fetch code definition: ${response.status}`);
       }
       const codeData = await response.json();
-      console.log(codeData);
+      // Discard stale responses if the user has hovered off / onto a new segment.
+      if (hoveredCode !== codeName) return;
       modalCodeData = codeData;
       showModal = true;
     } catch (error) {
       console.error("Error fetching code definition:", error);
+      if (hoveredCode !== codeName) return;
       modalCodeData = {
         name: codeName,
         error: "Failed to load code definition",
@@ -132,7 +143,7 @@
       };
       showModal = true;
     } finally {
-      isLoadingCode = false;
+      if (hoveredCode === codeName) isLoadingCode = false;
     }
   }
 
@@ -197,9 +208,7 @@
       .sum((d) => d.value || 0)
       // Alphabetical by name so the same top-level category sits in the same
       // angular slot across every sunburst in the gallery.
-      .sort((a, b) =>
-        d3.ascending(a.data?.name ?? "", b.data?.name ?? ""),
-      );
+      .sort((a, b) => d3.ascending(a.data?.name ?? "", b.data?.name ?? ""));
 
     partition(root);
     console.log({ root });
@@ -408,46 +417,34 @@
           : "default";
       })
       .on("mouseover", function (event: MouseEvent, d: HierarchyNodeExtended) {
-        return;
         d3.select(this).style("opacity", 0.8).style("stroke-width", 3);
-
-        const value = d.value || 0;
-        const percentage = d.parent
-          ? ((value / (d.parent.value || 1)) * 100).toFixed(1)
-          : 100;
-
-        // handleShowTooltip({
-        //   detail: {
-        //     event,
-        //     title,
-        //     data: d.data,
-        //     value,
-        //     percentage: parseFloat(percentage.toString()),
-        //   },
-        // });
+        if (d.depth > 1) {
+          hoveredCode = d.data.name;
+          hoveredColor = getHierarchicalColor(d);
+          isLoadingCode = true;
+          modalCodeData = { name: d.data.name };
+          showModal = true;
+          fetchCodeDefinition(d.data.name);
+        }
       })
       .on("mouseout", function (event: MouseEvent, d: HierarchyNodeExtended) {
-        return;
         d3.select(this).style("opacity", 1).style("stroke-width", 1.5);
-
-        // handleHideTooltip({});
+        if (d.depth > 1 && hoveredCode === d.data.name) {
+          hoveredCode = null;
+          showModal = false;
+          modalCodeData = null;
+          isLoadingCode = false;
+        }
       })
       .on("click", function (event: MouseEvent, d: HierarchyNodeExtended) {
-        console.log({ d });
         if (!isZoomed && d.depth === 1 && d.children && d.children.length > 0) {
-          // If we're not zoomed, zoom into this parent
           zoomedParent = d;
           isZoomed = true;
-          renderSunburst(); // Re-render with zoomed view
+          renderSunburst();
         } else if (isZoomed && d.data.name === zoomedParent?.data.name) {
-          // If clicking on the zoomed parent (inner circle), zoom out
           zoomedParent = null;
           isZoomed = false;
-          renderSunburst(); // Re-render with full view
-        } else if (d.depth > 1) {
-          console.log("Clicked on child arc:", d.data.name);
-          // If clicking on a child arc, fetch and display code definition
-          fetchCodeDefinition(d.data.name);
+          renderSunburst();
         }
       });
 
@@ -577,26 +574,26 @@
 
     // Add center indicator when in zoomed mode
     if (isZoomed) {
-      const zoom_out_hint = d3
-        .select(svgElement)
-        .append("text")
-        .attr("text-anchor", "middle")
-        .attr("x", width - 60)
-        .attr("y", 20)
-        // .attr("dy", "-2rem")
-        .style("font-size", "12px")
-        .style("fill", "#aaa")
-        .style("pointer-events", "none");
-      zoom_out_hint
-        .append("tspan")
-        .attr("x", width - 60)
-        .attr("dy", "-0.3em")
-        .text("Click inner ring");
-      zoom_out_hint
-        .append("tspan")
-        .attr("x", width - 60)
-        .attr("dy", "1.2em")
-        .text("to zoom out");
+      // const zoom_out_hint = d3
+      //   .select(svgElement)
+      //   .append("text")
+      //   .attr("text-anchor", "middle")
+      //   .attr("x", width - 60)
+      //   .attr("y", 20)
+      //   // .attr("dy", "-2rem")
+      //   .style("font-size", "12px")
+      //   .style("fill", "#aaa")
+      //   .style("pointer-events", "none");
+      // zoom_out_hint
+      //   .append("tspan")
+      //   .attr("x", width - 60)
+      //   .attr("dy", "-0.3em")
+      //   .text("Click inner ring");
+      // zoom_out_hint
+      //   .append("tspan")
+      //   .attr("x", width - 60)
+      //   .attr("dy", "1.2em")
+      //   .text("to zoom out");
     }
 
     const baseDelay = index * 500;
@@ -720,112 +717,87 @@
 
 <div
   class="sunburst-container rounded-lg px-4 pb-4 pt-2 flex-1 flex flex-col items-center justify-center relative"
+  style={showModal ? "z-index: 9999" : ""}
 >
-  <div class="sunburst-title text-lg mb-4 text-center">
-    {isZoomed ? `${title} - ${zoomedParent?.data.name || ""}` : title}
+  <div class="sunburst-title text-lg mb-4 text-center flex items-center gap-3">
+    {#if isZoomed}
+      <button
+        type="button"
+        class="back-button flex items-center gap-1 rounded px-2 py-0.5 text-sm"
+        aria-label="Back to overview"
+        onclick={() => {
+          zoomedParent = null;
+          isZoomed = false;
+          renderSunburst();
+        }}
+      >
+        ← Back
+      </button>
+    {/if}
+    <span>
+      {isZoomed ? `${title} - ${zoomedParent?.data.name || ""}` : title}
+    </span>
   </div>
 
   <svg bind:this={svgElement} overflow="visible" viewBox="0 0 400 400"></svg>
 
-  <!-- Modal for code definitions -->
+  <!-- Hover tooltip for code definitions; offset to the side with more space -->
   {#if showModal}
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-opacity-50 flex items-center justify-center z-50"
-      onclick={(e) => {
-        if (e.target === e.currentTarget) {
-          showModal = false;
-          modalCodeData = null;
-        }
-      }}
+      class="hover-tooltip absolute top-1/2 -translate-y-1/2 z-50 pointer-events-none"
+      class:tooltip-right={isLeftChart}
+      class:tooltip-left={!isLeftChart}
     >
       <div
-        class="bg-[var(--surface-elevated)] outline-2 outline-[var(--brand-primary)] rounded-lg shadow-xl max-w-2xl w-[25rem] mx-4 max-h-[80vh] overflow-hidden"
+        class="bg-[var(--surface-elevated)] rounded-lg shadow-xl w-[22rem] max-h-[32rem] overflow-hidden flex flex-col"
       >
-        <!-- Modal Header -->
         <div
-          class="flex justify-between items-center p-6 border-b border-[var(--brand-primary)]"
+          class="p-4"
+          style={`background-color: ${hoveredColor}; color: ${getContrastColor(hoveredColor)};`}
         >
-          <h2 class="text-xl text-white">
+          <h2 class="text-lg">
             {modalCodeData?.name || "Loading..."}
           </h2>
-          <!-- svelte-ignore a11y_consider_explicit_label -->
-          <button
-            class="text-gray-400 hover:text-gray-600 transition-colors"
-            onclick={() => {
-              showModal = false;
-              modalCodeData = null;
-            }}
-          >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              ></path>
-            </svg>
-          </button>
         </div>
-
-        <!-- Modal Content -->
-        <div class="p-6 overflow-y-auto max-h-[60vh] rounded-md z-100">
+        <div class="p-4 overflow-y-auto text-white space-y-3">
           {#if isLoadingCode}
-            <div class="flex items-center justify-center py-8">
+            <div class="flex items-center justify-center py-4">
               <div
-                class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"
+                class="animate-spin rounded-full h-6 w-6 border-b-2 border-white"
               ></div>
-              <span class="ml-2 text-gray-600">Loading code definition...</span>
+              <span class="ml-2 text-gray-300 text-sm">Loading…</span>
             </div>
           {:else if modalCodeData?.error}
-            <div class="text-red-600 text-center py-8">
+            <div class="text-red-400">
               <p class="font-semibold">Error: {modalCodeData.error}</p>
               {#if modalCodeData.details}
                 <p class="text-sm mt-2">{modalCodeData.details}</p>
               {/if}
             </div>
           {:else if modalCodeData}
-            <div class="space-y-4 text-white">
-              {#if modalCodeData.description}
-                <div>
-                  <h3 class="mb-2">Description:</h3>
-                  <p class="">{modalCodeData.description}</p>
-                </div>
-              {/if}
-
-              {#if modalCodeData.definition}
-                <div>
-                  <h3 class="mb-2">Definition:</h3>
-                  <p class="">{modalCodeData.definition}</p>
-                </div>
-              {/if}
-              {#if modalCodeData.parent}
-                <div>
-                  <h3 class="mb-2">Parent:</h3>
-                  <p class="">{modalCodeData.parent}</p>
-                </div>
-              {/if}
-            </div>
+            {#if modalCodeData.description}
+              <div>
+                <h3 class="mb-1 text-sm font-semibold opacity-80">
+                  Description
+                </h3>
+                <p>{modalCodeData.description}</p>
+              </div>
+            {/if}
+            {#if modalCodeData.definition}
+              <div>
+                <h3 class="mb-1 text-sm font-semibold opacity-80">
+                  Definition
+                </h3>
+                <p>{modalCodeData.definition}</p>
+              </div>
+            {/if}
+            {#if modalCodeData.parent}
+              <div>
+                <h3 class="mb-1 text-sm font-semibold opacity-80">Parent</h3>
+                <p>{modalCodeData.parent}</p>
+              </div>
+            {/if}
           {/if}
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="px-6 pb-4 flex justify-end">
-          <button
-            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-            onclick={() => {
-              showModal = false;
-              modalCodeData = null;
-            }}
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>
@@ -837,5 +809,24 @@
     .sunburst-container {
       max-width: 100% !important;
     }
+  }
+  /* Position hover tooltip just outside the chart, on the side with more room. */
+  .tooltip-right {
+    left: 100%;
+    margin-left: 0.75rem;
+  }
+  .tooltip-left {
+    right: 100%;
+    margin-right: 0.75rem;
+  }
+  .back-button {
+    color: var(--text-primary);
+    background-color: var(--surface-interactive);
+    outline: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .back-button:hover {
+    filter: brightness(1.15);
   }
 </style>

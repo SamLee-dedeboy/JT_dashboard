@@ -215,9 +215,7 @@
     if (!data.children) return data;
     return {
       ...data,
-      children: [...data.children].sort((a, b) =>
-        a.name.localeCompare(b.name),
-      ),
+      children: [...data.children].sort((a, b) => a.name.localeCompare(b.name)),
     };
   }
 
@@ -322,18 +320,18 @@
   <!-- <div class="absolute right-4 top-[20rem]">
     Some descriptive text/caption can be put here
   </div> -->
-  <div class=" px-5 py-5 grow">
+  <div class="px-5 py-5 grow">
     <button
       type="button"
-      class="tutorial-trigger absolute top-2 left-2 flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium"
+      class="tutorial-trigger fixed top-5 left-5 z-50 flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium shadow-md"
       onclick={() => (tutorial_open = true)}
     >
       <span aria-hidden="true">?</span>
       Tutorial
     </button>
-
-    <!-- Controls -->
-    <div class="fixed top-5 right-5 bg-white rounded-lg shadow-md p-4 z-50">
+    <div
+      class="absolute top-2 right-3 z-50 bg-white rounded-lg shadow-md px-3 py-2"
+    >
       <div class="flex items-center gap-3 text-gray-800">
         <span class="text-sm">Show Top 5 Only:</span>
         <label class="relative inline-block w-12 h-6">
@@ -424,7 +422,7 @@
               </div>
             </div>
             {#each rowData as item, index}
-              <div class="flex-2" style={`z-index: ${index};`}>
+              <div class="flex-2 relative">
                 <SunburstChart
                   data={item.data}
                   title={item.title}
