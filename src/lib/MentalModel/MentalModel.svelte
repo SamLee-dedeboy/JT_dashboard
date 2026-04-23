@@ -108,14 +108,33 @@
   let selected_code: string | undefined = $state(undefined);
   let tooltip_y: number | undefined = $state(undefined);
   let sidebar_el = $state<HTMLDivElement | undefined>(undefined);
+  let tooltip_el = $state<HTMLDivElement | undefined>(undefined);
+  let tooltip_height = $state(0);
+
+  // Track the tooltip's live height via ResizeObserver so we can clamp its
+  // position against both its own size and the sidebar's bounds.
+  $effect(() => {
+    const el = tooltip_el;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      tooltip_height = entries[0].contentRect.height;
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  });
+
   // Convert the hovered bubble's viewport y into a top offset inside the
-  // sidebar, then clamp so the tooltip doesn't spill off the sidebar's edges.
+  // sidebar. Because the tooltip is translated by -50%, `top` represents the
+  // tooltip's VERTICAL CENTER — so clamp by half the tooltip height on each
+  // end to keep the whole box inside the sidebar.
   let tooltip_top = $derived.by(() => {
     if (tooltip_y === undefined || !sidebar_el) return 0;
     const rect = sidebar_el.getBoundingClientRect();
+    const halfH = tooltip_height / 2;
     const raw = tooltip_y - rect.top;
-    const max = Math.max(0, rect.height - 80);
-    return Math.max(0, Math.min(max, raw));
+    const minTop = halfH;
+    const maxTop = Math.max(minTop, rect.height - halfH);
+    return Math.max(minTop, Math.min(maxTop, raw));
   });
 
   onMount(() => {
@@ -176,6 +195,7 @@
       {#if merged_server_data && selected_code}
         {#key selected_code}
           <div
+            bind:this={tooltip_el}
             class="absolute left-4 right-4 -translate-y-1/2 transition-all duration-200"
             style={`top: ${tooltip_top}px`}
           >
