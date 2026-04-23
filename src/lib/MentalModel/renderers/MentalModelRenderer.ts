@@ -206,7 +206,7 @@ export class MentalModelRenderer {
             // .attr("stroke", "#26414b")
             .attr("stroke", "#c3c3c3")
             .attr("stroke-opacity", 0.5)
-        const canvasRadiusScale = d3.scalePow().exponent(1/2).domain([d3.min(nodes_data, d => d[1]), d3.max(nodes_data, d => d[1])]).range([0, this.height * center / 1.5])
+        const canvasRadiusScale = d3.scalePow().exponent(1/2).domain([d3.min(nodes_data, d => d[1]), d3.max(nodes_data, d => d[1])]).range([0, this.height * center / 1.3])
         // update force
         const forceNode = d3.forceManyBody();
         this.simulation = d3
@@ -223,7 +223,32 @@ export class MentalModelRenderer {
         // .force("clf_y", d3.forceY((d) => classification_force_position_y[node_types[d[0]]] || this.height * center).strength(0.08))
         // .force("center", d3.forceCenter(this.width / 2, this.height * center).strength(0.02))
         // .force("charge", forceNode.distanceMin(20))
-        .force("collide", d3.forceCollide((d) => 1.2*d.r).strength(0.02))
+        .force("collide", d3.forceCollide((d) => 1.2*d.r).strength(0.2))
+        // Boundary force: keep "impacts salinity" nodes above the center line
+        // and "impacted by salinity" nodes below it. On each tick, clamp any
+        // node that has crossed and zero out its y velocity so it doesn't
+        // bounce. The Salinity center node is pinned to the line.
+        .force("boundary", () => {
+          const line = this.height * center;
+          nodes.forEach((d: any) => {
+            const r = d.r ?? 0;
+            if (d[0] === "Salinity") return;
+            const type = node_types[d[0]];
+            if (type === "impacts salinity") {
+              const maxY = line - r * 1.1;
+              if ((d.y ?? 0) > maxY) {
+                d.y = maxY;
+                if (d.vy && d.vy > 0) d.vy = 0;
+              }
+            } else if (type === "impacted by salinity") {
+              const minY = line + r * 1.1;
+              if ((d.y ?? 0) < minY) {
+                d.y = minY;
+                if (d.vy && d.vy < 0) d.vy = 0;
+              }
+            }
+          });
+        })
         .on("tick", () => {
           circles
             .attr(
