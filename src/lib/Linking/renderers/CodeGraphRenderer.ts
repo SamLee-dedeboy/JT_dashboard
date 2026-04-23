@@ -64,6 +64,13 @@ export class CodeGraphRenderer {
     private allNodes: GraphNode[] = [];
     private allLinks: GraphLink[] = [];
     private zoomBehavior: d3.ZoomBehavior<SVGSVGElement, unknown> | null = null;
+    // Per top-level id: where it sits inside the canvas (region), where its
+    // descendants are pulled toward (outward, for the branch "splay" effect),
+    // and the radial angle from the viewport center to both anchors.
+    private anchorByRoot: Map<
+        string,
+        { region: [number, number]; outward: [number, number]; angle: number }
+    > = new Map();
 
     constructor(svgId: string, dispatchHover: (node: GraphNode | null) => void) {
         this.svgId = svgId
@@ -107,6 +114,71 @@ export class CodeGraphRenderer {
         svg.transition().duration(350).call(this.zoomBehavior.transform, d3.zoomIdentity);
     }
     
+    // Evenly spaced angles shaped per top-level-node count:
+    //   1 -> center, 2 -> horizontal, 3 -> Y (one top arm, two below),
+    //   4 -> X (four diagonals), N>=5 -> evenly spaced starting at top.
+    private anglesForN(n: number): number[] {
+        if (n === 1) return [0];
+        if (n === 2) return [Math.PI, 0];
+        if (n === 3) return [-Math.PI / 2, Math.PI / 6, (5 * Math.PI) / 6];
+        if (n === 4)
+            return [
+                -(3 * Math.PI) / 4,
+                -Math.PI / 4,
+                (3 * Math.PI) / 4,
+                Math.PI / 4,
+            ];
+        return Array.from(
+            { length: n },
+            (_, i) => -Math.PI / 2 + (i * 2 * Math.PI) / n,
+        );
+    }
+
+    private computeRootAnchors(
+        codes: tCode[],
+        nodeDepths: Map<string, number>,
+    ): Map<
+        string,
+        { region: [number, number]; outward: [number, number]; angle: number }
+    > {
+        const topLevelIds = codes
+            .filter(
+                (c) => c.name !== "root" && (nodeDepths.get(c.name) || 0) === 1,
+            )
+            .map((c) => c.name)
+            .sort((a, b) => a.localeCompare(b));
+
+        const angles = this.anglesForN(topLevelIds.length);
+        const cx = this.width / 2;
+        const cy = this.height / 2;
+        const regionR = Math.min(this.width, this.height) * 0.1;
+        const outwardR = Math.max(this.width, this.height) * 0.1;
+
+        const map = new Map<
+            string,
+            { region: [number, number]; outward: [number, number]; angle: number }
+        >();
+        topLevelIds.forEach((id, i) => {
+            if (topLevelIds.length === 1) {
+                map.set(id, { region: [cx, cy], outward: [cx, cy], angle: 0 });
+                return;
+            }
+            const theta = angles[i];
+            map.set(id, {
+                region: [
+                    cx + regionR * Math.cos(theta),
+                    cy + regionR * Math.sin(theta),
+                ],
+                outward: [
+                    cx + outwardR * Math.cos(theta),
+                    cy + outwardR * Math.sin(theta),
+                ],
+                angle: theta,
+            });
+        });
+        return map;
+    }
+
     private calculateNodeDepths(codes: tCode[]): Map<string, number> {
         const depths = new Map<string, number>();
         const visited = new Set<string>();
@@ -130,11 +202,19 @@ export class CodeGraphRenderer {
         });
         console.log("Children to parent Map:", childToParents);
         
-        // Find root nodes (nodes with no parents)
-        const rootNodes = codes.filter(code => !childToParents.has(code.name));
+        // Root nodes are the top-level codes (no "\\" separator in the name).
+        // Using the path shape directly keeps this correct even when the
+        // synthetic "root" entry has been filtered out upstream.
+        const rootNodes = codes.filter(
+            (code) => code.name !== "root" && !code.name.includes("\\"),
+        );
         
-        // Perform BFS to calculate depths
-        const queue: { name: string; depth: number }[] = rootNodes.map(node => ({ name: node.name, depth: 0 }));
+        // Perform BFS to calculate depths. Top-level codes (the "roots" in
+        // our filtered graph) are assigned depth 1 so downstream code that
+        // treats depth-1 as the top tier (e.g. computeRootAnchors) keeps
+        // working regardless of whether the synthetic "root" sentinel is
+        // present.
+        const queue: { name: string; depth: number }[] = rootNodes.map(node => ({ name: node.name, depth: 1 }));
         
         while (queue.length > 0) {
             const { name, depth } = queue.shift()!;
@@ -153,30 +233,116 @@ export class CodeGraphRenderer {
         
         return depths;
     }
-    update(codes: tCode[]) {
-        console.log("Updating CodeGraphRenderer with codes:", codes);
+    update(rawCodes: tCode[]) {
+        console.log("Updating CodeGraphRenderer with codes:", rawCodes);
         const svg = d3.select(`#${this.svgId}`)
-        
+
+        // Restrict to the four canonical top-level categories and anything
+        // reachable from them via scenario_children. Stray codes with different
+        // prefixes or disconnected from these roots are dropped so the graph
+        // stays stable across scenarios.
+        const ALLOWED_ROOTS = new Set([
+            "Drivers",
+            "Value",
+            "Strategies",
+            "Governance",
+        ]);
+        const parentToChildrenAll = new Map<string, string[]>();
+        rawCodes.forEach((code) => {
+            parentToChildrenAll.set(code.name, code.scenario_children);
+        });
+        const reachable = new Set<string>();
+        const queue: string[] = [];
+        ALLOWED_ROOTS.forEach((root) => {
+            if (rawCodes.some((c) => c.name === root)) {
+                reachable.add(root);
+                queue.push(root);
+            }
+        });
+        while (queue.length > 0) {
+            const name = queue.shift()!;
+            const children = parentToChildrenAll.get(name) || [];
+            children.forEach((child) => {
+                if (!reachable.has(child)) {
+                    reachable.add(child);
+                    queue.push(child);
+                }
+            });
+        }
+        const codes = rawCodes.filter((c) => reachable.has(c.name));
+
         // Calculate node depths
         const nodeDepths = this.calculateNodeDepths(codes);
         console.log("Node Depths:", nodeDepths);
 
+        // Compute one region/outward anchor per top-level node based on how
+        // many there are: 4 -> X shape, 3 -> Y, 2 -> horizontal split, etc.
+        this.anchorByRoot = this.computeRootAnchors(codes, nodeDepths);
+
         const scaleRadius = d3.scalePow().exponent(1/2).domain([0, d3.max(codes, d=>d.participants.length) || 1]).range([12, 40])
-        // Construct graph data structure
-        const nodes: GraphNode[] = codes.filter(code => code.name !== "root").map(code => ({
-            id: code.name,
-            name: code.name.split("\\").at(-1)!,
-            radius: scaleRadius(code.participants.length),
-            participantCount: code.participants.length,
-            depth: nodeDepths.get(code.name) || 0,
-            isVisible: true, // All nodes visible by default
-            isExpanded: true,
-            children: code.scenario_children,
-            hasChildren: code.scenario_children.length > 0,
-            x: Math.random() * this.width,
-            y: Math.random() * this.height,
-            color: bubble_color(code.name.split("\\")[0])
-        }));
+        const cx = this.width / 2;
+        const cy = this.height / 2;
+        const minDim = Math.min(this.width, this.height);
+        const regionR = minDim * 0.2;
+        const stepR = minDim * 0.3;
+
+        // Assign each node a deterministic index within its (root, depth)
+        // sibling group, sorted alphabetically, so we can fan them angularly
+        // around the root's angle instead of stacking them at a single point.
+        const siblingCount = new Map<string, number>();
+        const siblingIndex = new Map<string, number>();
+        [...codes]
+            .filter((c) => c.name !== "root")
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach((c) => {
+                const rootId = c.name.split("\\")[0];
+                const d = nodeDepths.get(c.name) || 1;
+                const key = `${rootId}|${d}`;
+                const idx = siblingCount.get(key) ?? 0;
+                siblingIndex.set(c.name, idx);
+                siblingCount.set(key, idx + 1);
+            });
+
+        // Construct graph data structure. Initial position is seeded along the
+        // root's angle with a radius that scales linearly with depth and an
+        // angular offset per sibling so same-level siblings don't overlap.
+        const nodes: GraphNode[] = codes.filter(code => code.name !== "root").map(code => {
+            const rootId = code.name.split("\\")[0];
+            const anchor = this.anchorByRoot.get(rootId);
+            const depth = nodeDepths.get(code.name) || 1;
+            let baseX = cx;
+            let baseY = cy;
+            console.log(code.name, depth)
+            if (anchor) {
+                const r = stepR * (depth - 1);
+                const key = `${rootId}|${depth}`;
+                const count = siblingCount.get(key) ?? 1;
+                const idx = siblingIndex.get(code.name) ?? 0;
+                // Spread 90° around the root's angle; wider for deeper levels
+                // which typically have more siblings.
+                const spread = Math.PI / 2;
+                const frac =
+                    count <= 1 ? 0 : idx / (count - 1) - 0.5; // [-0.5, 0.5]
+                const theta = anchor.angle + frac * spread;
+                baseX = anchor.region[0] + r * Math.cos(theta);
+                baseY = anchor.region[1] + r * Math.sin(theta);
+            }
+            const jitter = 80;
+            return {
+                id: code.name,
+                name: code.name.split("\\").at(-1)!,
+                radius: scaleRadius(code.participants.length),
+                participantCount: code.participants.length,
+                depth,
+                isVisible: true,
+                isExpanded: true,
+                children: code.scenario_children,
+                hasChildren: code.scenario_children.length > 0,
+                x: baseX,
+                y: baseY,
+                color: bubble_color(code.name.split("\\")[0]),
+            };
+        });
         
         // Store all nodes and links for later reference
         this.allNodes = nodes;
@@ -222,14 +388,11 @@ export class CodeGraphRenderer {
             .exponent(2)
             .domain([1, d3.max(this.allNodes, d => d.depth) || 1])
             .range([0, Math.max(this.width, this.height) * 1.2])
-        // Anchors placed well outside the viewBox so the four category branches
-        // splay clearly in four directions rather than clustering at center.
-        const cornerForce = {
-            "Drivers": [-this.width / 2, -this.height / 2],
-            "Strategies": [this.width * 1.5, -this.height / 2],
-            "Value": [-this.width / 2, this.height * 1.5],
-            "Governance": [this.width * 1.5, this.height * 1.5],
-        }
+        // Anchors per top-level id: `region` is where the root sits inside the
+        // canvas (so each branch occupies its own quadrant of the N-arm shape);
+        // `outward` is placed well outside the viewBox so descendants splay
+        // outward from their root, giving each branch a tree-like layout.
+        const anchorByRoot = this.anchorByRoot;
 
         // Build sibling groups: visible nodes that share a parent and depth.
         // Used by the "sibling-repel" custom force below to push same-parent
@@ -278,7 +441,6 @@ export class CodeGraphRenderer {
                 }
             }
         };
-
         // Set up D3 force simulation with visible nodes
         const simulation = d3.forceSimulation(visibleNodes)
             .force("link", d3.forceLink<GraphNode, GraphLink>(visibleLinks)
@@ -307,23 +469,30 @@ export class CodeGraphRenderer {
                     return Math.max(minDistance, baseDistance);
                 })
                 .strength(1))
-            .force("charge", d3.forceManyBody().strength(-1))
+            // .force("charge", d3.forceManyBody().strength(-1))
             // .force("radial", d3.forceRadial(null, this.width / 2, this.height / 2).radius(d => {
             //     return scaleRadialRadius(d.depth)
             // }).strength(0.5))
             // Depth-1 nodes are pulled strongly toward the viewport center so
             // they form a tight cluster there; deeper nodes are pulled toward
             // their category's corner anchor so branches splay outward.
+            // Top-level nodes sit at their region anchor (inside the canvas),
+            // descendants are pulled toward the outward anchor along the same
+            // radial direction so each branch "splays" outward like a tree.
             .force("x", d3.forceX<GraphNode>().x(d => {
-                if (d.depth <= 1) return this.width / 2;
-                const corner = cornerForce[d.id.split("\\")[0]];
-                return corner ? corner[0] : this.width / 2;
-            }).strength(d => d.depth <= 1 ? 2 : 0.03))
+                const rootId = d.id.split("\\")[0];
+                const anchor = anchorByRoot.get(rootId);
+                if (!anchor) return this.width / 2;
+                return d.x
+                // return d.depth <= 1 ? anchor.region[0] : d.x
+            }).strength((d) => d.depth === 1 ? 2 : 0.5))
             .force("y", d3.forceY<GraphNode>().y(d => {
-                if (d.depth <= 1) return this.height / 1.5;
-                const corner = cornerForce[d.id.split("\\")[0]];
-                return corner ? corner[1] : this.height / 2;
-            }).strength(d => d.depth <= 1 ? 2 : 0.05))
+                const rootId = d.id.split("\\")[0];
+                const anchor = anchorByRoot.get(rootId);
+                if (!anchor) return this.height / 2;
+                return d.y
+                // return d.depth <= 1 ? anchor.region[1] : d.y
+            }).strength((d) => d.depth === 1 ? 2 : 0.5))
             // .force("center", d3.forceCenter(this.width / 2, this.height / 2))
             .force("collision", d3.forceCollide<GraphNode>()
                 .radius(d => d.radius + 5)
@@ -369,7 +538,7 @@ export class CodeGraphRenderer {
                     d3.select(event.currentTarget as SVGCircleElement)
                         .attr("stroke", "#333")
                         .attr("stroke-width", 1.5);
-                    this.dispatchHover(null);
+                    // this.dispatchHover(null);
                 }),
                 update => update
                     .attr("cx", d => d.x = d.x!)
