@@ -8,6 +8,7 @@
   import type { GraphNode } from "./renderers/CodeGraphRenderer";
   import { bubble_color } from "./constants";
   import { scale } from "svelte/transition";
+  import InfoButton from "../InfoButton.svelte";
   import { cubicOut } from "svelte/easing";
   let {
     selected_scenario = undefined,
@@ -107,29 +108,9 @@
         </div>
       </div>
     {:else}
-      <button
-        type="button"
-        class="info-panel-collapsed flex h-8 w-8 items-center justify-center rounded-full"
-        aria-label="Expand info panel"
-        onclick={() => (info_open = true)}
-        transition:scale={{ start: 0.85, duration: 200, easing: cubicOut }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          ><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path
-            d="M12 8h.01"
-          /></svg
-        >
-      </button>
+      <div transition:scale={{ start: 0.85, duration: 200, easing: cubicOut }}>
+        <InfoButton onclick={() => (info_open = true)} label="Expand info panel" />
+      </div>
     {/if}
   </div>
   {#if selected_scenario}
@@ -168,22 +149,6 @@
     );
     outline: 1px solid var(--border-subtle);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  }
-  .info-panel-collapsed {
-    transform-origin: top right;
-    background-color: color-mix(
-      in srgb,
-      var(--surface-elevated) 92%,
-      transparent
-    );
-    color: var(--text-primary);
-    outline: 1px solid var(--border-subtle);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-    transition: filter 0.15s;
-  }
-  .info-panel-collapsed:hover {
-    filter: brightness(1.15);
   }
   .info-toggle {
     color: var(--text-primary);

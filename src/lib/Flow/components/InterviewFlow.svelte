@@ -570,6 +570,13 @@
     // add_intro_pseudo_block();
     blockState.clicked_normal_blocks = [];
     render_paths();
+    for (let i = 1; i < sectionState.sections.length; i++) {
+      setTimeout(() => {
+        const next = [...sectionState.sections];
+        next[i] = { ...next[i], revealed: true };
+        sectionState.sections = next;
+      }, i * 600);
+    }
     document
       .querySelector(".flow-container")
       ?.addEventListener("click", (e) => {

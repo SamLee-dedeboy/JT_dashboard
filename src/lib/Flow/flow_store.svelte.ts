@@ -82,23 +82,6 @@ export const blockState = {
   },
   set clicked_normal_blocks(blocks: tBlock[]) {
     _clicked_normal_blocks = JSON.parse(JSON.stringify(blocks))
-    // Progressive disclosure: reveal section N+1 for any clicked block in section N.
-    // Monotonic — once revealed, stays revealed.
-    let next_sections = _sections;
-    let mutated = false;
-    for (const b of _clicked_normal_blocks) {
-      const idx = next_sections.findIndex((s) =>
-        s.columns.some((c) => c.column_id_prefix === b.column_id)
-      );
-      if (idx >= 0 && idx + 1 < next_sections.length && !next_sections[idx + 1].revealed) {
-        if (!mutated) {
-          next_sections = [...next_sections];
-          mutated = true;
-        }
-        next_sections[idx + 1] = { ...next_sections[idx + 1], revealed: true };
-      }
-    }
-    if (mutated) _sections = next_sections;
     flowActions.triggerRenderPaths();
   },
   get clicked_leading_blocks() {

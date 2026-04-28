@@ -1,15 +1,57 @@
 <script lang="ts">
   import { push } from "svelte-spa-router";
+  import { fade } from "svelte/transition";
+  import InfoButton from "./InfoButton.svelte";
+
+  let modal_open = $state(true);
 </script>
+
+{#if modal_open}
+  <div
+    class="modal-backdrop"
+    role="button"
+    tabindex="-1"
+    transition:fade={{ duration: 200 }}
+    onclick={() => (modal_open = false)}
+    onkeyup={() => {}}
+  >
+    <div
+      class="modal-box"
+      role="dialog"
+      aria-modal="true"
+      onclick={(e) => e.stopPropagation()}
+    >
+      <!-- <div class="modal-accent-bar"></div> -->
+      <h2 class="modal-title">Welcome to the<br />Co-Learning Dashboard</h2>
+      <p class="modal-body">
+        This site offers interactive opportunities to explore how the Just
+        Transitions in the Delta research project has prioritized and responded
+        to public engagement through a participatory scenario planning process
+      </p>
+      <p class="modal-cta">Click one of the modules to get started</p>
+      <button
+        class="modal-close"
+        onclick={() => (modal_open = false)}
+        aria-label="Close">✕</button
+      >
+    </div>
+  </div>
+{/if}
+
+<InfoButton
+  onclick={() => (modal_open = !modal_open)}
+  label="About this dashboard"
+  class="info-btn-fixed"
+/>
 
 <div class="home-container">
   <header class="welcome-header">
     <h1 class="welcome-title">Welcome to the Co-Learning Dashboard</h1>
-    <p class="welcome-subtitle">
+    <!-- <p class="welcome-subtitle">
       This site offers interactive opportunities to explore how the Just
       transitions in the Delta research project has prioritized and responded to
       public engagement through a participatory scenario planning process.
-    </p>
+    </p> -->
   </header>
 
   <div class="timeline-container">
@@ -18,21 +60,21 @@
     <!-- Timeline Item 1 - Left -->
     <div class="timeline-item left">
       <div class="timeline-side">
-        <button class="timeline-card" on:click={() => push("/flow")}>
+        <button class="timeline-card" onclick={() => push("/flow")}>
           <h3 class="card-title">Listening</h3>
           <h4 class="card-subtitle">
-            UNDERSTANDING PUBLIC VALUES and CONCERNS
+            UNDERSTANDING PUBLIC <br /> VALUES and CONCERNS
           </h4>
           <p class="card-body">
-            We started our co-learning process by interviewing Delta residents,
-            community organizers, Indigenous community members, farmers,
-            scientists, and agency officials. This first phase focused on public
-            opinions and values, along with overall perceptions of the Delta. We
-            asked interviewees what drives change in the Delta to reveal how
-            people understand and prioritize these factors.
+            Our process began by interviewing Delta residents, community
+            organizers, Indigenous community members, farmers, scientists,
+            experts and agency officials. Key questions we asked interviewees
+            were what they most value about the Delta, what factors are driving
+            change, what adaptation strategies are most useful to explore, and
+            who is and isn’t represented in Delta planning efforts.
           </p>
           <p class="card-hint">
-            Click to explore how we developed connections across our interview
+            Click to explore the results and connections across the interview
             data
           </p>
         </button>
@@ -48,16 +90,16 @@
         <div class="timeline-date">Early 2024</div>
       </div>
       <div class="timeline-side">
-        <button class="timeline-card" on:click={() => push("/linking")}>
+        <button class="timeline-card" onclick={() => push("/linking")}>
           <h3 class="card-title">Designing</h3>
-          <h4 class="card-subtitle">FROM IDEAS and VALUES TO SCENARIOS</h4>
+          <h4 class="card-subtitle">
+            FROM IDEAS and VALUES <br /> TO SCENARIOS
+          </h4>
           <p class="card-body">
             With a rich understanding of participant values, the drivers of
-            change, and the management strategies held across a range of
-            interviewees, we then applied these perceptions to the design of six
-            distinct scenarios. Each scenario draws from interview responses to
-            weave public opinions and priorities into the co-design of
-            adaptation strategies and features for each potential future.
+            change, and the management and adaptation strategies prioritized
+            across a range of interviewees, we used this information as the
+            foundation for the design of six distinct scenarios.
           </p>
           <p class="card-hint">
             Click to explore how interviews shaped the design of each scenario
@@ -69,20 +111,18 @@
     <!-- Timeline Item 3 - Left -->
     <div class="timeline-item left">
       <div class="timeline-side">
-        <button class="timeline-card" on:click={() => push("/mental-model")}>
-          <h3 class="card-title">ORGANIZING</h3>
-          <h4 class="card-subtitle">A LARGER MENTAL MODEL</h4>
+        <button class="timeline-card" onclick={() => push("/mental-model")}>
+          <h3 class="card-title">CONCEPTUALIZING</h3>
+          <h4 class="card-subtitle">SHARED UNDERSTANDINGS OF DELTA SALINITY</h4>
           <p class="card-body">
-            Third, we began organizing larger concepts based on the various
-            topics identified in the interviews. We nested these topics into and
-            defined themes that altogether helped us understand the "mental
-            models" of our participants. We divided these mental models into two
-            groups: 1) What drives change in relation to salinity? and 2) What
-            does salinity impact?
+            Throughout the project we have been documenting how project
+            participants conceptualize and understand salinity and salinity
+            management in the Delta. We collected these “mental models” through
+            interviews and our public workshops and exhibitions.
           </p>
           <p class="card-hint">
-            Click to explore salinity drivers and impacts within this mental
-            model
+            Click to explore shared understandings of drivers and impacts of
+            Delta Salinity
           </p>
         </button>
       </div>
@@ -97,19 +137,18 @@
         <div class="timeline-date">Summer 2025</div>
       </div>
       <div class="timeline-side">
-        <button class="timeline-card" on:click={() => push("/sunburst")}>
+        <button class="timeline-card" onclick={() => push("/sunburst")}>
           <h3 class="card-title">Comparing</h3>
           <h4 class="card-subtitle">DIFFERENT MENTAL MODELS</h4>
           <p class="card-body">
             We then took the interview and public mental models a step further
-            by comparing them across a range of demographic categories. We
-            observed similarities and differences between a variety of groups.
-            These groups include comparisons of age, experience, Delta resident
-            or non-resident, and research team members or not.
+            by comparing them across a range of demographic and other category
+            types. We observed similarities and differences between a variety of
+            groups, including comparisons across age, experience, Delta resident
+            or non-resident, and research team members compared to participants.
           </p>
           <p class="card-hint">
-            Click to explore how mental models differ across demographic
-            categories
+            Click to explore how mental models differ across participants
           </p>
         </button>
       </div>
@@ -119,6 +158,75 @@
 
 <style lang="postcss">
   @reference "tailwindcss";
+
+  :global(.info-btn-fixed) {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 100;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-box {
+    position: relative;
+    background: var(--surface-page);
+    border: 1px dashed var(--jt-green);
+    /* border-radius: 8px; */
+    max-width: 500px;
+    width: 90%;
+    padding: 4rem 3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    overflow: hidden;
+  }
+
+  .modal-title {
+    color: var(--text-primary);
+  }
+
+  .modal-body {
+    font-family: var(--font-body);
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .modal-cta {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--jt-blue);
+    margin: 0;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .modal-close:hover {
+    opacity: 1;
+  }
 
   .home-container {
     padding: 2rem;
@@ -146,12 +254,7 @@
   }
 
   .welcome-title {
-    font-family: var(--font-body);
-    font-weight: 400;
-    font-size: 2.25rem;
-    line-height: 1.2;
     color: var(--text-primary);
-    /* margin: 0 0 0.75rem; */
   }
 
   .welcome-subtitle {
@@ -271,26 +374,16 @@
   }
 
   .card-title {
-    /* font-family: var(--font-display); */
-    font-family: var(--font-body);
-    font-size: 1.75rem;
-    font-weight: 400;
     color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: var(--tracking-wide);
-    line-height: 1.1;
-    margin: 0;
+    font-family: "Hammersmith One", serif;
   }
 
   .card-subtitle {
-    /* font-family: var(--font-display); */
-    font-family: var(--font-body);
-    font-size: 1.05rem;
-    font-weight: 400;
     color: var(--jt-green);
     text-transform: uppercase;
     letter-spacing: var(--tracking-wide);
-    line-height: 1.2;
     margin: 0 0 0.25rem;
   }
 
@@ -343,11 +436,11 @@
     position: relative;
     width: 20px;
     height: 20px;
-    background: var(--jt-blue);
-    border: 4px solid var(--jt-blue);
+    background: white;
+    /* border: 1px solid var(--jt-green); */
     border-radius: 50%;
     z-index: 2;
-    box-shadow: 0 0 3px var(--jt-blue);
+    /* box-shadow: 0 0 3px var(--jt-blue); */
   }
 
   .timeline-date {
@@ -356,7 +449,7 @@
     transform: translateY(-50%);
     font-size: 1rem;
     font-weight: 600;
-    color: var(--jt-blue);
+    color: var(--jt-green);
     white-space: nowrap;
   }
 

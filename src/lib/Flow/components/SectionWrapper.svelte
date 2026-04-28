@@ -3,7 +3,7 @@
   import Section from "./Section.svelte";
   import type { BlockAggregator } from "../renderers/BlockAggregator";
   import { onMount } from "svelte";
-  import { fade } from "svelte/transition";
+  import { fly } from "svelte/transition";
 
   // Use $props() instead of export let
   let {
@@ -50,7 +50,7 @@
     style={`width: ${
       (100 * section.columns.length) / total_columns
     }%; z-index: ${10 * (total_sections - index)}`}
-    in:fade|global={{ duration: 400 }}
+    in:fly|global={{ x: 40, duration: 500 }}
   >
     <Section bind:section {data} {category_metadata} {block_aggregator}
     ></Section>
