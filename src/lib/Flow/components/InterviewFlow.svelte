@@ -39,7 +39,6 @@
   let container = $state<HTMLElement>();
   let chat_response_audio = $state<HTMLAudioElement>();
   let intro_step = $state(0);
-  let tutorial_open = $state(true);
   let recorder = $state<any>(null);
   let is_recording = $state(false);
   let chunks = $state<any[]>([]);
@@ -617,14 +616,7 @@
     <div class="overview-panel w-full"></div>
     <div class="statistics-panel flex h-1 grow flex-col">
       <div class="flex grow flex-col gap-8">
-        <button
-          type="button"
-          class="tutorial-trigger mx-2 flex items-center justify-center gap-2 rounded-md p-2 text-sm font-medium"
-          onclick={() => (tutorial_open = true)}
-        >
-          <span aria-hidden="true">?</span>
-          Tutorial
-        </button>
+
         <Combinations
           {block_aggregator}
           leading_section_title={Constants.column_id_to_title[leading_column]}
@@ -718,105 +710,11 @@
   </div>
 </div>
 
-{#if tutorial_open}
-  <div
-    class="tutorial-overlay fixed inset-0 z-50 flex items-center justify-center"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="tutorial-title"
-  >
-    <div
-      class="tutorial-backdrop absolute inset-0"
-      role="button"
-      tabindex="-1"
-      aria-label="Close tutorial"
-      onclick={() => (tutorial_open = false)}
-      onkeydown={(e) => {
-        if (e.key === "Escape") tutorial_open = false;
-      }}
-    ></div>
-    <div
-      class="tutorial-modal relative z-10 flex max-h-[85vh] w-160 max-w-[90vw] flex-col gap-4 overflow-auto rounded-lg p-6 text-white shadow-xl"
-    >
-      <div class="flex items-start justify-between gap-4">
-        <h2 id="tutorial-title" class="text-lg font-semibold">
-          How to use this interface
-        </h2>
-        <button
-          type="button"
-          class="tutorial-close rounded-md px-2 py-1 text-sm"
-          aria-label="Close tutorial"
-          onclick={() => (tutorial_open = false)}
-        >
-          ✕
-        </button>
-      </div>
-      <div class="flex flex-col gap-4 divide-y divide-dashed">
-        <div>
-          <div>We mainly asked three questions in the interview:</div>
-          <ol class="list-decimal list-outside pl-4">
-            <li>What should Future Salinity Management Strategies focus on?</li>
-            <li>What are the Drivers of Change?</li>
-            <li>Is the current decision making Fair?</li>
-          </ol>
-          <div class="my-2">
-            Answer the questions yourself by clicking the blocks and see how
-            many participants agree with you!
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2 pt-4">
-          <div>How to read the flow diagram:</div>
-          <div>Each block represents a category of public opinion.</div>
-          <div>
-            Connected blocks represent public opinion from the same group of
-            people.
-          </div>
-          <div>
-            Color of connections represent different groups of people.
-            <br />
-            These groups are defined by the participants' responses to
-            <span class="underline">
-              "What should be the Future Salinity Management Strategies?".
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-{/if}
 
 <style lang="postcss">
   @reference "tailwindcss";
   .upper-page {
     background-color: var(--surface-elevated);
-  }
-  .control-panel span {
-    color: var(--text-primary);
-  }
-  .tutorial-trigger {
-    background-color: var(--brand-primary);
-    color: white;
-    cursor: pointer;
-    transition: filter 0.15s;
-  }
-  .tutorial-trigger:hover {
-    filter: brightness(1.1);
-  }
-  .tutorial-backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .tutorial-modal {
-    background-color: var(--bg-page);
-    outline: 2px solid var(--brand-primary);
-  }
-  .tutorial-close {
-    background-color: transparent;
-    color: white;
-    cursor: pointer;
-  }
-  .tutorial-close:hover {
-    background-color: rgba(255, 255, 255, 0.1);
   }
   .sankey-svg {
     @apply absolute bottom-0 left-0 right-0 top-0;

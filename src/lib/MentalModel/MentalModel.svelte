@@ -5,6 +5,7 @@
   import CodeTooltip from "./CodeTooltip.svelte";
   import { server_address } from "./constants";
   import { push } from "svelte-spa-router";
+  import { nodeTypeColor } from "./constants";
 
   // function goBack() {
   //   push("/");
@@ -104,7 +105,6 @@
         console.error("Error:", error);
       });
   }
-  let tutorial_open = $state(true);
   let selected_code: string | undefined = $state(undefined);
   let tooltip_y: number | undefined = $state(undefined);
   let sidebar_el = $state<HTMLDivElement | undefined>(undefined);
@@ -144,14 +144,6 @@
 </script>
 
 <div class="page-container flex-1 flex flex-col relative">
-  <button
-    type="button"
-    class="tutorial-trigger absolute top-2 left-2 flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium"
-    onclick={() => (tutorial_open = true)}
-  >
-    <span aria-hidden="true">?</span>
-    Tutorial
-  </button>
   <div class="flex">
     <!-- <button
       on:click={goBack}
@@ -175,9 +167,23 @@
   </div>
 
   <div class="flex grow gap-6 relative min-h-0">
-    <div class="flex flex-col w-[60%] min-h-0">
+    <div class="flex flex-col w-[60%] min-h-0 gap-1">
       <div class="jt-section-title text-center text-[1.5rem] text-white">
-        Mental Models (48)
+        Collective mental model of <br />
+        salinity
+        <span
+          class="px-2"
+          style={`background-color: ${nodeTypeColor["impacts salinity"]}; color: black`}
+        >
+          Drivers
+        </span>
+        and
+        <span
+          class="px-2"
+          style={`background-color: ${nodeTypeColor["impacted by salinity"]}; color: white`}
+        >
+          Impacts
+        </span>
       </div>
       <AllMMs
         server_data={merged_server_data}
@@ -207,73 +213,15 @@
           </div>
         {/key}
       {:else}
-        <div class="flex h-full items-center justify-center p-4 text-center italic opacity-70">
+        <div
+          class="flex h-full items-center justify-center p-4 text-center italic opacity-70"
+        >
           Hover over a bubble on the left to see details about that code.
         </div>
       {/if}
     </div>
   </div>
 </div>
-
-{#if tutorial_open}
-  <div
-    class="tutorial-overlay fixed inset-0 z-50 flex items-center justify-center"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="mm-tutorial-title"
-  >
-    <div
-      class="tutorial-backdrop absolute inset-0"
-      role="button"
-      tabindex="-1"
-      aria-label="Close tutorial"
-      onclick={() => (tutorial_open = false)}
-      onkeydown={(e) => {
-        if (e.key === "Escape") tutorial_open = false;
-      }}
-    ></div>
-    <div
-      class="tutorial-modal relative z-10 flex max-h-[85vh] w-160 max-w-[90vw] flex-col gap-4 overflow-auto rounded-lg p-6 text-white shadow-xl"
-    >
-      <div class="flex items-start justify-between gap-4">
-        <h2 id="mm-tutorial-title" class="text-lg font-semibold">
-          How to read these Mental Models
-        </h2>
-        <button
-          type="button"
-          class="tutorial-close rounded-md px-2 py-1 text-sm"
-          aria-label="Close tutorial"
-          onclick={() => (tutorial_open = false)}
-        >
-          ✕
-        </button>
-      </div>
-      <div class="flex flex-col gap-3 text-left">
-        <p>
-          This page lets you compare mental models from 2023 public interviews
-          and 2025 exhibition participants.
-        </p>
-        <p>The participants were asked two main questions:</p>
-        <ul class="list-disc list-outside pl-5">
-          <li class="underline">
-            What factors do you think have the most influence on Delta Salinity
-            management?
-          </li>
-          <li class="underline">
-            What is most at risk if salinity increases in the Delta?
-          </li>
-        </ul>
-        <p>
-          Through these mental models we can create a shared understanding for
-          future salinity management strategies in the delta.
-        </p>
-        <p class="italic opacity-80">
-          Tip: Click a node to inspect its statistics.
-        </p>
-      </div>
-    </div>
-  </div>
-{/if}
 
 <style lang="postcss">
   @reference "tailwindcss";
@@ -290,30 +238,4 @@
     color: #646cff;
     margin-bottom: 1rem;
   } */
-
-  .tutorial-trigger {
-    background-color: var(--brand-primary);
-    color: white;
-    cursor: pointer;
-    transition: filter 0.15s;
-    z-index: 20;
-  }
-  .tutorial-trigger:hover {
-    filter: brightness(1.1);
-  }
-  .tutorial-backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  .tutorial-modal {
-    background-color: var(--bg-page);
-    outline: 2px solid var(--brand-primary);
-  }
-  .tutorial-close {
-    background-color: transparent;
-    color: white;
-    cursor: pointer;
-  }
-  .tutorial-close:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
 </style>
