@@ -5,6 +5,8 @@
   import Sunburst from "./lib/Sunburst/Sunburst.svelte";
   import Linking from "./lib/Linking/Linking.svelte";
   import Flow from "./lib/Flow/Flow.svelte";
+  import InfoButton from "./lib/InfoButton.svelte";
+  import { fade } from "svelte/transition";
 
   const routes = {
     "/": Home,
@@ -14,12 +16,49 @@
     "/sunburst": Sunburst,
   };
 
-  const navigateHome = () => {
-    push("/");
+  type PageInfo = {
+    title: string;
+    subtitle: string;
+    body: string;
+    hint: string;
+  };
+  const pageInfo: Record<string, PageInfo> = {
+    "/flow": {
+      title: "Listening",
+      subtitle: "Understanding Public Values and Concerns",
+      body: "Our process began by interviewing Delta residents, community organizers, Indigenous community members, farmers, scientists, experts and agency officials. Key questions we asked interviewees were what they most value about the Delta, what factors are driving change, what adaptation strategies are most useful to explore, and who is and isn't represented in Delta planning efforts.",
+      hint: "Explore the results and connections across the interview data",
+    },
+    "/linking": {
+      title: "Designing",
+      subtitle: "From Ideas and Values to Scenarios",
+      body: "With a rich understanding of participant values, the drivers of change, and the management and adaptation strategies prioritized across a range of interviewees, we used this information as the foundation for the design of six distinct scenarios.",
+      hint: "Explore how interviews shaped the design of each scenario",
+    },
+    "/mental-model": {
+      title: "Conceptualizing",
+      subtitle: "Shared Understandings of Delta Salinity",
+      body: 'Throughout the project we have been documenting how project participants conceptualize and understand salinity and salinity management in the Delta. We collected these "mental models" through interviews and our public workshops and exhibitions.',
+      hint: "Explore shared understandings of drivers and impacts of Delta Salinity",
+    },
+    "/sunburst": {
+      title: "Comparing",
+      subtitle: "Different Mental Models",
+      body: "We then took the interview and public mental models a step further by comparing them across a range of demographic and other category types. We observed similarities and differences between a variety of groups, including comparisons across age, experience, Delta resident or non-resident, and research team members compared to participants.",
+      hint: "Explore how mental models differ across participants",
+    },
   };
 
-  // Reactive statement to check if we're not on the home page
+  const navigateHome = () => push("/");
+
   let isNotHomePage = $derived($location !== "/");
+  let currentPage = $derived<PageInfo | null>(pageInfo[$location] ?? null);
+
+  let page_modal_open = $state(false);
+  $effect(() => {
+    // open the modal whenever navigating to a content page
+    if ($location && pageInfo[$location]) page_modal_open = true;
+  });
 
   // Fullscreen functionality
   let isFullscreen = $state(false);
@@ -35,75 +74,240 @@
     }
   };
 
-  const exitFullscreen = async () => {
-    try {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      }
-      isFullscreen = false;
-    } catch (error) {
-      console.warn("Could not exit fullscreen:", error);
-    }
-  };
-
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.key === "Enter" && !isFullscreen) {
       event.preventDefault();
       enterFullscreen();
-    } else if (event.key === "Escape" && isFullscreen) {
+    } else if (event.key === "Escape" && page_modal_open) {
       event.preventDefault();
-      exitFullscreen();
+      page_modal_open = false;
     }
-  };
-
-  // Listen for fullscreen change events
-  const handleFullscreenChange = () => {
-    isFullscreen = !!document.fullscreenElement;
   };
 </script>
 
-<svelte:window on:fullscreenchange={handleFullscreenChange} on:keydown={handleKeydown} />
+<svelte:window on:keydown={handleKeydown} />
+
+{#if page_modal_open && currentPage}
+  <div
+    class="modal-backdrop"
+    role="button"
+    tabindex="-1"
+    transition:fade={{ duration: 200 }}
+    onclick={() => (page_modal_open = false)}
+    onkeyup={() => {}}
+  >
+    <div
+      class="modal-box"
+      role="dialog"
+      aria-modal="true"
+      tabindex="-1"
+      onclick={(e) => e.stopPropagation()}
+      onkeyup={() => {}}
+    >
+      <!-- <h2 class="modal-title">{currentPage.title}</h2>
+      <p class="modal-subtitle">{currentPage.subtitle}</p>
+      <p class="modal-body">{currentPage.body}</p>
+      <p class="modal-cta">{currentPage.hint}</p> -->
+      <!-- <hr class="modal-divider" /> -->
+      <div class="modal-tutorial">
+        {#if $location === "/flow"}
+          <h3 class="modal-tutorial-title">How to use this interface</h3>
+          <div class="modal-tutorial-body">
+            <p>We mainly asked three questions in the interview:</p>
+            <ol>
+              <li>
+                What should Future Salinity Management Strategies focus on?
+              </li>
+              <li>What are the Drivers of Change?</li>
+              <li>Is the current decision making Fair?</li>
+            </ol>
+            <p>
+              Answer the questions yourself by clicking the blocks and see how
+              many participants agree with you!
+            </p>
+            <p>
+              Each block represents a category of public opinion. Connected
+              blocks represent public opinion from the same group of people.
+            </p>
+            <p>
+              Color of connections represent different groups of people, defined
+              by participants' responses to <em
+                >"What should be the Future Salinity Management Strategies?"</em
+              >
+            </p>
+            <p>Tip: Click a node to inspect its statistics.</p>
+          </div>
+        {:else if $location === "/linking"}
+          <h3 class="modal-tutorial-title">How to use this interface</h3>
+          <div class="modal-tutorial-body">
+            <p>
+              This interactive section illustrates how the results of interviews
+              informed and guided the design of the project’s future adaptation
+              scenarios.
+            </p>
+            <p>
+              This interactive section illustrates how the results of interviews
+              informed and guided the design of the project’s future adaptation
+              scenarios. Select a scenario from the left column to open a
+              description of that scenario and a diagram of public values and
+              concerns included in the scenario. You can zoom in and out of the
+              diagram and hover over any of the bubble categories to see how
+              many participants mentioned this interest and to read more
+              detailed information about how this topic was discussed in
+              interviews.
+            </p>
+            <p>Tip: TBD.</p>
+          </div>
+        {:else if $location === "/mental-model"}
+          <h3 class="modal-tutorial-title">How to read these Mental Models</h3>
+          <div class="modal-tutorial-body">
+            <p>
+              This mental model combines and visualizes how interview and
+              workshop participants collectively responded to the following
+              questions:
+            </p>
+            <p>
+              What factors do you think have the most influence on Delta
+              salinity management?
+            </p>
+            <p>What is most at risk if salinity increases in the Delta?</p>
+            <p>
+              Results have been organized into themes and symbolized from large
+              to small based on the number of times they are mentioned by
+              participants.
+            </p>
+            <p>
+              This collective mental model enables us to see shared
+              understandings in how participants perceive drivers and impacts of
+              Delta Salinity.
+            </p>
+            <p>Tip: TBD.</p>
+          </div>
+        {:else if $location === "/sunburst"}
+          <h3 class="modal-tutorial-title">How to read these charts</h3>
+          <div class="modal-tutorial-body">
+            <p>
+              Here we can compare the different themes present in the mental
+              models across different populations. You can compare differences
+              across team members and interviewees, different years of
+              engagement in the delta, residents and non residents, and
+              different ages.
+            </p>
+            <p>Tip: TBD.</p>
+          </div>
+        {/if}
+      </div>
+      <button
+        class="modal-close"
+        onclick={() => (page_modal_open = false)}
+        aria-label="Close">✕</button
+      >
+    </div>
+  </div>
+{/if}
 
 <main class="flex flex-col relative w-screen h-screen overflow-hidden">
   <header class="app-hero" class:app-hero--compact={isNotHomePage}>
-    <h1 class="app-hero__title">
-      <button
-        type="button"
-        class="app-hero__title-button"
-        onclick={navigateHome}
-      >
-        Just Transitions
-      </button>
-    </h1>
-    {#if !isNotHomePage}
-      <h2 class="app-hero__subtitle">In The Delta</h2>
-      <p class="app-hero__tagline">Drought, salinity, and sea-level rise</p>
+    {#if isNotHomePage && currentPage}
+      <div class="app-hero__page-info">
+        <InfoButton
+          onclick={() => (page_modal_open = !page_modal_open)}
+          label="About this section"
+        />
+        <div class="app-hero__page-text">
+          <span class="app-hero__page-title">{currentPage.title}</span>
+          <span class="app-hero__page-subtitle">{currentPage.subtitle}</span>
+        </div>
+      </div>
     {/if}
+    <div class="app-hero__brand">
+      <h1 class="app-hero__title">
+        <button
+          type="button"
+          class="app-hero__title-button"
+          onclick={navigateHome}
+        >
+          Just Transitions
+        </button>
+      </h1>
+      {#if !isNotHomePage}
+        <h2 class="app-hero__subtitle">In The Delta</h2>
+        <p class="app-hero__tagline">Drought, salinity, and sea-level rise</p>
+      {/if}
+    </div>
   </header>
   <Router {routes} />
 </main>
 
 <style lang="postcss">
   @reference "tailwindcss";
+
   main {
     min-height: 100vh;
     display: flex;
     background-color: var(--surface-elevated);
   }
 
-  /* Unified hero: all routes render <h1>Just Transitions</h1>; home adds
-     "In The Delta" + tagline. Right-justified block — all lines share a
-     right edge so they read as one headline. Natural flex flow (no absolute
-     positioning) so the Router area naturally gets the remaining height. */
   .app-hero {
     flex-shrink: 0;
     display: flex;
-    flex-direction: column;
     align-items: flex-end;
+    justify-content: flex-end;
+    flex-direction: column;
     text-align: right;
     padding: 0.75rem 2rem 1.5rem;
     background-color: var(--surface-elevated);
   }
+
+  .app-hero--compact {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.75rem;
+  }
+
+  /* ---- Left: page info ---- */
+  .app-hero__page-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .app-hero__page-text {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .app-hero__page-title {
+    font-family: var(--font-body);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    line-height: 1.1;
+  }
+
+  .app-hero__page-subtitle {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--jt-green);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    line-height: 1.2;
+  }
+
+  /* ---- Right: brand ---- */
+  .app-hero__brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+
   .app-hero__title-button {
     background: none;
     border: none;
@@ -114,9 +318,6 @@
     letter-spacing: inherit;
     text-transform: inherit;
     cursor: pointer;
-  }
-  .app-hero--compact {
-    padding-bottom: 0.75rem;
   }
 
   .app-hero__title,
@@ -137,5 +338,117 @@
     font-weight: 300;
     line-height: 1.2;
     margin: 0.25rem 0 0;
+  }
+
+  /* ---- Modal ---- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-box {
+    position: relative;
+    background: var(--surface-page);
+    border: 1px dashed var(--jt-green);
+    max-width: 500px;
+    max-height: 85vh;
+    width: 90%;
+    padding: 4rem 3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    overflow-y: auto;
+  }
+
+  .modal-title {
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .modal-subtitle {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--jt-green);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wider);
+    margin: 0;
+  }
+
+  .modal-body {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .modal-cta {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--jt-blue);
+    margin: 0;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .modal-close:hover {
+    opacity: 1;
+  }
+
+  .modal-divider {
+    border: none;
+    border-top: 1px dashed var(--border-subtle);
+    margin: 0;
+  }
+
+  .modal-tutorial {
+    text-align: left;
+  }
+
+  .modal-tutorial-title {
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+
+  .modal-tutorial-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .modal-tutorial-body p,
+  .modal-tutorial-body ol,
+  .modal-tutorial-body ul {
+    margin: 0;
+  }
+  .modal-tutorial-body ol,
+  .modal-tutorial-body ul {
+    padding-left: 1.25rem;
+  }
+  .modal-tutorial-tip {
+    font-style: italic;
+    opacity: 0.8;
   }
 </style>

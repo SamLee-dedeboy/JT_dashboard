@@ -1,10 +1,17 @@
+<script lang="ts" module>
+  let visited = false;
+</script>
+
 <script lang="ts">
   import { push } from "svelte-spa-router";
   import { fade } from "svelte/transition";
   import InfoButton from "./InfoButton.svelte";
 
-  let modal_open = $state(true);
+  let modal_open = $state(!visited);
+  visited = true;
 </script>
+
+<svelte:window onkeydown={(e) => { if (e.key === "Escape" && modal_open) { e.preventDefault(); modal_open = false; } }} />
 
 {#if modal_open}
   <div
