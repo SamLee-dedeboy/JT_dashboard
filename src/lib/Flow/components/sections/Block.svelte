@@ -107,8 +107,7 @@
 <div
   role="button"
   tabindex="0"
-  class={`block-container pointer-events-auto relative flex w-full
-  max-w-[8rem]
+  class={`block-container pointer-events-auto relative flex w-32
   justify-center
   text-[0.9rem]
   outline-1
@@ -158,7 +157,7 @@
   {/if}
   <div
     id={block.id}
-    class={`block-element relative flex w-full flex-col items-center justify-center rounded p-1 text-center text-white`}
+    class={`block-element relative flex w-full flex-col items-center justify-center p-1 text-center text-white`}
     style={`background-color: #506a74`}
     data-json={JSON.stringify({
       column: block.column_id,
@@ -174,10 +173,7 @@
     >
       {block.title}
       {#if block.column_id !== Constants.fairness_column_id}
-        <div
-          class="absolute right-[105%] top-1/2"
-          style="color: var(--text-primary);"
-        >
+        <div class="opacity-70 text-[0.75em] leading-tight">
           ({block.participants.length})
         </div>
       {/if}

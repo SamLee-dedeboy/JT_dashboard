@@ -150,12 +150,12 @@
     > -->
     <div
       class="column-headers relative z-[40] mt-6 flex max-w-full select-none justify-between overflow-x-visible"
-      style={`padding-left: 0.875rem; padding-right: 12.875rem; height: ${sorted_options.length * 1.5}rem;`}
+      style={`padding-left: 0.875rem; padding-right: 11.625rem; height: ${sorted_options.length * 1.5}rem;`}
     >
       {#each sorted_options as option, index}
         {@const option_clicked = clicked_options.includes(option)}
         {@const label_bottom = (sorted_options.length - index) * 1.5}
-        <div class="column-anchor relative w-[1.3rem] flex-none">
+        <div class="column-anchor relative w-[1.3rem] mr-1 flex-none">
           <span
             class="absolute whitespace-nowrap"
             style={`bottom: ${label_bottom + 0.25}rem; left: 0; color: ${option_clicked ? "white" : "darkgray"};`}
@@ -215,7 +215,9 @@
           </div>
         </div>
       {/each}
-      <div class="combinations-legend mt-3 -mr-40 flex flex-col gap-2 rounded p-3 text-base">
+      <div
+        class="combinations-legend mt-3 -mr-40 flex flex-col gap-2 rounded p-3 text-base"
+      >
         <div class="font-semibold">How to read this chart</div>
         <div>
           Each row is a group of participants who share the same set of
@@ -224,11 +226,12 @@
         <div>
           <span class="legend-swatch-filled"></span> A filled circle means the
           group picked that strategy;
-          <span class="legend-swatch-empty"></span> an empty circle means they
-          did not.
+          <span class="legend-swatch-empty"></span> an empty circle means they did
+          not.
         </div>
         <div>
-          The number on the right is how many participants share that combination.
+          The number on the right is how many participants share that
+          combination.
         </div>
       </div>
     </div>

@@ -94,6 +94,9 @@ export class CodeGraphRenderer {
                 this.onZoomChange(event.transform.k);
             });
         svg.call(this.zoomBehavior);
+        const k0 = 0.6;
+        const cx = this.width / 2, cy = this.height / 2;
+        svg.call(this.zoomBehavior.transform, d3.zoomIdentity.translate(cx * (1 - k0), cy * (1 - k0)).scale(k0));
     }
 
     zoomIn() {
@@ -111,7 +114,9 @@ export class CodeGraphRenderer {
     resetZoom() {
         if (!this.zoomBehavior) return;
         const svg = d3.select<SVGSVGElement, unknown>(`#${this.svgId}`);
-        svg.transition().duration(350).call(this.zoomBehavior.transform, d3.zoomIdentity);
+        const k0 = 0.6;
+        const cx = this.width / 2, cy = this.height / 2;
+        svg.transition().duration(350).call(this.zoomBehavior.transform, d3.zoomIdentity.translate(cx * (1 - k0), cy * (1 - k0)).scale(k0));
     }
     
     // Evenly spaced angles shaped per top-level-node count:

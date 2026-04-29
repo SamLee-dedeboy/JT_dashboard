@@ -62,15 +62,15 @@
             {#if selected_scenario}
               {#key selected_scenario.name}
                 <!-- <div class="p-1 absolute left-0 right-0 top-0 bottom-0"> -->
-                <div class="">
+                <!-- <div class="">
                   <img
                     src={`scenario_imagery/${selected_scenario.name}.jpg`}
                     alt="Scenario Image"
                     class=" object-contain"
                   />
-                </div>
+                </div> -->
                 <div
-                  class="scenario-content flex px-2 flex-col min-w-[18rem] relative outline-0"
+                  class="scenario-content flex px-2 flex-col min-w-[18rem] relative outline-0 mb-4"
                   style="outline-color: var(--jt-green);"
                   in:slide
                 >
@@ -82,7 +82,7 @@
                   </div>
                   <div class="px-1 text-left">
                     <!-- <span class="field-label"> Description - </span> -->
-                    <span class="field-content">
+                    <span class="field-content text-lg">
                       {selected_scenario.narrative}
                     </span>
                   </div>
@@ -120,7 +120,7 @@
           </div>
           {#if selected_scenario}
             <div
-              class="code-detail-panel mx-2 mt-2 min-h-0 grow border border-dashed relative"
+              class="code-detail-panel mx-6 mt-2 min-h-0 grow border border-dashed relative"
               style="border-color: var(--jt-green);"
             >
               {#if selected_code}

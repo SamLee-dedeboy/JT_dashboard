@@ -19,7 +19,7 @@
   );
   let { codes, selected_code = $bindable() }: CodeGraphProps = $props();
   let mounted = $state(false);
-  let zoom_level = $state(1);
+  let zoom_level = $state(0.6);
 
   $effect(() => {
     if (mounted) {

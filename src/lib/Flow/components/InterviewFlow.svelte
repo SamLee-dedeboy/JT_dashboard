@@ -598,32 +598,6 @@
 </script>
 
 <div class="upper-page flex flex-1 h-full w-full bg-gray-50">
-  <div class="control-panel flex w-[28rem] flex-col">
-    <!-- <span class="flex items-center justify-center font-serif text-lg font-bold">
-      JT Participant Transcripts
-    </span> -->
-    <!-- <div
-      role="button"
-      tabindex="0"
-      class="mb-4 flex justify-center rounded-md bg-green-200 px-1 py-0.5 text-center text-[#6b7280] shadow-md"
-      onclick={() => {
-        // setTour().start()
-      }}
-      onkeyup={() => {}}
-    >
-      Tutorial
-    </div> -->
-    <div class="overview-panel w-full"></div>
-    <div class="statistics-panel flex h-1 grow flex-col">
-      <div class="flex grow flex-col gap-8">
-
-        <Combinations
-          {block_aggregator}
-          leading_section_title={Constants.column_id_to_title[leading_column]}
-        ></Combinations>
-      </div>
-    </div>
-  </div>
   <div bind:this={container} class="flow-container relative flex grow">
     {#if sections.length > 0}
       {@const total_columns = sections.reduce((acc, section) => {
@@ -708,8 +682,32 @@
     {/if}
     <svg id="sankey-svg" class="sankey-svg"></svg>
   </div>
+  <div class="control-panel flex w-[28rem] flex-col">
+    <!-- <span class="flex items-center justify-center font-serif text-lg font-bold">
+      JT Participant Transcripts
+    </span> -->
+    <!-- <div
+      role="button"
+      tabindex="0"
+      class="mb-4 flex justify-center rounded-md bg-green-200 px-1 py-0.5 text-center text-[#6b7280] shadow-md"
+      onclick={() => {
+        // setTour().start()
+      }}
+      onkeyup={() => {}}
+    >
+      Tutorial
+    </div> -->
+    <div class="overview-panel w-full"></div>
+    <div class="statistics-panel flex h-1 grow flex-col">
+      <div class="flex grow flex-col gap-8 pb-4">
+        <Combinations
+          {block_aggregator}
+          leading_section_title={Constants.column_id_to_title[leading_column]}
+        ></Combinations>
+      </div>
+    </div>
+  </div>
 </div>
-
 
 <style lang="postcss">
   @reference "tailwindcss";

@@ -135,7 +135,9 @@
                 >"What should be the Future Salinity Management Strategies?"</em
               >
             </p>
-            <p>Tip: Click a node to inspect its statistics.</p>
+            <!-- <p>
+              Tip: Click nodes column-by-column to see public opinion patterns.
+            </p> -->
           </div>
         {:else if $location === "/linking"}
           <h3 class="modal-tutorial-title">How to use this interface</h3>
@@ -146,17 +148,14 @@
               scenarios.
             </p>
             <p>
-              This interactive section illustrates how the results of interviews
-              informed and guided the design of the project’s future adaptation
-              scenarios. Select a scenario from the left column to open a
-              description of that scenario and a diagram of public values and
-              concerns included in the scenario. You can zoom in and out of the
-              diagram and hover over any of the bubble categories to see how
-              many participants mentioned this interest and to read more
-              detailed information about how this topic was discussed in
-              interviews.
+              Select a scenario from the left column to open a description of
+              that scenario and a diagram of public values and concerns included
+              in the scenario. You can zoom in and out of the diagram and hover
+              over any of the bubble categories to see how many participants
+              mentioned this interest and to read more detailed information
+              about how this topic was discussed in interviews.
             </p>
-            <p>Tip: TBD.</p>
+            <!-- <p>Tip: TBD.</p> -->
           </div>
         {:else if $location === "/mental-model"}
           <h3 class="modal-tutorial-title">How to read these Mental Models</h3>
@@ -166,11 +165,13 @@
               workshop participants collectively responded to the following
               questions:
             </p>
-            <p>
-              What factors do you think have the most influence on Delta
-              salinity management?
-            </p>
-            <p>What is most at risk if salinity increases in the Delta?</p>
+            <ol>
+              <li>
+                What factors do you think have the most influence on Delta
+                salinity management?
+              </li>
+              <li>What is most at risk if salinity increases in the Delta?</li>
+            </ol>
             <p>
               Results have been organized into themes and symbolized from large
               to small based on the number of times they are mentioned by
@@ -181,10 +182,14 @@
               understandings in how participants perceive drivers and impacts of
               Delta Salinity.
             </p>
-            <p>Tip: TBD.</p>
+            <p class="italic">
+              Tip: Hover over a node to inspect its statistics.
+            </p>
           </div>
         {:else if $location === "/sunburst"}
-          <h3 class="modal-tutorial-title">How to read these charts</h3>
+          <h3 class="modal-tutorial-title">
+            Comparing mental models across populations
+          </h3>
           <div class="modal-tutorial-body">
             <p>
               Here we can compare the different themes present in the mental
@@ -193,7 +198,7 @@
               engagement in the delta, residents and non residents, and
               different ages.
             </p>
-            <p>Tip: TBD.</p>
+            <p>Tip: click elements of the mental model for more information.</p>
           </div>
         {/if}
       </div>

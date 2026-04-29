@@ -21,7 +21,7 @@
     codebook.reduce((acc, code) => {
       acc[code.name] = code.parent;
       return acc;
-    }, {})
+    }, {}),
   );
 
   $effect(() => {
@@ -35,7 +35,7 @@
         acc[parent_code] = [];
       }
       acc[parent_code] = Array.from(
-        new Set(acc[parent_code].concat(server_data[code]))
+        new Set(acc[parent_code].concat(server_data[code])),
       );
       return acc;
     }, {});
@@ -46,10 +46,7 @@
     console.log("Mental Models:", render_data);
     bubble_renderer.update(render_data, codebook, code_tsne);
   });
-  function handleHover(
-    node: [string, number] | null,
-    clientY?: number,
-  ) {
+  function handleHover(node: [string, number] | null, clientY?: number) {
     selected_code = node ? node[0] : undefined;
     tooltip_y = node ? clientY : undefined;
   }

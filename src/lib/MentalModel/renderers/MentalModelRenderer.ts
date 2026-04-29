@@ -70,7 +70,7 @@ export class MentalModelRenderer {
           .attr("stroke-width", 1.5)
           .attr("cx", this.width/2)
           .attr("cy", this.height * center)
-          .attr("r", 80)
+          .attr("r", 55)
         svg.append("text")
           .attr("class", "bubble_label")
           .classed("jt-body-3", true)
@@ -79,7 +79,7 @@ export class MentalModelRenderer {
           .attr("text-anchor", "middle")
           .attr("dominant-baseline", "middle")
           .attr("font-family", "'Hammersmith One', sans-serif")
-          .attr("font-size", Math.max(8, Math.min(20, 80 * 0.3)))
+          .attr("font-size", Math.max(8, Math.min(16, 65 * 0.3)))
           .attr("pointer-events", "none")
           .attr("fill", contrastTextColor("var(--brand-primary)"))
           .text("SALINITY")
@@ -97,7 +97,7 @@ export class MentalModelRenderer {
         console.log("mental model data", nodes_data)
         const svg = d3.select(`#${this.svgId}`)
         const bubble_group = svg.select("g.bubble_group")
-        const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([18, 65])
+        const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([12, 55])
         const nodes = nodes_data.concat([["Salinity", 80]])
         const classification_force_position_y = {
           "impacts salinity": this.height * center / 2,
@@ -131,13 +131,13 @@ export class MentalModelRenderer {
                 .attr("cy", (d) => d.y = classification_force_position_y[node_types[d[0]]] || this.height*center)
                 .attr("r", 0)
                 .transition().duration(300).delay(300)
-                .attr("r", d => d.r = d[0] === "Salinity"? 80: radiusScale(d[1])),
+                .attr("r", d => d.r = d[0] === "Salinity"? 55: radiusScale(d[1])),
               update => update
                 .attr("fill", d => d[0] === "Salinity" ? "var(--brand-primary)" : colorForNode(node_types[d[0]]))
                 .transition().duration(100)
                 .attr("cx", (d) => d.x = code_tsne[d[0]] * this.width || this.width/2)
                 .attr("cy", (d) => d.y = classification_force_position_y[node_types[d[0]]] || this.height*center)
-                .attr("r", d => d.r = d[0] === "Salinity"? 80: radiusScale(d[1])),
+                .attr("r", d => d.r = d[0] === "Salinity"? 55: radiusScale(d[1])),
               exit => exit.transition().duration(300).attr("r", 0).remove()
             )
         console.log(node_types, classification_force_position_y[node_types[nodes[1][0]]])
@@ -152,7 +152,7 @@ export class MentalModelRenderer {
             .attr("dominant-baseline", "middle")
             .attr("font-family", "'Hammersmith One', sans-serif")
             .attr("font-size", (d) => {
-              const r = d[0] === "Salinity" ? 80 : radiusScale(d[1]);
+              const r = d[0] === "Salinity" ? 55 : radiusScale(d[1]);
               return Math.max(8, Math.min(20, r * 0.3)) + "px";
             })
             .attr("fill", (d) =>

@@ -406,10 +406,10 @@
                     </p>
                   {/if}
                 </div>
-                <h2 class="mt-2">Takeaways</h2>
+                <!-- <h2 class="mt-2">Takeaways</h2>
                 <p class="text italic opacity-70">
                   Placeholder for key takeaways from this comparison.
-                </p>
+                </p> -->
               </div>
             </div>
             {#each rowData as item, index}
@@ -460,7 +460,6 @@
     </div> -->
     <div class="h-[5rem]"></div>
   </div>
-
 
   <!-- Scroll indicator arrow -->
   <!-- {#if showScrollIndicator} -->
@@ -528,5 +527,4 @@
       opacity: 0.6;
     }
   }
-
 </style>

@@ -33,8 +33,10 @@
   let block_aggregator = $state<BlockAggregator>({} as BlockAggregator);
   let transcripts = $state<tParticipantData[]>([]);
   let init_done = $state(false);
+  let loading = $state(false);
 
   async function fetchData() {
+    loading = true;
     // fetch data from backend
     await fetch(server_address + "/data/")
       .then((response) => response.json())
@@ -71,6 +73,7 @@
         };
         participantState.all_participants = participants;
         init_done = true;
+        loading = false;
       });
   }
 
@@ -102,4 +105,36 @@
 
 {#if init_done}
   <InterviewFlow {category_metadata} {data} {block_aggregator}></InterviewFlow>
+{:else if loading}
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading data…</p>
+  </div>
 {/if}
+
+<style lang="postcss">
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+  }
+
+  .spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid var(--border-subtle);
+    border-top-color: var(--jt-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>

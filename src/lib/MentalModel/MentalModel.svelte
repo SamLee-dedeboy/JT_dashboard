@@ -226,7 +226,7 @@
 <style lang="postcss">
   @reference "tailwindcss";
   .page-container {
-    padding: 2rem;
+    padding: 0rem 2rem;
     text-align: center;
   }
 

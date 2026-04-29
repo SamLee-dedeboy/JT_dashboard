@@ -41,33 +41,33 @@
 </script>
 
 <div
-  class="modal-content p-6 flex flex-col min-h-[400px] overflow-y-auto text-left text-white"
+  class="modal-content flex flex-col min-h-[400px] overflow-y-auto text-left text-white"
 >
   <div class="flex justify-between items-start mb-4">
     <div class="flex-1">
-      <h2 class="text-xl mb-2">
+      <h4 class="mb-2">
         You're looking at participant responses about
         <span
-          class="category-chip px-3 py-1 rounded ml-1"
+          class="category-chip px-3 py-1 rounded ml-1 text-[1rem]"
           style={`background-color: color-mix(in srgb, ${bubble_color(code.id.split("\\").at(0))} 90%, transparent); color: ${contrastTextColor(bubble_color(code.id.split("\\").at(0)))}`}
         >
           {code.depth <= 1
             ? code.id.split("\\").at(-1)?.toUpperCase()
             : code.id.split("\\").at(-1)}
         </span>
-      </h2>
+      </h4>
     </div>
-    <button
+    <!-- <button
       class="close-button text-2xl text-gray-500 hover:text-gray-700 rounded-full w-8 h-8 flex items-center justify-center leading-none hover:bg-gray-100 transition-colors"
       onclick={() => handleClose()}
       title="Close"
     >
       ×
-    </button>
+    </button> -->
   </div>
 
   <div class="mb-4">
-    <p class="text-lg">
+    <p class="">
       <span class=" underline">
         {code.participantCount}
       </span>
@@ -91,7 +91,7 @@
       </div>
     {:then summarization}
       <div class="py-4 rounded-lg text-left" in:slide>
-        <p class="text-base leading-relaxed whitespace-pre-wrap">
+        <p class="leading-relaxed whitespace-pre-wrap">
           {summarization || "No summary available."}
         </p>
       </div>
