@@ -755,9 +755,9 @@
           class="p-4"
           style={`background-color: ${hoveredColor}; color: ${getContrastColor(hoveredColor)};`}
         >
-          <h2 class="text-lg">
+          <h4 class="text-lg">
             {modalCodeData?.name || "Loading..."}
-          </h2>
+          </h4>
         </div>
         <div class="p-4 overflow-y-auto text-white space-y-3">
           {#if isLoadingCode}
@@ -777,23 +777,23 @@
           {:else if modalCodeData}
             {#if modalCodeData.description}
               <div>
-                <h3 class="mb-1 text-sm font-semibold opacity-80">
+                <h4 class="mb-1 text-sm font-semibold opacity-80">
                   Description
-                </h3>
+                </h4>
                 <p>{modalCodeData.description}</p>
               </div>
             {/if}
             {#if modalCodeData.definition}
               <div>
-                <h3 class="mb-1 text-sm font-semibold opacity-80">
+                <h4 class="mb-1 text-sm font-semibold opacity-80">
                   Definition
-                </h3>
+                </h4>
                 <p>{modalCodeData.definition}</p>
               </div>
             {/if}
             {#if modalCodeData.parent}
               <div>
-                <h3 class="mb-1 text-sm font-semibold opacity-80">Parent</h3>
+                <h4 class="mb-1 text-sm font-semibold opacity-80">Parent</h4>
                 <p>{modalCodeData.parent}</p>
               </div>
             {/if}

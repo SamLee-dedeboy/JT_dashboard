@@ -81,8 +81,21 @@ export class CodeGraphRenderer {
         const svg = d3.select<SVGSVGElement, unknown>(`#${this.svgId}`)
             .attr("viewBox", `0 0 ${this.width} ${this.height}`)
 
-        // Zoomable group: link/node/label layers pan and zoom together.
+        // Arrowhead marker (referenced by center→root arrows)
+        svg.append("defs")
+            .append("marker")
+            .attr("id", `arrow-${this.svgId}`)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 10).attr("refY", 0)
+            .attr("markerWidth", 6).attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#999");
+
+        // Zoomable group: center-group sits behind links and nodes.
         const zoomGroup = svg.append("g").attr("class", "zoom-group")
+        zoomGroup.append("g").attr("class", "center-group")
         zoomGroup.append("g").attr("class", "link-group")
         zoomGroup.append("g").attr("class", "node-group")
         zoomGroup.append("g").attr("class", "label-group")
@@ -512,6 +525,69 @@ export class CodeGraphRenderer {
             //     .attr("stroke-width", 1)
             //     .lower(); // Send to back
         
+        // Center circle + arrows to top-level nodes
+        const cx = this.width / 2, cy = this.height / 2;
+        const centerR = 22;
+        const topNodes = visibleNodes.filter(n => n.depth === 1);
+
+        const centerGroup = svg.select(".center-group");
+        centerGroup.selectAll("circle.center-circle")
+            .data([null])
+            .join("circle")
+            .attr("class", "center-circle")
+            .attr("cx", cx).attr("cy", cy).attr("r", centerR)
+            .attr("fill", "none")
+            .attr("stroke", "#999")
+            .attr("stroke-width", 1.5)
+            .attr("stroke-dasharray", "4,3");
+
+        centerGroup.selectAll("text.center-label")
+            .data([null])
+            .join("text")
+            .attr("class", "center-label")
+            .attr("x", cx).attr("y", cy)
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("font-family", "'Hammersmith One', sans-serif")
+            .attr("font-size", "9px")
+            .attr("fill", "#999")
+            .attr("pointer-events", "none")
+            .text("SALINITY");
+
+        const arrows = centerGroup.selectAll("line.center-arrow")
+            .data(topNodes, (d: any) => d.id)
+            .join("line")
+            .attr("class", "center-arrow")
+            .attr("stroke", "#999")
+            .attr("stroke-opacity", 0.6)
+            .attr("stroke-width", 1.5)
+            .attr("marker-end", `url(#arrow-${this.svgId})`);
+
+        function updateArrows() {
+            arrows
+                .attr("x1", (d: GraphNode) => {
+                    const dx = (d.x ?? cx) - cx, dy = (d.y ?? cy) - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    return cx + (dx / dist) * centerR;
+                })
+                .attr("y1", (d: GraphNode) => {
+                    const dx = (d.x ?? cx) - cx, dy = (d.y ?? cy) - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    return cy + (dy / dist) * centerR;
+                })
+                .attr("x2", (d: GraphNode) => {
+                    const dx = (d.x ?? cx) - cx, dy = (d.y ?? cy) - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    return cx + (dx / dist) * Math.max(0, dist - d.radius - 4);
+                })
+                .attr("y2", (d: GraphNode) => {
+                    const dx = (d.x ?? cx) - cx, dy = (d.y ?? cy) - cy;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    return cy + (dy / dist) * Math.max(0, dist - d.radius - 4);
+                });
+        }
+        updateArrows();
+
         // Render links
         const link = svg.select(".link-group")
             .selectAll("line")
@@ -519,7 +595,8 @@ export class CodeGraphRenderer {
             .join("line")
             .attr("stroke", "#999")
             .attr("stroke-opacity", 0.6)
-            .attr("stroke-width", 2);
+            .attr("stroke-width", 2)
+            .attr("marker-end", `url(#arrow-${this.svgId})`);
         
         // Render nodes
         const node = svg.select(".node-group")
@@ -589,11 +666,19 @@ export class CodeGraphRenderer {
         
         // Update positions on simulation tick
         simulation.on("tick", () => {
-            link
-                .attr("x1", d => (d.source as GraphNode).x!)
-                .attr("y1", d => (d.source as GraphNode).y!)
-                .attr("x2", d => (d.target as GraphNode).x!)
-                .attr("y2", d => (d.target as GraphNode).y!);
+            updateArrows();
+            link.each(function(d) {
+                const s = d.source as GraphNode, t = d.target as GraphNode;
+                const dx = (t.x ?? 0) - (s.x ?? 0);
+                const dy = (t.y ?? 0) - (s.y ?? 0);
+                const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                const ux = dx / dist, uy = dy / dist;
+                d3.select(this)
+                    .attr("x1", (s.x ?? 0) + ux * s.radius)
+                    .attr("y1", (s.y ?? 0) + uy * s.radius)
+                    .attr("x2", (t.x ?? 0) - ux * (t.radius + 4))
+                    .attr("y2", (t.y ?? 0) - uy * (t.radius + 4));
+            });
             
             node
                 .attr("cx", d => d.x=d.x!)

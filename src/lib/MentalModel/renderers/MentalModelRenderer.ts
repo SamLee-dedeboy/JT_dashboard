@@ -18,6 +18,16 @@ export class MentalModelRenderer {
 
     init() {
         const svg = d3.select(`#${this.svgId}`)
+        svg.append("defs")
+            .append("marker")
+            .attr("id", `mm-arrow-${this.svgId}`)
+            .attr("viewBox", "0 -5 10 10")
+            .attr("refX", 10).attr("refY", 0)
+            .attr("markerWidth", 6).attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M0,-5L10,0L0,5")
+            .attr("fill", "#c3c3c3");
         const regions = svg.append("g").attr("class", "region")
         const links_group = svg.append("g").attr("class", "links_group")
         const bubble_group = svg.append("g").attr("class", "bubble_group")
@@ -194,18 +204,15 @@ export class MentalModelRenderer {
             //     .attr("dy", "0.6em")
             // })
 
-        const links = svg.select("g.links_group").selectAll("line")
+        const links = svg.select("g.links_group").selectAll("path.link")
             .data(nodes_data.filter(d => d[0] !== "Salinity"), (d) => d[0])
-            .join("line")
+            .join("path")
             .attr("class", "link")
-            .attr("x1", (d) => d.x || this.width/2)
-            .attr("y1", (d) => d.y || this.height * center)
-            .attr("x2", this.width/2)
-            .attr("y2", this.height*center)
+            .attr("fill", "none")
             .attr("stroke-width", 1.5)
-            // .attr("stroke", "#26414b")
             .attr("stroke", "#c3c3c3")
             .attr("stroke-opacity", 0.5)
+            .attr("marker-mid", `url(#mm-arrow-${this.svgId})`)
         const canvasRadiusScale = d3.scalePow().exponent(1/2).domain([d3.min(nodes_data, d => d[1]), d3.max(nodes_data, d => d[1])]).range([0, this.height * center / 1.3])
         // update force
         const forceNode = d3.forceManyBody();
@@ -277,10 +284,25 @@ export class MentalModelRenderer {
             .selectAll("tspan")
             .attr("x", (d) => d.x)
             .attr("y", (d) => d.y);
-          links.attr("x1", (d) => d.x || this.width/2)
-            .attr("y1", (d) => d.y || this.height* center)
-            .classed("is_top", d => d.is_top = d.y < this.height*center)
-            .classed("is_bottom", d => d.is_bottom = d.y > this.height*center)
+          const salinityCx = this.width / 2, salinityCy = this.height * center, salinityR = 55;
+          links.each(function(d: any) {
+              const nx = d.x || salinityCx, ny = d.y || salinityCy;
+              const dx = salinityCx - nx, dy = salinityCy - ny;
+              const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+              const ux = dx / dist, uy = dy / dist;
+              const nodeR = d.r || 12;
+              const nodeEdgeX = nx + ux * nodeR, nodeEdgeY = ny + uy * nodeR;
+              const salEdgeX = salinityCx - ux * (salinityR + 4), salEdgeY = salinityCy - uy * (salinityR + 4);
+              const isDriver = node_types[d[0]] === "impacts salinity";
+              const x1 = isDriver ? nodeEdgeX : salEdgeX;
+              const y1 = isDriver ? nodeEdgeY : salEdgeY;
+              const x2 = isDriver ? salEdgeX : nodeEdgeX;
+              const y2 = isDriver ? salEdgeY : nodeEdgeY;
+              const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+              d3.select(this).attr("d", `M${x1},${y1} L${mx},${my} L${x2},${y2}`);
+          })
+          .classed("is_top", (d: any) => d.is_top = d.y < this.height*center)
+          .classed("is_bottom", (d: any) => d.is_bottom = d.y > this.height*center)
             
         //   this.updateContour(bubble_data)
         })

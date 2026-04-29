@@ -25,7 +25,6 @@
   </div>
 </div>
 
-
 <style lang="postcss">
   @reference "tailwindcss";
   .page-container {
@@ -45,5 +44,6 @@
   .bubble-container {
     outline: 1px solid var(--jt-secondary);
     border-radius: 0.5rem;
+    background: var(--surface-page);
   }
 </style>

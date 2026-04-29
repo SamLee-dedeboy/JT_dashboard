@@ -15,7 +15,7 @@
   const svgId = "code_graph";
   let graph_renderer: CodeGraphRenderer = new CodeGraphRenderer(
     svgId,
-    handleHover
+    handleHover,
   );
   let { codes, selected_code = $bindable() }: CodeGraphProps = $props();
   let mounted = $state(false);
