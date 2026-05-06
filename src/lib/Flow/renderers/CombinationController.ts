@@ -21,38 +21,32 @@ import type { tBlock } from "../types";
 //   "#E1DABD",
 //   "#ABC798",
 // ];
+// Previous palette (30 colors):
+// const colors = [
+//   "#93a4f4", "#ee5fb7", "#4cb4b7", "#a083c9", "#27ac22",
+//   "#4fa1e1", "#d77440", "#73aa24", "#c368d1", "#d0b232",
+//   "#4f68ed", "#ea38a6", "#038387", "#8764b8", "#11910d",
+//   "#3487c7", "#d06228", "#689920", "#ba58c9", "#c19c00",
+//   "#c8d1fa", "#f7adda", "#9bd9db", "#b29ad4", "#a7e3a5",
+//   "#83bdeb", "#df8e64", "#a4cc6c", "#cf87da", "#dac157",
+// ];
 const colors = [
-  "#93a4f4",
-  "#ee5fb7",
-  "#4cb4b7",
-  "#a083c9",
-  "#27ac22",
-  "#4fa1e1",
-  "#d77440",
-  "#73aa24",
-  "#c368d1",
-  "#d0b232",
-  "#4f68ed",
-  "#ea38a6",
-  "#038387",
-  "#8764b8",
-  "#11910d",
-  "#3487c7",
-  "#d06228",
-  "#689920",
-  "#ba58c9",
-  "#c19c00",
-  "#c8d1fa",
-  "#f7adda",
-  "#9bd9db",
-  "#b29ad4",
-  "#a7e3a5",
-  "#83bdeb",
-  "#df8e64",
-  "#a4cc6c",
-  "#cf87da",
-  "#dac157"
-]
+  "#e6194b", // red
+  "#f58231", // orange
+  "#ffe119", // yellow
+  "#bfef45", // lime
+  "#3cb44b", // green
+  "#42d4f4", // cyan
+  "#4363d8", // blue
+  "#911eb4", // purple
+  "#f032e6", // magenta
+  "#fabed4", // pink
+  "#469990", // teal
+  "#dcbeff", // lavender
+  "#9a6324", // brown
+  "#aaffc3", // mint
+  "#ffd8b1", // apricot
+];
 export const combination_controller = {
   generateCombinations(target_blocks: tBlock[]) {
     let block_id_to_title_dict = target_blocks.reduce((acc, block) => {

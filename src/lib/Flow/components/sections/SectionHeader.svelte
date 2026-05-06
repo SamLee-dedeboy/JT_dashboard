@@ -24,6 +24,37 @@
     options: { [key: string]: string[] };
   } = $props();
 
+  let title_font_size = $derived(
+    (() => {
+      const len = section.title.replace(/<[^>]+>/g, "").length;
+      if (len <= 35) return "11pt";
+      if (len <= 65) return "10pt";
+      if (len <= 75) return "9pt";
+      return "7pt";
+    })(),
+  );
+
+  let title_el = $state<HTMLElement | undefined>(undefined);
+
+  $effect(() => {
+    const el = title_el;
+    if (!el) return;
+    void section.title;
+    void title_font_size;
+    const measure = () => {
+      if (el.clientWidth === 0) return;
+      el.style.fontSize = title_font_size;
+      let size = parseFloat(getComputedStyle(el).fontSize);
+      while (el.scrollHeight > el.clientHeight && size > 6) {
+        size -= 0.5;
+        el.style.fontSize = size + "px";
+      }
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  });
+
   let changes = $state<tCategoryChange[]>([]);
   let selected_column = $state(Object.keys(options)[0]);
   let show_column_selection_menu = $state(false);
@@ -98,8 +129,8 @@
 <div
   class="header-container section-header pointer-events-auto relative flex text-lg"
 >
-  <div class="section-title relative w-full">
-    {section.title}
+  <div class="section-title relative w-full" bind:this={title_el}>
+    {@html section.title}
     <!-- <div
       role="button"
       tabindex="0"
@@ -171,8 +202,8 @@
   .section-title {
     /* background-color: var(--jt-primary); */
     color: black;
-    font-size: 15px;
-    min-height: 4.5rem;
+    height: 4.5rem;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;

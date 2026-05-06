@@ -182,7 +182,7 @@ let _category_options = $state({} as { [key: string]: string[] });
 let _sections = $state([
   {
     id: "future_management",
-    title: "What should future Salinity Management Strategies focus on?",
+    title: "What should future salinity management strategies focus on?",
     hidden: false,
     revealed: true,
     columns: [
@@ -199,7 +199,7 @@ let _sections = $state([
   },
   {
     id: "drivers_of_change",
-    title: "What are the Drivers of Change?",
+    title: "What are the main drivers of change for Delta salinity",
     hidden: false,
     revealed: false,
     columns: [
@@ -216,7 +216,7 @@ let _sections = $state([
   },
   {
     id: "decision_making_2",
-    title: "Who is currently represented?",
+    title: "Who is currently represented in Delta planning and decision making?",
     hidden: false,
     revealed: false,
     columns: [
@@ -233,7 +233,7 @@ let _sections = $state([
   },
   {
     id: "decision_making_3",
-    title: "Who is currently not represented?",
+    title: "Who is currently not represented in Delta planning and decision making?",
     hidden: false,
     revealed: false,
     columns: [
@@ -250,7 +250,7 @@ let _sections = $state([
   },
   {
     id: "decision_making",
-    title: "Is current decision making Fair?",
+    title: "Is current decision making fair?",
     hidden: false,
     revealed: false,
     columns: [

@@ -113,7 +113,9 @@
         {#if $location === "/flow"}
           <h3 class="modal-tutorial-title">How to use this interface</h3>
           <div class="modal-tutorial-body">
-            <p>We mainly asked three questions in the interview:</p>
+            <p>
+              Three common questions we asked participants in interviews were:
+            </p>
             <ol>
               <li>
                 What should Future Salinity Management Strategies focus on?
@@ -212,7 +214,7 @@
 {/if}
 
 <main class="flex flex-col relative w-screen h-screen overflow-hidden">
-  <header class="app-hero" class:app-hero--compact={isNotHomePage}>
+  <header class="app-hero h-[60px]" class:app-hero--compact={isNotHomePage}>
     {#if isNotHomePage && currentPage}
       <div class="app-hero__page-info">
         <InfoButton
@@ -226,19 +228,25 @@
       </div>
     {/if}
     <div class="app-hero__brand">
-      <h1 class="app-hero__title">
+      <span class="app-hero__title">
         <button
           type="button"
           class="app-hero__title-button"
+          title="Back to home"
           onclick={navigateHome}
         >
-          Just Transitions
+          Just Transitions in the Delta
+          {#if isNotHomePage}
+            <span class="app-hero__title-back">← Back to home</span>
+          {:else}
+            <span class="app-hero__title-back">&nbsp;</span>
+            <!-- <p class="app-hero__tagline">
+              Drought, salinity, and sea-level rise
+            </p> -->
+          {/if}
         </button>
-      </h1>
-      {#if !isNotHomePage}
-        <h2 class="app-hero__subtitle">In The Delta</h2>
-        <p class="app-hero__tagline">Drought, salinity, and sea-level rise</p>
-      {/if}
+      </span>
+      <!-- <h2 class="app-hero__subtitle">In The Delta</h2> -->
     </div>
   </header>
   <Router {routes} />
@@ -260,15 +268,17 @@
     justify-content: flex-end;
     flex-direction: column;
     text-align: right;
-    padding: 0.75rem 2rem 1.5rem;
+    padding: 0.75rem 2rem 0rem 2rem;
+    margin-bottom: 1rem;
     background-color: var(--surface-elevated);
+    border-bottom: 3px solid var(--border-subtle);
   }
 
   .app-hero--compact {
     flex-direction: row;
-    align-items: center;
+    /* align-items: center; */
     justify-content: space-between;
-    padding-bottom: 0.75rem;
+    /* padding-bottom: 0.75rem; */
   }
 
   /* ---- Left: page info ---- */
@@ -286,8 +296,8 @@
   }
 
   .app-hero__page-title {
-    font-family: var(--font-body);
-    font-size: 1.5rem;
+    font-family: var(--font-display);
+    font-size: 30pt;
     font-weight: 400;
     color: var(--text-primary);
     text-transform: uppercase;
@@ -297,8 +307,8 @@
 
   .app-hero__page-subtitle {
     font-family: var(--font-body);
-    font-size: 0.8rem;
-    font-weight: 400;
+    font-size: 18pt;
+    font-weight: 500;
     color: var(--jt-green);
     text-transform: uppercase;
     letter-spacing: var(--tracking-wider);
@@ -310,7 +320,6 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    text-align: right;
   }
 
   .app-hero__title-button {
@@ -323,6 +332,31 @@
     letter-spacing: inherit;
     text-transform: inherit;
     cursor: pointer;
+    text-align: right;
+    opacity: 0.85;
+    transition: opacity 0.2s ease;
+  }
+  .app-hero__title-button:hover {
+    opacity: 1;
+  }
+
+  .app-hero__title-back {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    opacity: 0.7;
+    margin-top: 0.2rem;
+    transition:
+      opacity 0.2s ease,
+      color 0.2s ease;
+  }
+  .app-hero__title-button:hover .app-hero__title-back {
+    opacity: 1;
+    color: var(--jt-green);
   }
 
   .app-hero__title,
@@ -330,7 +364,7 @@
     color: var(--brand-primary);
     font-family: var(--sc-title);
     font-weight: 400;
-    font-size: 2.5rem;
+    font-size: 1.2rem;
     line-height: 1;
     text-transform: uppercase;
     margin: 0;

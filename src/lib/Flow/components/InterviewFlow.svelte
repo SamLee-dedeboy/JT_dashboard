@@ -597,14 +597,17 @@
   });
 </script>
 
-<div class="upper-page flex flex-1 h-full w-full bg-gray-50">
-  <div bind:this={container} class="flow-container relative flex grow">
-    {#if sections.length > 0}
-      {@const total_columns = sections.reduce((acc, section) => {
-        return acc + section.columns.length;
-      }, 0)}
-      {@const total_sections = sections.length}
-      <!-- <div class="first-two-sections flex justify-around gap-x-2">
+<div class="upper-page main-content flex gap-[20pt] h-full w-full">
+  <div class="flex flex-col gap-2">
+    <h4>Interview Questions and Responses</h4>
+    <div class="flex flex-1 h-ful w-full">
+      <div bind:this={container} class="flow-container relative flex grow">
+        {#if sections.length > 0}
+          {@const total_columns = sections.reduce((acc, section) => {
+            return acc + section.columns.length;
+          }, 0)}
+          {@const total_sections = sections.length}
+          <!-- <div class="first-two-sections flex justify-around gap-x-2">
         <SectionWrapper
           bind:section={section0}
           index={0}
@@ -624,65 +627,68 @@
           {block_aggregator}
         ></SectionWrapper>
       </div> -->
-      {#if sections[0]?.revealed}
-        <SectionWrapper
-          bind:section={section0}
-          index={0}
-          {total_sections}
-          {total_columns}
-          {data}
-          {category_metadata}
-          {block_aggregator}
-        ></SectionWrapper>
-      {/if}
-      {#if sections[1]?.revealed}
-        <SectionWrapper
-          bind:section={section1}
-          index={1}
-          {total_sections}
-          {total_columns}
-          {data}
-          {category_metadata}
-          {block_aggregator}
-        ></SectionWrapper>
-      {/if}
-      {#if sections[2]?.revealed}
-        <SectionWrapper
-          bind:section={section2}
-          index={2}
-          {total_sections}
-          {total_columns}
-          {data}
-          {category_metadata}
-          {block_aggregator}
-        ></SectionWrapper>
-      {/if}
-      {#if sections[3]?.revealed}
-        <SectionWrapper
-          bind:section={section3}
-          index={3}
-          {total_sections}
-          {total_columns}
-          {data}
-          {category_metadata}
-          {block_aggregator}
-        ></SectionWrapper>
-      {/if}
-      {#if sections[4]?.revealed}
-        <SectionWrapper
-          bind:section={section4}
-          index={4}
-          {total_sections}
-          {total_columns}
-          {data}
-          {category_metadata}
-          {block_aggregator}
-        ></SectionWrapper>
-      {/if}
-    {/if}
-    <svg id="sankey-svg" class="sankey-svg"></svg>
+          {#if sections[0]?.revealed}
+            <SectionWrapper
+              bind:section={section0}
+              index={0}
+              {total_sections}
+              {total_columns}
+              {data}
+              {category_metadata}
+              {block_aggregator}
+            ></SectionWrapper>
+          {/if}
+          {#if sections[1]?.revealed}
+            <SectionWrapper
+              bind:section={section1}
+              index={1}
+              {total_sections}
+              {total_columns}
+              {data}
+              {category_metadata}
+              {block_aggregator}
+            ></SectionWrapper>
+          {/if}
+          {#if sections[2]?.revealed}
+            <SectionWrapper
+              bind:section={section2}
+              index={2}
+              {total_sections}
+              {total_columns}
+              {data}
+              {category_metadata}
+              {block_aggregator}
+            ></SectionWrapper>
+          {/if}
+          {#if sections[3]?.revealed}
+            <SectionWrapper
+              bind:section={section3}
+              index={3}
+              {total_sections}
+              {total_columns}
+              {data}
+              {category_metadata}
+              {block_aggregator}
+            ></SectionWrapper>
+          {/if}
+          {#if sections[4]?.revealed}
+            <SectionWrapper
+              bind:section={section4}
+              index={4}
+              {total_sections}
+              {total_columns}
+              {data}
+              {category_metadata}
+              {block_aggregator}
+            ></SectionWrapper>
+          {/if}
+        {/if}
+        <svg id="sankey-svg" class="sankey-svg"></svg>
+      </div>
+    </div>
   </div>
-  <div class="control-panel flex w-[28rem] flex-col">
+  <div class="control-panel flex w-[28rem] flex-col gap-2.5 pb-2">
+    <h4>Shared Values and Concerns</h4>
     <!-- <span class="flex items-center justify-center font-serif text-lg font-bold">
       JT Participant Transcripts
     </span> -->
@@ -697,8 +703,11 @@
     >
       Tutorial
     </div> -->
-    <div class="overview-panel w-full"></div>
-    <div class="statistics-panel flex h-1 grow flex-col">
+    <!-- <div class="overview-panel w-full"></div> -->
+    <div
+      class="statistics-panel flex h-1 grow flex-col outline-2"
+      style="outline-color: var(--border-accent)"
+    >
       <div class="flex grow flex-col gap-8 pb-4">
         <Combinations
           {block_aggregator}
@@ -713,6 +722,9 @@
   @reference "tailwindcss";
   .upper-page {
     background-color: var(--surface-elevated);
+  }
+  .main-content {
+    padding: 0pt 20pt 10pt;
   }
   .sankey-svg {
     @apply absolute bottom-0 left-0 right-0 top-0;

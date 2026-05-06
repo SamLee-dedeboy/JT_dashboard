@@ -59,6 +59,18 @@
     aggregate_combinations(participant_combinations),
   );
 
+  let strategy_counts = $derived(
+    sorted_options.map((option) =>
+      rendered_combinations.reduce((count, combination) => {
+        const titles =
+          combination_content[combination]?.map((b) => b.title) ?? [];
+        if (titles.includes(option))
+          count += combination_participants[combination]?.length ?? 0;
+        return count;
+      }, 0),
+    ),
+  );
+
   let sorted_combinations = $derived(
     [...rendered_combinations].sort(
       (a, b) =>
@@ -138,11 +150,11 @@
   });
 </script>
 
-<div class="combinations-container flex w-full grow flex-col gap-y-1">
-  <div class="flex">
-    <div class="px-1 underline">
+<div class="combinations-container flex w-full grow flex-col gap-y-1 pl-2 pt-2">
+  <div class="flex mb-12">
+    <h5 class="px-1 font-bold!">
       Future Salinity Management {leading_section_title}
-    </div>
+    </h5>
   </div>
   <div class="flex grow flex-col">
     <!-- <div
@@ -157,7 +169,7 @@
         {@const label_bottom = (sorted_options.length - index) * 1.5}
         <div class="column-anchor relative w-[1.3rem] mr-1 flex-none">
           <span
-            class="absolute whitespace-nowrap"
+            class="absolute whitespace-nowrap text-sm"
             style={`bottom: ${label_bottom + 0.25}rem; left: 0; color: ${option_clicked ? "white" : "darkgray"};`}
           >
             {option}
@@ -170,7 +182,7 @@
       {/each}
     </div>
     <div
-      class="combinations-list flex h-1 grow snap-y flex-col gap-y-2 overflow-auto pl-2 pr-[11.5rem] text-sm"
+      class="combinations-list flex h-1 grow flex-col gap-y-2 overflow-auto pl-2 pr-46 text-sm"
       style={`scrollbar-gutter: stable`}
     >
       {#each sorted_combinations as combination, index}
@@ -186,7 +198,7 @@
         <div
           role="button"
           tabindex={index}
-          class="combination-container relative flex snap-center justify-between px-1.5 py-1 opacity-[15%] outline-0 outline-black transition-opacity hover:shadow-md hover:brightness-90"
+          class="combination-container relative flex justify-between px-1.5 py-1 opacity-15 outline-0 outline-black transition-opacity hover:shadow-md hover:brightness-90"
           class:rendered={rendered_combinations.includes(combination)}
           class:highlighted={highlighted_combinations.includes(combination)}
           style={`background-color: ${combination_colors[combination]};`}
@@ -204,24 +216,36 @@
                 cy="55"
                 r="50"
                 fill={circle_filled[index] ? "white" : "white"}
-                opacity={circle_filled[index] ? 1 : 0.5}
+                opacity={circle_filled[index] ? 1 : 0.2}
                 stroke-width="8"
-                stroke={circle_filled[index] ? "gray" : "lightgray"}
+                stroke={circle_filled[index] ? "#444444" : "lightgray"}
               ></circle>
             </svg>
           {/each}
-          <div class="absolute bottom-0 left-[101%] right-0 top-0">
-            {combination_participants[combination].length}
+          <div
+            class="participant-chips absolute bottom-0 left-[101%] right-0 top-0 flex items-center gap-1 px-1"
+          >
+            {#each combination_participants[combination] as participant}
+              <span class="participant-chip">{participant}</span>
+            {/each}
           </div>
         </div>
       {/each}
+      <!-- <div class="strategy-totals relative flex select-none justify-between px-1.5 py-1">
+        {#each sorted_options as _option, i}
+          <div class="strategy-total-count w-[1.3rem] text-center">
+            {strategy_counts[i]}
+          </div>
+        {/each}
+        <span class="strategy-totals-label"># participants who selected this strategy</span>
+      </div> -->
       <div
         class="combinations-legend mt-3 -mr-40 flex flex-col gap-2 rounded p-3 text-base"
       >
         <div class="font-semibold">How to read this chart</div>
         <div>
-          Each row is a group of participants who share the same set of
-          <span class="underline">Future Salinity Management Strategies</span>.
+          Each row represents participants who supports the same set of
+          <span class="underline"> salinity management strategies</span>.
         </div>
         <div>
           <span class="legend-swatch-filled"></span> A filled circle means the
@@ -230,8 +254,7 @@
           not.
         </div>
         <div>
-          The number on the right is how many participants share that
-          combination.
+          The initials on the right show which participants share that combination.
         </div>
       </div>
     </div>
@@ -273,6 +296,44 @@
     color: rgba(255, 255, 255, 0.8);
     outline: 1px dashed rgba(255, 255, 255, 0.2);
   }
+  .strategy-total-count {
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    opacity: 0.8;
+  }
+  .strategy-totals-label {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 0.5rem;
+    font-size: 0.65rem;
+    font-style: italic;
+    color: var(--text-tertiary);
+    opacity: 0.7;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .participant-chips {
+    flex-wrap: nowrap;
+  }
+  .participant-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.88);
+    color: #222;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    font-family: var(--font-body);
+  }
+
   .legend-swatch-filled,
   .legend-swatch-empty {
     display: inline-block;

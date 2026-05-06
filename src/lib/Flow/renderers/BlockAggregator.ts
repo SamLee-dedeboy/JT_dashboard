@@ -491,7 +491,7 @@ export class BlockAggregator {
         //   });
         // });
       });
-    Object.entries(fairness).forEach(([key, value]) => {
+    Object.entries(fairness).filter(([, value]) => value.length > 0).forEach(([key, value]) => {
       fairness_blocks.push({
         id: Constants.fairness_column_id + key,
         column_id: Constants.fairness_column_id,
