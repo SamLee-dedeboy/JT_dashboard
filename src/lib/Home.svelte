@@ -11,7 +11,14 @@
   visited = true;
 </script>
 
-<svelte:window onkeydown={(e) => { if (e.key === "Escape" && modal_open) { e.preventDefault(); modal_open = false; } }} />
+<svelte:window
+  onkeydown={(e) => {
+    if (e.key === "Escape" && modal_open) {
+      e.preventDefault();
+      modal_open = false;
+    }
+  }}
+/>
 
 {#if modal_open}
   <div

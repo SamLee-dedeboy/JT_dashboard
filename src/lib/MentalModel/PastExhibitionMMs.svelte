@@ -26,7 +26,7 @@
 
 {#each mental_models as mental_model, index}
   {#if participants[index] === "SB"}
-    <div class="flex w-[45rem] h-[45rem] relative">
+    <div class="flex w-full max-w-[45rem] aspect-square relative">
       <div class="text-white absolute left-1 top-1">{participants[index]}</div>
       <ExhibitionMmBubbles
         svgId={`mental_model_svg_${index}`}

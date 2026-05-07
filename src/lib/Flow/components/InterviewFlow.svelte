@@ -574,7 +574,7 @@
         const next = [...sectionState.sections];
         next[i] = { ...next[i], revealed: true };
         sectionState.sections = next;
-      }, i * 600);
+      }, i * 300);
     }
     document
       .querySelector(".flow-container")
@@ -597,7 +597,7 @@
   });
 </script>
 
-<div class="upper-page main-content flex gap-[20pt] h-full w-full">
+<div class="upper-page main-content flex gap-5 h-full w-full">
   <div class="flex flex-col gap-2">
     <h4>Interview Questions and Responses</h4>
     <div class="flex flex-1 h-ful w-full">
@@ -687,7 +687,9 @@
       </div>
     </div>
   </div>
-  <div class="control-panel flex w-[28rem] flex-col gap-2.5 pb-2">
+  <div
+    class="control-panel flex w-[20rem] md:w-[18rem] lg:w-[22rem] xl:w-[28rem] flex-col gap-2.5 pb-2"
+  >
     <h4>Shared Values and Concerns</h4>
     <!-- <span class="flex items-center justify-center font-serif text-lg font-bold">
       JT Participant Transcripts
@@ -724,7 +726,7 @@
     background-color: var(--surface-elevated);
   }
   .main-content {
-    padding: 0pt 20pt 10pt;
+    padding: 0 1.25rem 0.625rem;
   }
   .sankey-svg {
     @apply absolute bottom-0 left-0 right-0 top-0;

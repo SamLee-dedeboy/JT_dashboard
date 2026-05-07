@@ -213,7 +213,9 @@
   </div>
 {/if}
 
-<main class="flex flex-col relative w-screen h-screen overflow-hidden">
+<main
+  class="flex flex-col relative w-screen h-screen overflow-y-auto lg:overflow-hidden"
+>
   <header class="app-hero h-[60px]" class:app-hero--compact={isNotHomePage}>
     {#if isNotHomePage && currentPage}
       <div class="app-hero__page-info">
@@ -297,7 +299,7 @@
 
   .app-hero__page-title {
     font-family: var(--font-display);
-    font-size: 30pt;
+    font-size: 1.875rem;
     font-weight: 400;
     color: var(--text-primary);
     text-transform: uppercase;
@@ -307,7 +309,7 @@
 
   .app-hero__page-subtitle {
     font-family: var(--font-body);
-    font-size: 18pt;
+    font-size: 1.5rem;
     font-weight: 500;
     color: var(--jt-green);
     text-transform: uppercase;
