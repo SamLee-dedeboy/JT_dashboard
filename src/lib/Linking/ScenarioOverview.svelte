@@ -45,14 +45,18 @@
           >
             {#each scenario_overview as scenario}
               <button
-                class="scenario-button w-[9rem] min-h-[4rem] rounded outline-1 px-4 py-2 uppercase transition-all"
+                class="scenario-button w-[9rem] min-h-[4rem] rounded outline-1 px-4 py-2 uppercase transition-all text-[1rem]"
                 class:active={selected_scenario?.name === scenario.name}
                 onclick={() =>
                   (selected_scenario = scenario_overview?.find(
                     (s) => s.name === scenario.name,
                   ))}
               >
-                {scenario.name}
+                {#if scenario.name === "Tunnel Vision"}
+                  A Tunnel
+                {:else}
+                  {scenario.name}
+                {/if}
               </button>
             {/each}
           </div>
@@ -80,8 +84,8 @@
                       {selected_scenario.name}
                     </span>
                   </div>
-                  <div class="px-1 text-left">
-                    <!-- <span class="field-label"> Description - </span> -->
+                  <div class="px-1 text-left italic">
+                    <span class="text-lg"> Scenario Description: </span>
                     <span class="field-content text-lg">
                       {selected_scenario.narrative}
                     </span>
@@ -228,7 +232,7 @@
   .field-label {
     color: var(--brand-secondary);
     background: var(--surface-elevated);
-    padding: 0.25rem 0.25rem;
+    /* padding: 0.25rem 0.25rem; */
     border-radius: 4px;
   }
 
