@@ -15,7 +15,7 @@
   onMount(() => {});
 </script>
 
-<div class="page-container px-2 pb-2 flex grow relative">
+<div class="page-container flex grow relative">
   <!-- <CodeBubbles {codes} /> -->
   <div class="flex-1 flex flex-col min-h-0">
     <ScenarioOverview bind:selected_scenario bind:selected_code />
@@ -29,6 +29,7 @@
   @reference "tailwindcss";
   .page-container {
     /* padding: 2rem; */
+    padding: 0pt 10pt 20pt;
     text-align: center;
   }
 

@@ -47,7 +47,7 @@
 </script>
 
 {#key selected_scenario}
-  <div class="info-panel absolute right-3 top-3 z-20 italic">
+  <div class="info-panel absolute right-4 top-0.5 z-20 italic">
     {#if info_open}
       <div
         class="info-panel-expanded flex flex-col gap-2 rounded-md p-3 text-sm text-left"
@@ -109,7 +109,10 @@
       </div>
     {:else}
       <div transition:scale={{ start: 0.85, duration: 200, easing: cubicOut }}>
-        <InfoButton onclick={() => (info_open = true)} label="Expand info panel" />
+        <InfoButton
+          onclick={() => (info_open = true)}
+          label="Expand info panel"
+        />
       </div>
     {/if}
   </div>

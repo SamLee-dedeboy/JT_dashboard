@@ -158,7 +158,8 @@
   .loading {
     color: var(--text-secondary);
   }
-
+  .scenario-container {
+  }
   .scenario-label {
     color: var(--text-secondary);
   }
