@@ -167,7 +167,7 @@
   </div>
 
   <div class="flex flex-col lg:flex-row grow gap-6 relative min-h-0">
-    <div class="flex flex-col w-full lg:w-[60%] min-h-0 gap-1">
+    <div class="flex flex-col w-full lg:w-[70%] min-h-0 gap-1">
       <div class="jt-section-title text-center text-[1.5rem] text-white">
         Collective mental model of <br />
         salinity
@@ -196,7 +196,7 @@
     </div>
     <div
       bind:this={sidebar_el}
-      class="mm-sidebar relative w-full lg:w-[40%] rounded p-4 text-white overflow-hidden min-h-0"
+      class="mm-sidebar relative w-full lg:w-[30%] rounded p-4 text-white overflow-hidden min-h-0"
     >
       {#if merged_server_data && selected_code}
         {#key selected_code}

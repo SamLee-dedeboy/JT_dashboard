@@ -1,7 +1,7 @@
 import * as d3 from "d3"
 import { contrastTextColor } from "../../../constants/colors"
 import { colorForNode } from "../constants"
-const center = 1.8/3;
+const center = 1.6/3;
 export class MentalModelRenderer {
     svgId: string;
     width: number = 1000
@@ -107,7 +107,7 @@ export class MentalModelRenderer {
         console.log("mental model data", nodes_data)
         const svg = d3.select(`#${this.svgId}`)
         const bubble_group = svg.select("g.bubble_group")
-        const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([12, 55])
+        const radiusScale = d3.scaleSqrt().domain([0, d3.max(nodes_data, d => d[1])]).range([20, 65])
         const nodes = nodes_data.concat([["Salinity", 80]])
         const classification_force_position_y = {
           "impacts salinity": this.height * center / 2,
@@ -163,7 +163,7 @@ export class MentalModelRenderer {
             .attr("font-family", "'Hammersmith One', sans-serif")
             .attr("font-size", (d) => {
               const r = d[0] === "Salinity" ? 55 : radiusScale(d[1]);
-              return Math.max(8, Math.min(20, r * 0.3)) + "px";
+              return Math.max(8, Math.min(20, r * 0.25)) + "px";
             })
             .attr("fill", (d) =>
               d[0] === "Salinity"
@@ -173,7 +173,7 @@ export class MentalModelRenderer {
             .attr("pointer-events", "none")
             .text((d) => d[0])
             .each(function(d) {
-              wrap(d3.select(this), d.r*2)
+              wrap(d3.select(this), d.r)
               const line_num = d3.select(this).selectAll("tspan").nodes().length
               d3.select(this).append("tspan")
                 .text(`(${d[1]})`)
@@ -213,7 +213,7 @@ export class MentalModelRenderer {
             .attr("stroke", "#c3c3c3")
             .attr("stroke-opacity", 0.5)
             .attr("marker-mid", `url(#mm-arrow-${this.svgId})`)
-        const canvasRadiusScale = d3.scalePow().exponent(1/2).domain([d3.min(nodes_data, d => d[1]), d3.max(nodes_data, d => d[1])]).range([0, this.height * center / 1.3])
+        const canvasRadiusScale = d3.scalePow().exponent(1/2).domain([d3.min(nodes_data, d => d[1]), d3.max(nodes_data, d => d[1])]).range([120, this.height])
         // update force
         const forceNode = d3.forceManyBody();
         this.simulation = d3
@@ -222,15 +222,15 @@ export class MentalModelRenderer {
         .alphaMin(0.001)
         // .force("parent_x", d3.forceX((d) => d.parent_x).strength(0.1))  
         // .force("parent_y", d3.forceY((d) => d.parent_y).strength(0.1))
-        .force("tsne_x", d3.forceX((d) => code_tsne[d[0]] * this.width || this.width/2).strength(0.1))
-        .force("clf_y", d3.forceY((d) => classification_force_position_y[node_types[d[0]]] || this.height * center).strength(0.12))
+        // .force("tsne_x", d3.forceX((d) => code_tsne[d[0]] * this.width || this.width/2).strength(0.1))
+        .force("clf_y", d3.forceY((d) => classification_force_position_y[node_types[d[0]]] || this.height * center).strength(0.1))
         // .force("center_x", d3.forceX(this.width/2).strength(0.02))
         // .force("center_y", d3.forceY(this.height*center).strength(0.01))
-        .force("frequency_y", d3.forceRadial(null, this.width/2, this.height*center).radius((d) => canvasRadiusScale(d[1]) + 120).strength(1))
+        .force("frequency_y", d3.forceRadial(null, this.width/2, this.height*center).radius((d) => canvasRadiusScale(d[1]) + 130).strength(0.2))
         // .force("clf_y", d3.forceY((d) => classification_force_position_y[node_types[d[0]]] || this.height * center).strength(0.08))
         // .force("center", d3.forceCenter(this.width / 2, this.height * center).strength(0.02))
-        // .force("charge", forceNode.distanceMin(20))
-        .force("collide", d3.forceCollide((d) => 1.2*d.r).strength(0.2))
+        .force("charge", forceNode.distanceMin(20))
+        .force("collide", d3.forceCollide((d) => 1.1*d.r).strength(0.5))
         // Boundary force: keep "impacts salinity" nodes above the center line
         // and "impacted by salinity" nodes below it. On each tick, clamp any
         // node that has crossed and zero out its y velocity so it doesn't
@@ -242,13 +242,13 @@ export class MentalModelRenderer {
             if (d[0] === "Salinity") return;
             const type = node_types[d[0]];
             if (type === "impacts salinity") {
-              const maxY = line - r * 1.1;
+              const maxY = line - r * 1.2;
               if ((d.y ?? 0) > maxY) {
                 d.y = maxY;
                 if (d.vy && d.vy > 0) d.vy = 0;
               }
             } else if (type === "impacted by salinity") {
-              const minY = line + r * 1.1;
+              const minY = line + r * 1.2;
               if ((d.y ?? 0) < minY) {
                 d.y = minY;
                 if (d.vy && d.vy < 0) d.vy = 0;
@@ -354,47 +354,109 @@ function dragended(event, simulation, nodes) {
 function clip(x, range) {
     return Math.max(Math.min(x, range[1]), range[0]);
   }
-  function wrap(text, width) {
-    text.each(function (d, i) {
-        let text = d3.select(this)
-        let words = text.text().split(/[\s-]+/).reverse(),
-            word,
-            line: any[] = [],
-            lineNumber = 0,
-            lineHeight = 1.1, // ems
-            x = d.x,
-            y = d.y,
-            dy = 0, //parseFloat(text.attr("dy")),
-            tspan = text.text(null)
-                .append("tspan")
+  function wrap(text, radius: number) {
+    text.each(function (d) {
+        const node = d3.select(this);
+        const fullText = node.text();
+        const words = fullText.split(/[\s-]+/).filter(Boolean);
+        const x = d.x;
+        const y = d.y;
+        const lineHeight = 1.1; // ems
+        const padding = 5; // px reserved on each chord
+        const fontSizePx = parseFloat(node.attr("font-size") || "12") || 12;
+        const lineHeightPx = fontSizePx * lineHeight;
+
+        // Width of the horizontal chord at vertical offset `dyPx` from circle center
+        const chordWidth = (dyPx: number) => {
+            const r2 = radius * radius - dyPx * dyPx;
+            return r2 > 0 ? 2 * Math.sqrt(r2) - padding : 0;
+        };
+
+        // Hidden tspan used purely for measurement
+        const measureTspan = node.text(null)
+            .append("tspan")
+            .attr("visibility", "hidden");
+        const measure = (s: string) => {
+            measureTspan.text(s);
+            return measureTspan.node()!.getComputedTextLength();
+        };
+
+        // Break a single word into chunks that each fit in `maxWidth`.
+        // Always emits at least one char per chunk to guarantee progress.
+        const breakWord = (word: string, maxWidth: number): string[] => {
+            const chunks: string[] = [];
+            let current = "";
+            for (const ch of word) {
+                const trial = current + ch;
+                if (current.length > 0 && measure(trial) > maxWidth) {
+                    chunks.push(current);
+                    current = ch;
+                } else {
+                    current = trial;
+                }
+            }
+            if (current) chunks.push(current);
+            return chunks.length > 0 ? chunks : [word];
+        };
+
+        // Greedy layout assuming `assumedLineCount` total lines (so we know
+        // each line's vertical offset and thus its chord width). Returns the
+        // resulting lines, or null if the text didn't fit in that many.
+        const tryLayout = (assumedLineCount: number): string[] | null => {
+            const lines: string[] = [];
+            const remaining = [...words];
+            for (let i = 0; i < assumedLineCount; i++) {
+                const yOffset = (i - (assumedLineCount - 1) / 2) * lineHeightPx;
+                const maxWidth = chordWidth(Math.abs(yOffset) + lineHeightPx / 2);
+                if (maxWidth <= 0) return null;
+
+                let line = "";
+                while (remaining.length > 0) {
+                    const next = remaining[0];
+                    const trial = line ? line + " " + next : next;
+                    if (measure(trial) <= maxWidth) {
+                        line = trial;
+                        remaining.shift();
+                    } else if (!line) {
+                        // Single word exceeds chord width — break it character-wise
+                        const chunks = breakWord(next, maxWidth);
+                        line = chunks[0];
+                        const leftover = next.slice(chunks[0].length);
+                        if (leftover) remaining[0] = leftover;
+                        else remaining.shift();
+                        break;
+                    } else {
+                        break;
+                    }
+                }
+                lines.push(line);
+                if (remaining.length === 0) return lines;
+            }
+            return null;
+        };
+
+        const maxLines = Math.max(1, Math.floor((2 * radius) / lineHeightPx));
+        let lines: string[] | null = null;
+        for (let n = 1; n <= maxLines && !lines; n++) {
+            lines = tryLayout(n);
+        }
+        // Fallback: take whatever fits in maxLines, dropping any leftover
+        if (!lines) {
+            lines = tryLayout(maxLines) || [fullText];
+        }
+
+        measureTspan.remove();
+        node.text(null);
+        const total = lines.length;
+        lines.forEach((line, i) => {
+            const dyEm = (i - (total - 1) / 2) * lineHeight;
+            node.append("tspan")
                 .attr("x", x)
                 .attr("y", y)
-                .attr("dy", dy + "em")
-                .attr("text-anchor", "bottom")
+                .attr("dy", dyEm + "em")
+                .attr("text-anchor", "middle")
                 .attr("dominant-baseline", "central")
-          while (word = words.pop()) {
-            line.push(word);
-            tspan.text(line.join(" "));
-            if (tspan.node()!.getComputedTextLength() > width && line.length > 1) {
-                line.pop();
-                tspan.text(line.join(" "));
-                line = [word];
-                tspan = text.append("tspan")
-                    .attr("x", x)
-                    .attr("y", y)
-                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                    .attr("dominant-baseline", "central")
-                    .text(word);
-            }
-          }
-          const line_num = text.selectAll("tspan").nodes().length
-          if(line_num > 1) {
-            const offset = lineHeight * (line_num - 1) / 2
-            text.selectAll("tspan").attr("dy", function() {
-              const dy = parseFloat(d3.select(this).attr("dy"))
-              return dy - offset + "em"
-            })
-            // text.selectAll("tspan").attr("dy", parseFloat(y) - em_to_px / 2 * lineHeight * (line_num - 1) / 2)
-          }
+                .text(line);
+        });
     });
   }

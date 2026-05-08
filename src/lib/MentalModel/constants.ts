@@ -8,7 +8,7 @@ export const categories = ["Value", "Drivers", "Governance", "Strategies"]
 // renderer (circle fill) and the tooltip (border accent) so both stay in sync.
 export const nodeTypeColor: Record<string, string> = {
   "impacts salinity": "var(--cat-1)",
-  "impacted by salinity": "var(--cat-2)",
+  "impacted by salinity": "var(--cat-6)",
 };
 const defaultNodeColor = "var(--cat-3)";
 export function colorForNode(nodeType: string | undefined): string {
