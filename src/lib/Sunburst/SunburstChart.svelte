@@ -471,39 +471,39 @@
       .attr("stroke-width", 1)
       .style("opacity", 0.7);
 
-    const countLabels = g
-      .selectAll(".count-label")
-      .data(
-        extendedRoot
-          .descendants()
-          .filter(
-            (d) =>
-              !isZoomed && d.depth === 1 && d.children && d.children.length > 0,
-          ) as HierarchyNodeExtended[],
-      )
-      .enter()
-      .append("text")
-      .attr("class", "count-label")
-      .attr("transform", function (d: HierarchyNodeExtended) {
-        const angle = (d.x0 + d.x1) / 2;
-        const radius = d.y1 + 85;
-        const x = Math.sin(angle) * radius;
-        const y = -Math.cos(angle) * radius;
-        return `translate(${x},${y}) rotate(0)`;
-      })
-      .attr("text-anchor", "middle")
-      .attr("dy", "0.35em")
-      .style("font-size", "10px")
-      .style("fill", "white")
-      .style("pointer-events", "none")
-      .text((d: HierarchyNodeExtended) => {
-        if (!d.children) return "0";
-        const visibleChildren = d.children.filter((child) => {
-          const childKey = `${d.data.name}_${child.data.name}`;
-          return !hiddenChildren.has(childKey);
-        }).length;
-        return visibleChildren;
-      });
+    // const countLabels = g
+    //   .selectAll(".count-label")
+    //   .data(
+    //     extendedRoot
+    //       .descendants()
+    //       .filter(
+    //         (d) =>
+    //           !isZoomed && d.depth === 1 && d.children && d.children.length > 0,
+    //       ) as HierarchyNodeExtended[],
+    //   )
+    //   .enter()
+    //   .append("text")
+    //   .attr("class", "count-label")
+    //   .attr("transform", function (d: HierarchyNodeExtended) {
+    //     const angle = (d.x0 + d.x1) / 2;
+    //     const radius = d.y1 + 85;
+    //     const x = Math.sin(angle) * radius;
+    //     const y = -Math.cos(angle) * radius;
+    //     return `translate(${x},${y}) rotate(0)`;
+    //   })
+    //   .attr("text-anchor", "middle")
+    //   .attr("dy", "0.35em")
+    //   .style("font-size", "10px")
+    //   .style("fill", "white")
+    //   .style("pointer-events", "none")
+    //   .text((d: HierarchyNodeExtended) => {
+    //     if (!d.children) return "0";
+    //     const visibleChildren = d.children.filter((child) => {
+    //       const childKey = `${d.data.name}_${child.data.name}`;
+    //       return !hiddenChildren.has(childKey);
+    //     }).length;
+    //     return visibleChildren;
+    //   });
 
     let labels = g
       .selectAll("text.arc-text")
