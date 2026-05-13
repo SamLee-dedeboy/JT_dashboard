@@ -599,7 +599,7 @@
 
 <div class="upper-page main-content flex gap-5 h-full w-full">
   <div class="flex flex-col gap-2">
-    <h4>Interview Questions and Responses</h4>
+    <h4 class="!font-[500]">Interview Questions and Responses</h4>
     <div class="flex flex-1 h-ful w-full">
       <div bind:this={container} class="flow-container relative flex grow">
         {#if sections.length > 0}
@@ -690,7 +690,7 @@
   <div
     class="control-panel flex w-[20rem] md:w-[18rem] lg:w-[22rem] xl:w-[28rem] flex-col gap-2.5 pb-2"
   >
-    <h4>Shared Values and Concerns</h4>
+    <h4 class="!font-[500]">Shared Values and Concerns</h4>
     <!-- <span class="flex items-center justify-center font-serif text-lg font-bold">
       JT Participant Transcripts
     </span> -->

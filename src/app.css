@@ -252,7 +252,7 @@ body {
   margin: 0;
   background-color: var(--surface-page);
   color: var(--text-primary);
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-family: "Proxima Nova";
 }
 
