@@ -84,9 +84,9 @@
                       {selected_scenario.name}
                     </span>
                   </div>
-                  <div class="px-1 text-left italic">
-                    <span class="text-lg"> Scenario Description: </span>
-                    <span class="field-content text-lg">
+                  <div class="px-1 text-left">
+                    <span class="font-semibold"> Scenario Description: </span>
+                    <span class="field-content italic">
                       {selected_scenario.narrative}
                     </span>
                   </div>

@@ -41,7 +41,7 @@
 </script>
 
 <div
-  class="modal-content flex flex-col min-h-[400px] overflow-y-auto text-left text-white"
+  class="modal-content flex flex-col min-h-[400px] overflow-y-auto text-left text-white p-4"
 >
   <div class="flex justify-between items-start mb-4">
     <div class="flex-1">
@@ -71,7 +71,7 @@
       <span class=" underline">
         {code.participantCount}
       </span>
-      participants mentioned this in the interview.
+      participants mentioned this in their interview.
     </p>
     {#if handleExpand}
       <div class="mt-4">
@@ -102,7 +102,7 @@
 <style lang="postcss">
   @reference "tailwindcss";
   .modal-content {
-    font-family: "Hammersmith One", sans-serif;
+    font-family: var(--font-body);
   }
   .category-chip {
     box-decoration-break: clone;

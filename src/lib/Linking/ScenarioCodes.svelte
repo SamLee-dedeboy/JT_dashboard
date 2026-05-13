@@ -43,7 +43,7 @@
       });
   }
   const categories = ["Drivers", "Strategies", "Value", "Governance"];
-  let info_open = $state(true);
+  let info_open = $state(false);
 </script>
 
 {#key selected_scenario}
