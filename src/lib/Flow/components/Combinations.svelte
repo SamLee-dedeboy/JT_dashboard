@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { slide, fly } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
   import { cubicOut } from "svelte/easing";
 
   import {
@@ -12,6 +12,7 @@
   import { initial_to_id_dict } from "../constants";
   import type { BlockAggregator } from "../renderers/BlockAggregator";
   import { combination_controller } from "../renderers/CombinationController";
+  import InfoButton from "../../InfoButton.svelte";
 
   // Use $props() instead of export let
   let {
@@ -95,6 +96,8 @@
   // State for tracking trigger times
   let update_base_block_trigger_times = $state(0);
 
+  let show_help_modal = $state(false);
+
   // Side effects
   $effect(() => {
     // if (first_block_title) {
@@ -150,16 +153,28 @@
   });
 </script>
 
-<div class="combinations-container flex w-full grow flex-col gap-y-1 pl-2 pt-2">
-  <div class="flex mb-12">
-    <h5 class="px-1 font-bold!">
-      Future Salinity Management {leading_section_title}
-    </h5>
+<div
+  class="combinations-container relative flex w-full grow flex-col gap-y-1 pl-2 pt-2"
+>
+  <InfoButton
+    class="absolute right-2 top-2 z-50"
+    label="How to read this chart"
+    onclick={() => (show_help_modal = true)}
+  />
+  <div class="flex mb-2">
+    <span class="px-1 text-[0.925rem] mr-8">
+      <!-- Future Salinity Management {leading_section_title} -->
+      See how participants priorities align across the different salinity management
+      strategies.
+    </span>
   </div>
   <div class="flex grow flex-col">
     <!-- <div
       class="relative z-[40] mb-[-0.5rem] mt-[-2.5rem] flex max-w-full select-none gap-x-[1.3rem] overflow-x-visible pl-12"
     > -->
+    <div style="color: var(--text-subtitle);">
+      Salinity Management Strategies
+    </div>
     <div
       class="column-headers relative z-[40] mt-6 flex max-w-full select-none justify-between overflow-x-visible"
       style={`padding-left: 0.875rem; padding-right: 11.625rem; height: ${sorted_options.length * 1.5}rem;`}
@@ -202,12 +217,12 @@
           class:rendered={rendered_combinations.includes(combination)}
           class:highlighted={highlighted_combinations.includes(combination)}
           style={`background-color: ${combination_colors[combination]};`}
-          on:click={(e) => {
+          onclick={(e) => {
             e.preventDefault();
             // This functionality is currently disabled
             // TODO: Re-implement highlighted combinations functionality if needed
           }}
-          on:keyup={() => {}}
+          onkeyup={() => {}}
         >
           {#each sorted_options as option, index}
             <svg class="h-[1.3rem] w-[1.3rem]" viewBox="0 0 100 110"
@@ -225,9 +240,10 @@
           <div
             class="participant-chips absolute bottom-0 left-[101%] right-0 top-0 flex items-center gap-1 px-1"
           >
-            {#each combination_participants[combination] as participant}
+            <!-- {#each combination_participants[combination] as participant}
               <span class="participant-chip">{participant}</span>
-            {/each}
+            {/each} -->
+            {combination_participants[combination].length}
           </div>
         </div>
       {/each}
@@ -239,9 +255,36 @@
         {/each}
         <span class="strategy-totals-label"># participants who selected this strategy</span>
       </div> -->
+    </div>
+  </div>
+
+  {#if show_help_modal}
+    <div
+      class="help-modal-overlay absolute left-0 right-8 top-1 inset-0 z-60"
+      role="dialog"
+      aria-modal="true"
+      aria-label="How to read this chart"
+      transition:fade={{ duration: 150 }}
+    >
+      <button
+        type="button"
+        class="modal-backdrop absolute inset-0"
+        aria-label="Close modal"
+        onclick={() => (show_help_modal = false)}
+      ></button>
       <div
-        class="combinations-legend mt-3 -mr-40 flex flex-col gap-2 rounded p-3 text-base"
+        class="help-modal-content absolute left-1 right-0 top-0 flex w-full flex-col gap-2 rounded p-4 pr-6 text-base"
+        style="width: calc(100% - 1rem);"
+        transition:fly={{ y: -8, duration: 200, easing: cubicOut }}
       >
+        <button
+          type="button"
+          class="modal-close absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded text-sm"
+          aria-label="Close"
+          onclick={() => (show_help_modal = false)}
+        >
+          ×
+        </button>
         <div class="font-semibold">How to read this chart</div>
         <div>
           Each row represents participants who supports the same set of
@@ -254,11 +297,12 @@
           not.
         </div>
         <div>
-          The initials on the right show which participants share that combination.
+          The initials on the right show which participants share that
+          combination.
         </div>
       </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 <style lang="postcss">
@@ -291,10 +335,32 @@
     z-index: 30;
     pointer-events: none;
   }
-  .combinations-legend {
-    background-color: rgba(255, 255, 255, 0.05);
+  .help-modal-overlay {
+    background-color: var(--jt-surface-elevated);
+    /* backdrop-filter: blur(2px); */
+  }
+  .modal-backdrop {
+    /* background: transparent; */
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .help-modal-content {
+    background-color: var(--surface-elevated);
+    color: rgba(255, 255, 255, 0.95);
+    outline: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 3px rgba(0, 0, 0, 0.5);
+  }
+  .modal-close {
+    background-color: transparent;
     color: rgba(255, 255, 255, 0.8);
-    outline: 1px dashed rgba(255, 255, 255, 0.2);
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+  .modal-close:hover {
+    color: white;
   }
   .strategy-total-count {
     font-size: 0.65rem;
