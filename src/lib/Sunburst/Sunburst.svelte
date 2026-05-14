@@ -355,7 +355,9 @@
           >
             <!-- Descriptive text for this row + Takeaways placeholder -->
             <div class="max-w-4xl flex-1 mx-auto flex flex-col gap-4">
-              <div class="p-4 rounded-lg shadow-md">
+              <div
+                class="p-4 rounded-lg shadow-md bg-(--surface-elevated) ml-3 mt-3"
+              >
                 <div class="text-left">
                   {#if rowIndex === 0}
                     <h2>Age Group</h2>
@@ -421,7 +423,7 @@
               </div>
             </div>
             {#each rowData as item, index}
-              <div class="min-w-[27rem] relative">
+              <div class="min-w-[30rem] relative">
                 <SunburstChart
                   data={item.data}
                   title={item.title}
