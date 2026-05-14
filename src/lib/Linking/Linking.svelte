@@ -46,8 +46,8 @@
     font-size: 1.1rem;
   } */
   .bubble-container {
-    outline: 1px solid var(--jt-green);
-    /* border-radius: 0.5rem; */
+    outline: 1px solid var(--surface-page);
+    border-radius: 0.1rem;
     background: var(--surface-page);
   }
 </style>
