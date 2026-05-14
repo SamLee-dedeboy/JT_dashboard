@@ -25,40 +25,15 @@
       },
       body: JSON.stringify({ code: code.id }),
     })
-      .then(async (response) => {
-        const data = await response.json();
+      .then((response) => response.json())
+      .then((data) => {
         console.log("Summarization", data);
-        return { ok: response.ok, data };
-      })
-      .then(({ ok, data }) => {
-        if (!ok) return "";
-        return extractSummaryText(data);
+        return data;
       })
       .catch((error) => {
         console.error("Error:", error);
         return "";
       });
-  }
-
-  function extractSummaryText(data: unknown): string {
-    if (data == null) return "";
-    if (typeof data === "string") return data;
-    if (typeof data === "number" || typeof data === "boolean")
-      return String(data);
-    if (Array.isArray(data)) {
-      return data.map((item) => extractSummaryText(item)).join("\n");
-    }
-    if (typeof data === "object") {
-      const obj = data as Record<string, unknown>;
-      const preferred = ["summary", "response", "text", "content", "message"];
-      for (const key of preferred) {
-        if (typeof obj[key] === "string") return obj[key] as string;
-        if (obj[key] && typeof obj[key] === "object")
-          return extractSummaryText(obj[key]);
-      }
-      return "";
-    }
-    return "";
   }
   onMount(() => {
     console.log("Mounted GraphNodeTooltip with code:", code);
@@ -66,10 +41,16 @@
 </script>
 
 <div
-  class="modal-content flex flex-col min-h-[400px] overflow-y-auto text-left text-white p-4"
+  class="modal-content flex flex-col grow text-left text-white pb-4 relative"
 >
-  <div class="flex justify-between items-start mb-4">
-    <div class="flex-1">
+  <div
+    class="text-center font-(--font-body) font-semibold p-2"
+    style={`background-color: color-mix(in srgb, ${bubble_color(code.id.split("\\").at(0))} 90%, transparent); color: ${contrastTextColor(bubble_color(code.id.split("\\").at(0)))}`}
+  >
+    {code.depth <= 1
+      ? code.id.split("\\").at(-1)?.toUpperCase()
+      : code.id.split("\\").at(-1)}
+    <!-- <div class="flex-1">
       <h4 class="mb-2">
         You're looking at participant responses about
         <span
@@ -81,7 +62,7 @@
             : code.id.split("\\").at(-1)}
         </span>
       </h4>
-    </div>
+    </div> -->
     <!-- <button
       class="close-button text-2xl text-gray-500 hover:text-gray-700 rounded-full w-8 h-8 flex items-center justify-center leading-none hover:bg-gray-100 transition-colors"
       onclick={() => handleClose()}
@@ -91,9 +72,9 @@
     </button> -->
   </div>
 
-  <div class="mb-4">
+  <div class="scrollable mb-4 px-4 flex flex-col absolute top-0 bottom-0">
     <p class="">
-      <span class=" underline">
+      <span class="underline">
         {code.participantCount}
       </span>
       participants mentioned this in their interview.
@@ -106,21 +87,21 @@
         > to see its children.
       </div>
     {/if}
-  </div>
 
-  <div class="flex-1 overflow-y-auto">
-    <!-- <p class="text-lg mb-3">Summary of participant responses:</p> -->
-    {#await fetchSummarization()}
-      <div class="flex items-center justify-center py-8">
-        <div class="text-gray-500">Loading summary...</div>
-      </div>
-    {:then summarization}
-      <div class="py-4 rounded-lg text-left" in:slide>
-        <p class="leading-relaxed whitespace-pre-wrap">
-          {summarization || "No summary available."}
-        </p>
-      </div>
-    {/await}
+    <div class="">
+      <!-- <p class="text-lg mb-3">Summary of participant responses:</p> -->
+      {#await fetchSummarization()}
+        <div class="flex items-center justify-center py-8">
+          <div class="text-gray-500">Loading summary...</div>
+        </div>
+      {:then summarization}
+        <div class="py-4 rounded-lg text-left" in:slide>
+          <p class="leading-relaxed whitespace-pre-wrap">
+            {summarization || "No summary available."}
+          </p>
+        </div>
+      {/await}
+    </div>
   </div>
 </div>
 
@@ -128,6 +109,14 @@
   @reference "tailwindcss";
   .modal-content {
     font-family: var(--font-body);
+    height: 100%;
+    min-height: 0;
+  }
+  .modal-content .scrollable {
+    position: static;
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
   }
   .category-chip {
     box-decoration-break: clone;

@@ -47,7 +47,7 @@
 </script>
 
 {#key selected_scenario}
-  <div class="info-panel absolute right-4 top-0.5 z-20 italic">
+  <div class="info-panel absolute right-9 top-13 z-20 italic">
     {#if info_open}
       <div
         class="info-panel-expanded flex flex-col gap-2 rounded-md p-3 text-sm text-left"
@@ -55,7 +55,7 @@
       >
         <div class="flex items-start justify-between gap-2">
           <span class="title-banner uppercase not-italic font-normal text-xl">
-            Public Opinion
+            PUBLIC IDEAS & VLAUES
           </span>
           <button
             type="button"
@@ -95,8 +95,8 @@
             /></svg
           >
           <span>
-            This chart shows what participants' opinions we considered for this
-            scenario.
+            This chart shows the participant ideas and values that we aligned to
+            this scenario.
           </span>
         </span>
         <div class="ml-7 font-normal">

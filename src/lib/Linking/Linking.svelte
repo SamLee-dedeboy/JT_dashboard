@@ -17,11 +17,14 @@
 
 <div class="page-container flex grow relative">
   <!-- <CodeBubbles {codes} /> -->
-  <div class="flex-1 flex flex-col min-h-0">
+  <div class="flex-1 flex flex-col min-h-0 relative">
     <ScenarioOverview bind:selected_scenario bind:selected_code />
   </div>
-  <div class="bubble-container flex flex-col flex-1 min-h-0">
-    <ScenarioCodes {selected_scenario} bind:selected_code />
+  <div class="flex flex-col flex-1 gap-4">
+    <h3>PUBLIC IDEAS & VALUES</h3>
+    <div class="bubble-container flex flex-col flex-1 min-h-0">
+      <ScenarioCodes {selected_scenario} bind:selected_code />
+    </div>
   </div>
 </div>
 
@@ -29,7 +32,7 @@
   @reference "tailwindcss";
   .page-container {
     /* padding: 2rem; */
-    padding: 0pt 10pt 20pt;
+    padding: 0.5rem 2rem 2rem;
     text-align: center;
   }
 
@@ -43,8 +46,8 @@
     font-size: 1.1rem;
   } */
   .bubble-container {
-    outline: 1px solid var(--jt-secondary);
-    border-radius: 0.5rem;
+    outline: 1px solid var(--jt-green);
+    /* border-radius: 0.5rem; */
     background: var(--surface-page);
   }
 </style>

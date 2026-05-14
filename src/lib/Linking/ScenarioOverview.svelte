@@ -39,7 +39,7 @@
     <div class="flex flex-col flex-1 gap-y-2 min-h-0">
       <div class="flex grow gap-y-2 min-h-0">
         <div class="selector flex flex-col gap-y-4 z-10">
-          <!-- <div class="scenario-label italic text-left pl-1">Scenarios:</div> -->
+          <h3 class="scenario-label text-center pl-1 capitalize">SCENARIO</h3>
           <div
             class="flex flex-col gap-x-4 gap-y-4 flex-wrap mx-1 grow justify-between"
           >
@@ -62,7 +62,9 @@
           </div>
         </div>
         <div class="content-area flex flex-col grow min-h-0">
-          <div class="content-container px-4 flex rounded relative gap-1">
+          <div
+            class="content-container px-4 flex flex-col rounded relative gap-4 grow"
+          >
             {#if selected_scenario}
               {#key selected_scenario.name}
                 <!-- <div class="p-1 absolute left-0 right-0 top-0 bottom-0"> -->
@@ -73,24 +75,27 @@
                     class=" object-contain"
                   />
                 </div> -->
+                <h3 class="text-center">DESCRIPTIONS</h3>
                 <div
-                  class="scenario-content flex px-2 flex-col min-w-[18rem] relative outline-0 mb-4"
+                  class="flex flex-col gap-2 outline-1 grow"
                   style="outline-color: var(--jt-green);"
-                  in:slide
                 >
-                  <div class="px-1 text-left">
-                    <!-- <span class="field-label"> Description - </span> -->
-                    <span class="field-name text-2xl font-semibold">
-                      {selected_scenario.name}
-                    </span>
-                  </div>
-                  <div class="px-1 text-left">
-                    <span class="font-semibold"> Scenario Description: </span>
-                    <span class="field-content italic">
-                      {selected_scenario.narrative}
-                    </span>
-                  </div>
-                  <!-- <div class="mt-2 px-1 text-left">
+                  <div
+                    class="scenario-content flex px-4 py-4 flex-col min-w-[18rem] relative mb-4"
+                    in:slide
+                  >
+                    <div class="px-1 text-left">
+                      <span class="field-name text-2xl font-semibold pt-2">
+                        {selected_scenario.name}
+                      </span>
+                    </div>
+                    <div class="px-1 text-left">
+                      <span class="font-semibold"> Scenario Description: </span>
+                      <span class="field-content italic">
+                        {selected_scenario.narrative}
+                      </span>
+                    </div>
+                    <!-- <div class="mt-2 px-1 text-left">
                     <span class="field-label">
                       Why is this scenario important?
                     </span>
@@ -118,34 +123,32 @@
                       {/each}
                     </div>
                   </div> -->
+                  </div>
+                  {#if selected_scenario}
+                    <div
+                      class="code-detail-panel m-4 min-h-0 grow relative bg-(--surface-page)"
+                    >
+                      {#if selected_code}
+                        <div class="absolute top-0 bottom-0 left-0 right-0">
+                          <GraphNodeTooltip
+                            code={selected_code}
+                            handleClose={() => (selected_code = undefined)}
+                          />
+                        </div>
+                      {:else}
+                        <div
+                          class="flex h-full items-center justify-center p-4 text-center text-sm italic opacity-70"
+                        >
+                          Click a bubble on the right to see participant
+                          opinions about it here.
+                        </div>
+                      {/if}
+                    </div>
+                  {/if}
                 </div>
               {/key}
             {/if}
           </div>
-          {#if selected_scenario}
-            <div
-              class="code-detail-panel mx-6 mt-2 min-h-0 grow border border-dashed relative"
-              style="border-color: var(--jt-green);"
-            >
-              {#if selected_code}
-                <div
-                  class="absolute top-0 bottom-0 left-0 right-0 overflow-auto p-3"
-                >
-                  <GraphNodeTooltip
-                    code={selected_code}
-                    handleClose={() => (selected_code = undefined)}
-                  />
-                </div>
-              {:else}
-                <div
-                  class="flex h-full items-center justify-center p-4 text-center text-sm italic opacity-70"
-                >
-                  Click a bubble on the right to see participant opinions about
-                  it here.
-                </div>
-              {/if}
-            </div>
-          {/if}
         </div>
       </div>
     </div>
