@@ -82,16 +82,16 @@ export class CodeGraphRenderer {
             .attr("viewBox", `0 0 ${this.width} ${this.height}`)
 
         // Arrowhead marker (referenced by center→root arrows)
-        svg.append("defs")
-            .append("marker")
-            .attr("id", `arrow-${this.svgId}`)
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 10).attr("refY", 0)
-            .attr("markerWidth", 6).attr("markerHeight", 6)
-            .attr("orient", "auto")
-            .append("path")
-            .attr("d", "M0,-5L10,0L0,5")
-            .attr("fill", "#999");
+        // svg.append("defs")
+        //     .append("marker")
+        //     .attr("id", `arrow-${this.svgId}`)
+        //     .attr("viewBox", "0 -5 10 10")
+        //     .attr("refX", 10).attr("refY", 0)
+        //     .attr("markerWidth", 6).attr("markerHeight", 6)
+        //     .attr("orient", "auto")
+        //     .append("path")
+        //     .attr("d", "M0,-5L10,0L0,5")
+        //     .attr("fill", "#999");
 
         // Zoomable group: center-group sits behind links and nodes.
         const zoomGroup = svg.append("g").attr("class", "zoom-group")
@@ -297,12 +297,12 @@ export class CodeGraphRenderer {
         // many there are: 4 -> X shape, 3 -> Y, 2 -> horizontal split, etc.
         this.anchorByRoot = this.computeRootAnchors(codes, nodeDepths);
 
-        const scaleRadius = d3.scalePow().exponent(1/2).domain([0, d3.max(codes, d=>d.participants.length) || 1]).range([12, 40])
+        const scaleRadius = d3.scalePow().exponent(1/2).domain([0, d3.max(codes, d=>d.participants.length) || 1]).range([30, 70])
         const cx = this.width / 2;
         const cy = this.height / 2;
         const minDim = Math.min(this.width, this.height);
-        const regionR = minDim * 0.2;
-        const stepR = minDim * 0.3;
+        const regionR = minDim * 0.1;
+        const stepR = minDim * 0.4;
 
         // Assign each node a deterministic index within its (root, depth)
         // sibling group, sorted alphabetically, so we can fan them angularly
@@ -332,7 +332,7 @@ export class CodeGraphRenderer {
             let baseY = cy;
             console.log(code.name, depth)
             if (anchor) {
-                const r = stepR * (depth - 1);
+                const r = regionR + stepR * (depth - 1);
                 const key = `${rootId}|${depth}`;
                 const count = siblingCount.get(key) ?? 1;
                 const idx = siblingIndex.get(code.name) ?? 0;
@@ -527,19 +527,24 @@ export class CodeGraphRenderer {
         
         // Center circle + arrows to top-level nodes
         const cx = this.width / 2, cy = this.height / 2;
-        const centerR = 22;
+        const centerR = 48;
         const topNodes = visibleNodes.filter(n => n.depth === 1);
 
         const centerGroup = svg.select(".center-group");
+
+        // Radiating "sun" rays around the central node.
+        const rayCount = 24;
+        const rayInner = centerR + 6;
+        const rayOuter = centerR + 28;
+
         centerGroup.selectAll("circle.center-circle")
             .data([null])
             .join("circle")
             .attr("class", "center-circle")
             .attr("cx", cx).attr("cy", cy).attr("r", centerR)
-            .attr("fill", "none")
-            .attr("stroke", "#999")
-            .attr("stroke-width", 1.5)
-            .attr("stroke-dasharray", "4,3");
+            .attr("fill", "#a3d977")
+            .attr("stroke", "#333")
+            .attr("stroke-width", 3);
 
         centerGroup.selectAll("text.center-label")
             .data([null])
@@ -549,8 +554,9 @@ export class CodeGraphRenderer {
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
             .attr("font-family", "'Hammersmith One', sans-serif")
-            .attr("font-size", "9px")
-            .attr("fill", "#999")
+            .attr("font-weight", "700")
+            .attr("font-size", "16px")
+            .attr("fill", "#111")
             .attr("pointer-events", "none")
             .text("SALINITY");
 

@@ -25,15 +25,40 @@
       },
       body: JSON.stringify({ code: code.id }),
     })
-      .then((response) => response.json())
-      .then((data) => {
+      .then(async (response) => {
+        const data = await response.json();
         console.log("Summarization", data);
-        return data;
+        return { ok: response.ok, data };
+      })
+      .then(({ ok, data }) => {
+        if (!ok) return "";
+        return extractSummaryText(data);
       })
       .catch((error) => {
         console.error("Error:", error);
         return "";
       });
+  }
+
+  function extractSummaryText(data: unknown): string {
+    if (data == null) return "";
+    if (typeof data === "string") return data;
+    if (typeof data === "number" || typeof data === "boolean")
+      return String(data);
+    if (Array.isArray(data)) {
+      return data.map((item) => extractSummaryText(item)).join("\n");
+    }
+    if (typeof data === "object") {
+      const obj = data as Record<string, unknown>;
+      const preferred = ["summary", "response", "text", "content", "message"];
+      for (const key of preferred) {
+        if (typeof obj[key] === "string") return obj[key] as string;
+        if (obj[key] && typeof obj[key] === "object")
+          return extractSummaryText(obj[key]);
+      }
+      return "";
+    }
+    return "";
   }
   onMount(() => {
     console.log("Mounted GraphNodeTooltip with code:", code);
