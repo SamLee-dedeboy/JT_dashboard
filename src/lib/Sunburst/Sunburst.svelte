@@ -314,16 +314,17 @@
 
 <div
   bind:this={scrollPanelContainer}
-  class="min-h-screen bg-[var(--surface-page)] font-body overflow-y-auto relative flex px-4 text-white"
+  class="min-h-screen bg-[var(--surface-elevated)] font-body overflow-y-auto relative flex px-4 text-white"
 >
   <!-- <div class="absolute right-4 top-[20rem]">
     Some descriptive text/caption can be put here
   </div> -->
   <div class="px-5 py-5 grow">
     <div
-      class="absolute top-2 right-3 z-50 bg-white rounded-lg shadow-md px-3 py-2"
+      class="absolute top-0 right-2 z-50 rounded-lg shadow-md px-3 py-2 color-white"
+      style="background: var(--surface-elevated);"
     >
-      <div class="flex items-center gap-3 text-gray-800">
+      <div class="flex items-center gap-3 text-white">
         <span class="text-sm">Show Top 5 Only:</span>
         <label class="relative inline-block w-12 h-6">
           <input
@@ -345,16 +346,16 @@
     </div>
 
     <!-- Gallery -->
-    <div class="flex flex-col gap-8 mb-8">
+    <div class="flex flex-col gap-8 mb-8 mt-6">
       {#each Array.from( { length: Math.ceil(processedDatasets.length / 2) }, (_, i) => processedDatasets.slice(i * 2, i * 2 + 2), ) as rowData, rowIndex}
         <div class="flex flex-col gap-4">
           <!-- Row of two sunbursts -->
-          <div class="flex justify-center gap-8">
+          <div
+            class="flex justify-center gap-8 bg-[var(--surface-page)] rounded"
+          >
             <!-- Descriptive text for this row + Takeaways placeholder -->
             <div class="max-w-4xl flex-1 mx-auto flex flex-col gap-4">
-              <div
-                class="bg-[var(--surface-elevated)] p-4 rounded-lg shadow-md"
-              >
+              <div class="p-4 rounded-lg shadow-md">
                 <div class="text-left">
                   {#if rowIndex === 0}
                     <h2>Age Group</h2>
@@ -364,29 +365,29 @@
                       >
                       and
                       <span class="underline">{rowData[1]?.title || ""}</span>.
-                      The total number of nodes for participants aged 18-35 had
-                      on average less subthemes than the 36-64 age group and 65
-                      years and older group.
+                      Participants aged 18-35 had on average less subthemes than
+                      the 36-64 age group and 65 years and older group.
                       <span class="underline">
                         This suggests that mental models become more detailed or
                         developed with increasing age.
                       </span>
                       The most mentioned theme in the mental models is human impacts.
-                      The most mentioned driver of salinity was flow for the older
-                      groups and structure (physical geography) for the younger groups.
+                      <!-- The most mentioned driver of salinity was flow for the older
+                      groups and structure (physical geography) for the younger groups. -->
                     </p>
                   {:else if rowIndex === 1}
                     <h2>Experience of Engagement</h2>
                     <p class="text">
-                      The visualization above shows how engagement experience
-                      affects mental model composition.
+                      Here you can see how years of engagement in the Delta can
+                      affect mental model composition.
                       <span class="underline">{rowData[0]?.title || ""}</span>
                       versus
                       <span class="underline">{rowData[1]?.title || ""}</span>
-                      reveals how different levels of engagement influence the themes
+                      influence themes people focus on.
+                      <!-- reveals how different levels of engagement influence the themes
                       people focus on. The mental models of people with 0-10 years
                       of experience had fewer subthemes on average than the mental
-                      models of people with over 30 years of experience.
+                      models of people with over 30 years of experience. -->
                       <span class="underline">
                         This suggests that as engagement in the delta increases,
                         individuals learn more about the system and their
@@ -404,6 +405,13 @@
                       climate change appears as the most identified theme in
                       only the team mental models.
                     </p>
+                    <span class="underline">
+                      This suggests that interviewees’ mental models had greater
+                      breadth than research team members. While interviewees
+                      focused more on human impact influences, researchers
+                      focused more on climate change and physical infrastructure
+                      influences.
+                    </span>
                   {/if}
                 </div>
                 <!-- <h2 class="mt-2">Takeaways</h2>
@@ -413,7 +421,7 @@
               </div>
             </div>
             {#each rowData as item, index}
-              <div class="flex-2 relative">
+              <div class="min-w-[27rem] relative">
                 <SunburstChart
                   data={item.data}
                   title={item.title}

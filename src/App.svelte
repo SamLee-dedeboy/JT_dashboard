@@ -163,8 +163,8 @@
           <h3 class="modal-tutorial-title">How to read these Mental Models</h3>
           <div class="modal-tutorial-body">
             <p>
-              This mental model combines and visualizes how interview and
-              workshop participants collectively responded to the following
+              This collective mental model combines and visualizes how interview
+              and workshop participants collectively responded to the following
               questions:
             </p>
             <ol>
@@ -184,9 +184,7 @@
               understandings in how participants perceive drivers and impacts of
               Delta Salinity.
             </p>
-            <p class="italic">
-              Tip: Hover over a node to inspect its statistics.
-            </p>
+            <p class="italic">Tip: Hover over a node to view the data.</p>
           </div>
         {:else if $location === "/sunburst"}
           <h3 class="modal-tutorial-title">
@@ -195,12 +193,15 @@
           <div class="modal-tutorial-body">
             <p>
               Here we can compare the different themes present in the mental
-              models across different populations. You can compare differences
+              models across different populations. You can see differences
               across team members and interviewees, different years of
               engagement in the delta, residents and non residents, and
               different ages.
             </p>
-            <p>Tip: click elements of the mental model for more information.</p>
+            <p>
+              Tip: click different segments of the wheels to see more on what
+              this concept was in participants' mental model.
+            </p>
           </div>
         {/if}
       </div>

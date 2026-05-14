@@ -59,13 +59,18 @@
 />
 
 <div class="home-container">
-  <header class="welcome-header">
+  <header class="welcome-header gap-8">
     <h1 class="welcome-title">Welcome to the Co-Learning Dashboard</h1>
-    <!-- <p class="welcome-subtitle">
-      This site offers interactive opportunities to explore how the Just
+    <p class="welcome-subtitle">
+      <!-- This site offers interactive opportunities to explore how the Just
       transitions in the Delta research project has prioritized and responded to
-      public engagement through a participatory scenario planning process.
-    </p> -->
+      public engagement through a participatory scenario planning process. -->
+      “What is co-learning”? Co-learning is a collaborative process in which researchers,
+      community members, and other partners learn from one another by sharing knowledge,
+      experiences, and perspectives to jointly understand issues and develop solutions.
+      It recognizes that expertise exists both inside and outside academia and values
+      mutual learning throughout the research process
+    </p>
   </header>
 
   <div class="timeline-container">
@@ -83,9 +88,10 @@
             Our process began by interviewing Delta residents, community
             organizers, Indigenous community members, farmers, scientists,
             experts and agency officials. Key questions we asked interviewees
-            were what they most value about the Delta, what factors are driving
-            change, what adaptation strategies are most useful to explore, and
-            who is and isn’t represented in Delta planning efforts.
+            included what they most value about the Delta, what factors they
+            believe drive change, what salinity adaptation strategies they are
+            most interested in seeing explored, and who is and isn’t represented
+            in Delta planning efforts.
           </p>
           <p class="card-hint">
             Click to explore the results and connections across the interview
@@ -110,10 +116,9 @@
             FROM IDEAS and VALUES <br /> TO SCENARIOS
           </h4>
           <p class="card-body">
-            With a rich understanding of participant values, the drivers of
-            change, and the management and adaptation strategies prioritized
-            across a range of interviewees, we used this information as the
-            foundation for the design of six distinct scenarios.
+            With a better understanding of interviewee's perceived drivers of
+            change, management and adaptation strategies to explore, and values
+            and priorities, we designed six distinct scenarios.
           </p>
           <p class="card-hint">
             Click to explore how interviews shaped the design of each scenario
@@ -129,15 +134,14 @@
           <h3 class="card-title">CONCEPTUALIZING</h3>
           <h4 class="card-subtitle">SHARED UNDERSTANDINGS OF DELTA SALINITY</h4>
           <p class="card-body">
-            Throughout the project we have been documenting how project
-            participants conceptualize and understand salinity and salinity
-            management in the Delta. We collected these “mental models” through
-            interviews and our public workshops and exhibitions.
+            Leveraging these interviews and data collected through our public
+            workshops, we have been documenting how project participants
+            conceptualize and understand salinity and salinity management in the
+            Delta, as well as how those understandings change over time. These
+            are visualized as “mental models” which are representations of how
+            people understand a system, concept, or process works.
           </p>
-          <p class="card-hint">
-            Click to explore shared understandings of drivers and impacts of
-            Delta Salinity
-          </p>
+          <p class="card-hint">Click to see these mental models</p>
         </button>
       </div>
       <div class="timeline-dot">
@@ -155,11 +159,10 @@
           <h3 class="card-title">Comparing</h3>
           <h4 class="card-subtitle">DIFFERENT MENTAL MODELS</h4>
           <p class="card-body">
-            We then took the interview and public mental models a step further
-            by comparing them across a range of demographic and other category
-            types. We observed similarities and differences between a variety of
-            groups, including comparisons across age, experience, Delta resident
-            or non-resident, and research team members compared to participants.
+            We then compare how the mental models are similar and different
+            across different groups of people, including across age, years of
+            engagement in the Delta, Delta resident or non-resident, and
+            research team members compared to research participants.
           </p>
           <p class="card-hint">
             Click to explore how mental models differ across participants
@@ -277,7 +280,7 @@
     font-size: 1rem;
     line-height: 1.5;
     /* color: var(--text-secondary); */
-    max-width: 900px;
+    max-width: 700px;
     margin: 0;
     text-align: center;
   }
