@@ -5,7 +5,7 @@
   import CodeTooltip from "./CodeTooltip.svelte";
   import { server_address } from "./constants";
   import { push } from "svelte-spa-router";
-  import { nodeTypeColor } from "./constants";
+  import { nodeTypeColor, nodeTypeTextColor } from "./constants";
 
   // function goBack() {
   //   push("/");
@@ -108,6 +108,7 @@
   let selected_code: string | undefined = $state(undefined);
   let tooltip_y: number | undefined = $state(undefined);
   let sidebar_el = $state<HTMLDivElement | undefined>(undefined);
+  let tooltip_anchor_el = $state<HTMLDivElement | undefined>(undefined);
   let tooltip_el = $state<HTMLDivElement | undefined>(undefined);
   let tooltip_height = $state(0);
 
@@ -128,12 +129,16 @@
   // tooltip's VERTICAL CENTER — so clamp by half the tooltip height on each
   // end to keep the whole box inside the sidebar.
   let tooltip_top = $derived.by(() => {
-    if (tooltip_y === undefined || !sidebar_el) return 0;
-    const rect = sidebar_el.getBoundingClientRect();
+    if (tooltip_y === undefined || !tooltip_anchor_el) return 0;
+    const rect = tooltip_anchor_el.getBoundingClientRect();
+    const sidebarRect = sidebar_el?.getBoundingClientRect();
     const halfH = tooltip_height / 2;
     const raw = tooltip_y - rect.top;
+    const availableHeight = sidebarRect
+      ? sidebarRect.bottom - rect.top
+      : rect.height;
     const minTop = halfH;
-    const maxTop = Math.max(minTop, rect.height - halfH);
+    const maxTop = Math.max(minTop, availableHeight - halfH);
     return Math.max(minTop, Math.min(maxTop, raw));
   });
 
@@ -143,7 +148,7 @@
   });
 </script>
 
-<div class="page-container flex-1 flex flex-col relative">
+<div class="page-container flex grow relative">
   <div class="flex">
     <!-- <button
       on:click={goBack}
@@ -167,23 +172,19 @@
   </div>
 
   <div class="flex flex-col lg:flex-row grow gap-6 relative min-h-0">
-    <div class="flex flex-col w-full lg:w-[70%] min-h-0 gap-1">
-      <div class="jt-section-title text-center text-[1.5rem] text-white">
-        Collective mental model of <br />
-        salinity
-        <span
-          class="px-2"
-          style={`background-color: ${nodeTypeColor["impacts salinity"]}; color: black`}
-        >
-          Drivers
-        </span>
-        and
-        <span
-          class="px-2"
-          style={`background-color: ${nodeTypeColor["impacted by salinity"]}; color: white`}
-        >
-          Impacts
-        </span>
+    <div class="relative flex flex-col w-full lg:w-[70%] min-h-0 gap-1">
+      <h3 class="uppercase">Collective Mental Model</h3>
+      <div
+        class="axis-label absolute top-[2.5rem] left-2 z-10 px-3 py-1 rounded text-[1rem] font-semibold pointer-events-none"
+        style={`background-color: ${nodeTypeColor["impacts salinity"]}; color: ${nodeTypeTextColor["impacts salinity"]}`}
+      >
+        Drivers
+      </div>
+      <div
+        class="axis-label absolute bottom-2 left-2 z-10 px-3 py-1 rounded text-[1rem] font-semibold pointer-events-none"
+        style={`background-color: ${nodeTypeColor["impacted by salinity"]}; color: ${nodeTypeTextColor["impacted by salinity"]}`}
+      >
+        Impacts
       </div>
       <AllMMs
         server_data={merged_server_data}
@@ -196,29 +197,32 @@
     </div>
     <div
       bind:this={sidebar_el}
-      class="mm-sidebar relative w-full lg:w-[30%] rounded p-4 text-white overflow-hidden min-h-0"
+      class="mm-sidebar relative w-full lg:w-[30%] rounded pb-4 text-white overflow-hidden min-h-0"
     >
-      {#if merged_server_data && selected_code}
-        {#key selected_code}
+      <h3 class="uppercase">Descriptions</h3>
+      <div class="relative mt-1" bind:this={tooltip_anchor_el}>
+        {#if merged_server_data && selected_code}
+          {#key selected_code}
+            <div
+              bind:this={tooltip_el}
+              class="absolute top-2 left-2 right-2 -translate-y-1/2 transition-all duration-200"
+              style={`top: ${tooltip_top}px`}
+            >
+              <CodeTooltip
+                {codebook}
+                all_code_participants={merged_server_data}
+                {selected_code}
+              ></CodeTooltip>
+            </div>
+          {/key}
+        {:else}
           <div
-            bind:this={tooltip_el}
-            class="absolute left-4 right-4 -translate-y-1/2 transition-all duration-200"
-            style={`top: ${tooltip_top}px`}
+            class="flex h-full items-center justify-center p-4 text-center italic opacity-70"
           >
-            <CodeTooltip
-              {codebook}
-              all_code_participants={merged_server_data}
-              {selected_code}
-            ></CodeTooltip>
+            Hover over a bubble on the left to see details about that code.
           </div>
-        {/key}
-      {:else}
-        <div
-          class="flex h-full items-center justify-center p-4 text-center italic opacity-70"
-        >
-          Hover over a bubble on the left to see details about that code.
-        </div>
-      {/if}
+        {/if}
+      </div>
     </div>
   </div>
 </div>
@@ -226,7 +230,7 @@
 <style lang="postcss">
   @reference "tailwindcss";
   .page-container {
-    padding: 0rem 2rem;
+    padding: 0rem 2rem 2rem;
     text-align: center;
   }
 

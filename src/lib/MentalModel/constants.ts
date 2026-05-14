@@ -10,7 +10,17 @@ export const nodeTypeColor: Record<string, string> = {
   "impacts salinity": "var(--cat-1)",
   "impacted by salinity": "var(--cat-6)",
 };
+// Contrasting text color paired with each node-type background. Kept here so
+// labels/tooltips/legend chips stay in sync with the renderer's fills.
+export const nodeTypeTextColor: Record<string, string> = {
+  "impacts salinity": "black",
+  "impacted by salinity": "white",
+};
 const defaultNodeColor = "var(--cat-3)";
+const defaultNodeTextColor = "white";
 export function colorForNode(nodeType: string | undefined): string {
   return (nodeType && nodeTypeColor[nodeType]) || defaultNodeColor;
+}
+export function textColorForNode(nodeType: string | undefined): string {
+  return (nodeType && nodeTypeTextColor[nodeType]) || defaultNodeTextColor;
 }

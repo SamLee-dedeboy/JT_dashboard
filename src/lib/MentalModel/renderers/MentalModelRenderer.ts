@@ -160,7 +160,7 @@ export class MentalModelRenderer {
             .attr("y", (d) => d.y)
             .attr("text-anchor", "middle")
             .attr("dominant-baseline", "middle")
-            .attr("font-family", "'Hammersmith One', sans-serif")
+            .attr("font-family", "Proxima Nova")
             .attr("font-size", (d) => {
               const r = d[0] === "Salinity" ? 55 : radiusScale(d[1]);
               return Math.max(8, Math.min(20, r * 0.25)) + "px";
@@ -181,7 +181,7 @@ export class MentalModelRenderer {
                 .attr("dominant-baseline", "middle")
                 .attr("x", d.x)
                 .attr("y", d.y)
-                .attr("dy", `-${((line_num+1)/2) * 1.2}em`)
+                .attr("dy", `${((line_num+1)/2) * 1.2}em`)
             })
             // .each(function(d) {
             //   const text = d3.select(this);

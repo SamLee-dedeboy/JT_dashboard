@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { colorForNode } from "./constants";
+  import { colorForNode, textColorForNode } from "./constants";
   type tCodeTooltipProps = {
     codebook: {
       parent: string;
@@ -20,9 +20,11 @@
   }: tCodeTooltipProps = $props();
   // Categorical color for the hovered node's type, used to tint the tooltip's
   // border so it stays visually linked to the node on the canvas.
-  let node_color = $derived(
-    colorForNode(codebook.find((code) => code.name === selected_code)?.type),
+  let node_type = $derived(
+    codebook.find((code) => code.name === selected_code)?.type,
   );
+  let node_color = $derived(colorForNode(node_type));
+  let node_text_color = $derived(textColorForNode(node_type));
   let child_dict = $derived(
     codebook.reduce((acc, code) => {
       const parent_code = code.parent === "N/A" ? code.name : code.parent;
@@ -68,9 +70,11 @@
 
 <div class="">
   {#if tooltip_data}
-    <div class="tooltip-content text-lg px-3 py-1 jt-body-2 rounded text-white">
-      <div class="text-left mt-2">
-        <!-- is defined as: -->
+    <div
+      class="tooltip-content jt-body-2 rounded text-white"
+      style="background-color: var(--surface-interactive);"
+    >
+      <!-- <div class="text-left mt-2">
         <p
           class="mt-0 text-[1.2rem] border-r-[4px] bg-[#323b3e] p-3 py-1 rounded"
           style={`border-color: ${node_color};`}
@@ -81,45 +85,57 @@
           {codebook.find((code) => code.name === selected_code)?.definition ||
             "No definition available"}
         </p>
-      </div>
-      <p class="text-left mt-2">
-        <span class="font-semibold underline">
-          {total_participants}
-        </span>
-        participants mentioned this.
-      </p>
-      {#if tooltip_data.length > 1}
-        <p class="text-left">
-          Among these {total_participants} participants,
+      </div> -->
+      <h4
+        class="inline-block px-2 py-1 rounded w-full"
+        style={`background-color: ${node_color}; color: ${node_text_color};`}
+      >
+        {selected_code}
+      </h4>
+      <div class="px-6 pb-4">
+        <p class="text-left mt-3">
+          {codebook.find((code) => code.name === selected_code)?.definition ||
+            "No definition available"}
         </p>
-        <ul class="text-left">
-          <li class="ml-2">
-            -
-            <span class="underline">
-              {(Object.values(tooltip_data[0]) as any)[0].length}
-            </span>
-            participants mentioned
-            <span class="underline italic">
-              {Object.keys(tooltip_data[0])[0]}
-              (general)
-            </span>
-          </li>
-          {#each tooltip_data
-            .slice(1)
-            .sort((a, b) => (Object.values(b) as any)[0].length - (Object.values(a) as any)[0].length) as item, index}
+        <p class="text-left mt-2">
+          <span class="font-semibold underline">
+            {total_participants}
+          </span>
+          participants mentioned this.
+        </p>
+        {#if tooltip_data.length > 1}
+          <p class="text-left">
+            Among these {total_participants} participants,
+          </p>
+          <ul class="text-left">
             <li class="ml-2">
               -
               <span class="underline">
-                {(Object.values(item) as any)[0].length}
+                {(Object.values(tooltip_data[0]) as any)[0].length}
               </span>
               participants mentioned
               <span class="underline italic">
-                {Object.keys(item)[0]}
+                {Object.keys(tooltip_data[0])[0]}
+                (general)
               </span>
             </li>
-          {/each}
-        </ul>
-      {/if}
+            {#each tooltip_data
+              .slice(1)
+              .sort((a, b) => (Object.values(b) as any)[0].length - (Object.values(a) as any)[0].length) as item, index}
+              <li class="ml-2">
+                -
+                <span class="underline">
+                  {(Object.values(item) as any)[0].length}
+                </span>
+                participants mentioned
+                <span class="underline italic">
+                  {Object.keys(item)[0]}
+                </span>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
       {#if handleClose}
         <button
           class="mt-1 px-1 py-0.5 rounded text-white hover:bg-[#7ed957] hover:text-[#253439] hover:outline-[#253439] outline outline-2 outline-slate-200 transition-colors duration-200"
