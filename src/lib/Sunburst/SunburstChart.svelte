@@ -116,6 +116,19 @@
   }
 
   async function fetchCodeDefinition(codeName: string) {
+    console.log(`Fetching definition for code: ${codeName}`);
+    if (codeName === "Eco Impacts (general)") {
+      const def =
+        "Effects that an action, event, or change has on ecosystems and the living organisms within them.";
+      modalCodeData = {
+        name: codeName,
+        definition: def,
+      };
+      showModal = true;
+      isLoadingCode = false;
+      return;
+    }
+
     isLoadingCode = true;
     try {
       const response = await fetch(`${server_address}/code/`, {
